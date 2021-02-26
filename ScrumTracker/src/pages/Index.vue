@@ -1,12 +1,6 @@
 <template>
   <q-page class="flex flex-center column">
     <div class="row q-ma-md">
-      <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-full.svg"
-      >
-    </div>
-    <div class="row q-ma-md">
       <q-btn label="testApi" @click="showApi"/>
     </div>
     <div class="row q-ma-md">
