@@ -1,28 +1,32 @@
 <template>
-  <q-page class="flex flex-center column">
-    <q-input v-model="username" label="Username" />
-    <q-input v-model="password" label="Password" />
-    <div class="row q-ma-md">
-      <q-btn label="ADD USER" @click="sendApi"/>
+  <q-page class="q-ma-md column flex flex-center" width="100%">
+    <div class="q-ma-md row">
+      <q-input class="row" v-model="newUser.username" label="Username" />
+    </div>
+    <div class="row">
+      <q-input class="row" v-model="newUser.password" label="Password" />
     </div>
     <div class="row q-ma-md">
-      <p v-if="show==true">{{ msg }}</p>
+      <q-btn color="primary" size="md" label="ADD USER" @click="sendApi"/>
     </div>
-    <div class="row q-ma-md">
-      <ul id="example-1">
-        <li v-for="item in msg_2" :key="item._id">
-          {{ item.username }}
-          {{ item.password }}
-          <q-btn size="xs" label="DELETE USER" @click="deleteApi(item._id)"/>
-        </li>
-      </ul>
+    <div class="row">
+      <q-btn class="row" color="primary" size="md" @click="showUsersFunction" label="GET ALL USERS" />
     </div>
+    <q-list class="q-pa-md row flex flex-center" v-if="showUsers==true" style="align-items: center;" width="70%">
+      <q-item v-for="user in users" :key="user.username" class="col-8">
+        <q-item-section>
+          {{ user.username }} {{ user.password }}
+        </q-item-section>
+        <q-item-section>
+          <q-btn style="width: 20vh" color="primary" size="sm" label="DELETE USER" @click="deleteApi(user._id)" />
+        </q-item-section>
+      </q-item>
+    </q-list>
   </q-page>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import axios from 'axios'
 
 export default {
   name: 'PageIndex',
@@ -30,69 +34,39 @@ export default {
     return {
       show: false,
       apiResult: '',
-      username: '',
-      password: '',
+      newUser: {
+        username: '',
+        password: ''
+      },
+      showUsers: false,
+      users: [],
       msg: '',
       msg_2: ''
     }
   },
-  beforeMount () {
-    this.getApi()
+  mounted () {
+    this.fetchUsers()
   },
   methods: {
     ...mapGetters('user', [
-      'getApi'
+      'getUsers'
     ]),
     ...mapActions('user', [
-      'fetchApi'
+      'fetchUsers',
+      'postUser',
+      'deleteUser'
     ]),
-    sendApi () {
-      const path = 'http://localhost:5000/users/add'
-      const sendData = { username: this.username, password: this.password }
-      console.log(sendData)
-      axios.post(path, sendData)
-        .then((res) => {
-          this.msg = res.data
-          console.log(this.msg)
-          this.msg_2[this.msg._id] = this.msg
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-        })
-      this.show = true
-      this.username = ''
-      this.password = ''
+    showUsersFunction () {
+      this.users = this.getUsers()
+      this.showUsers = true
     },
-    getApi () {
-      const path = 'http://localhost:5000/users/get'
-      axios.get(path)
-        .then((res) => {
-          this.msg_2 = res.data
-          console.log(this.msg_2)
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-        })
+    sendApi () {
+      this.postUser(this.newUser)
+      this.newUser.username = ''
+      this.newUser.password = ''
     },
     deleteApi (id) {
-      const path = 'http://localhost:5000/users/delete'
-      console.log(id)
-      axios.delete(path, { data: { _id: id } })
-        .then(response => {
-          console.log(response)
-          for (const key of Object.entries(this.msg_2)) {
-            if (key[0] === id) {
-              const data = {
-                ...this.msg_2
-              }
-              delete data[id]
-              this.msg_2 = data
-              break
-            }
-          }
-        })
+      this.deleteUser(id)
     }
   }
 }

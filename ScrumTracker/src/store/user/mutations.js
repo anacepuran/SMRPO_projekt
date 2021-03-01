@@ -1,3 +1,3 @@
-export function SET_RESULT (state, result) {
-  state.apiResult = result
+export function SET_USERS (state, fetchedUsers) {
+  state.users = fetchedUsers
 }

@@ -1,22 +1,29 @@
-from flask import Flask, render_template, request, url_for, redirect, jsonify
+from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['MONGO_URI'] = 'mongodb+srv://admin:smrpoadmin@clustertest.ef9bm.mongodb.net/testdb?retryWrites=true&w=majority'
+app.config[
+    'MONGO_URI'] = 'mongodb+srv://admin:smrpoadmin@clustertest.ef9bm.mongodb.net/testdb?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE'
 mongo = PyMongo(app)
 
+
+@app.route('/')
+def test_api():
+    return "api works"
+
+
 @app.route('/users/add', methods=['POST'])
-def addUser():
+def add_user():
     username = request.json['username']
     password = request.json['password']
 
     if username and password:
         id = mongo.db.users.insert(
-            {'username': username, 
-            "password": password}
+            {'username': username,
+             'password': password}
         )
         response = {
             '_id': str(id),
@@ -30,14 +37,12 @@ def addUser():
 
 
 @app.route('/users/get', methods=['GET'])
-def getUser():
+def get_user():
     obj = {}
     data = mongo.db.users.find()
 
     for o in data:
         key = str(o["_id"])
-        #to safely modify the data/prevent modifying the o while looping
-        #because ObjectId can not be JSONified
         a = o.copy()
         a["_id"] = key
         obj[key] = a
@@ -46,17 +51,16 @@ def getUser():
 
 
 @app.route('/users/delete', methods=['DELETE'])
-def deleteUser():
+def delete_user():
     print(request.json['_id'])
     _id = request.json['_id']
     mongo.db.users.delete_one({'_id': ObjectId(_id)})
     return "deleted"
-    #return render_template('index.html')
 
 
 if __name__ == '__main__':
     app.run()
-    
+
 '''
 @app.route('/add', methods=['POST'])
 def add_todo():

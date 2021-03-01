@@ -1,3 +1,3 @@
-export function getApi (state) {
-  return state.apiResult
+export function getUsers (state) {
+  return state.users
 }
