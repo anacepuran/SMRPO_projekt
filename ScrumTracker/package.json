@@ -2,7 +2,7 @@
   "name": "scrumtracker",
   "version": "0.0.1",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "ScrumTracker",
   "author": "ana neza bojan jakob",
   "private": true,
   "scripts": {

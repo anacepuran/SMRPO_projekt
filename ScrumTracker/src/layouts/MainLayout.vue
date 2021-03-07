@@ -10,12 +10,41 @@
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
-
-        <q-toolbar-title>
+        <q-toolbar-title class="title">
           ScrumTracker
         </q-toolbar-title>
-
-        <div>v1.0</div>
+        <!--<q-btn round class="q-ma-md" icon="person" color="secondary" @click="dropdownProfile" />-->
+        <q-btn-dropdown
+          rounded
+          class="q-ma-md"
+          color="white"
+          no-icon-animation
+          dropdown-icon="person"
+          size="md"
+          text-color="primary"
+        >
+          <div class="row no-wrap q-pa-md">
+            <div class="column items-center">
+              <q-avatar size="64px" icon="person" color="primary" text-color="white"/>
+              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ currentUser }}</div>
+              <hr style="color:primary; width: 100%" />
+              <q-btn
+                flat
+                color="primary"
+                label="Edit profile"
+                @click="$router.push('/profile')"
+                v-close-popup
+              />
+              <q-btn
+                flat
+                color="negative"
+                label="Logout"
+                @click="Logout"
+                v-close-popup
+              />
+            </div>
+          </div>
+        </q-btn-dropdown>
       </q-toolbar>
     </q-header>
 
@@ -48,7 +77,7 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
-
+import { mapGetters, mapActions } from 'vuex'
 const linksData = [
   {
     title: 'Docs',
@@ -102,6 +131,25 @@ export default {
       leftDrawerOpen: false,
       essentialLinks: linksData
     }
+  },
+  computed: {
+    currentUser () {
+      var currentUser = this.getCurrentUser()
+      console.log(currentUser)
+      return currentUser
+    }
+  },
+  methods: {
+    ...mapGetters('user', [
+      'getCurrentUser'
+    ]),
+    ...mapActions('user', ['Logout'])
   }
 }
 </script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Recursive&display=swap');
+  .title {
+      font-family: 'Recursive', sans-serif;
+  }
+</style>
