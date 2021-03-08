@@ -1,9 +1,8 @@
 <template>
   <q-item
+    v-if="permissions === '' || this.user.permissions === 'Admin'"
     clickable
-    tag="a"
-    target="_blank"
-    :href="link"
+    @click = '$router.push(link)'
   >
     <q-item-section
       v-if="icon"
@@ -11,39 +10,46 @@
     >
       <q-icon :name="icon" />
     </q-item-section>
-
     <q-item-section>
       <q-item-label>{{ title }}</q-item-label>
-      <q-item-label caption>
-        {{ caption }}
-      </q-item-label>
     </q-item-section>
   </q-item>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
-  name: 'EssentialLink',
+  name: 'MenuLinks',
   props: {
     title: {
       type: String,
       required: true
     },
-
-    caption: {
-      type: String,
-      default: ''
-    },
-
     link: {
       type: String,
       default: '#'
     },
-
     icon: {
       type: String,
       default: ''
+    },
+    permissions: {
+      type: String,
+      required: true
     }
+  },
+  mounted () {
+    this.user = this.getCurrentUser()
+  },
+  data () {
+    return {
+      user: {}
+    }
+  },
+  methods: {
+    ...mapGetters('user', [
+      'getCurrentUser'
+    ])
   }
 }
 </script>

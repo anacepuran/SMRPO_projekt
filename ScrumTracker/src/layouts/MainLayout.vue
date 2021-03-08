@@ -13,7 +13,6 @@
         <q-toolbar-title class="title">
           ScrumTracker
         </q-toolbar-title>
-        <!--<q-btn round class="q-ma-md" icon="person" color="secondary" @click="dropdownProfile" />-->
         <q-btn-dropdown
           rounded
           class="q-ma-md"
@@ -26,7 +25,7 @@
           <div class="row no-wrap q-pa-md">
             <div class="column items-center">
               <q-avatar size="64px" icon="person" color="primary" text-color="white"/>
-              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ currentUser }}</div>
+              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ user.username }}</div>
               <hr style="color:primary; width: 100%" />
               <q-btn
                 flat
@@ -59,16 +58,15 @@
           header
           class="text-grey-8"
         >
-          Essential Links
+         MenuLinks
         </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
+        <MenuLinks
+          v-for="link in linksData"
           :key="link.title"
           v-bind="link"
         />
       </q-list>
     </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -76,66 +74,52 @@
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
+import MenuLinks from 'components/MenuLinks.vue'
 import { mapGetters, mapActions } from 'vuex'
-const linksData = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
 
 export default {
   name: 'MainLayout',
-  components: { EssentialLink },
+  components: { MenuLinks },
   data () {
     return {
+      user: {},
       leftDrawerOpen: false,
-      essentialLinks: linksData
+      linksData: [
+        {
+          title: 'Manage users',
+          icon: 'manage_accounts',
+          link: 'home/users',
+          permissions: 'Admin'
+        },
+        {
+          title: 'Github',
+          icon: 'code',
+          link: 'https://github.com/quasarframework',
+          permissions: ''
+        },
+        {
+          title: 'Discord Chat Channel',
+          icon: 'chat',
+          link: 'https://chat.quasar.dev',
+          permissions: ''
+        }
+      ]
     }
+  },
+  mounted () {
+    this.$q.localStorage.set(this.user, this.currentUser)
+    this.user = this.$q.localStorage.getItem(this.user)
+    // console.log('local')
+    // console.log(this.user)
+    this.$q.sessionStorage.set(this.user, this.currentUser)
+    this.user = this.$q.sessionStorage.getItem(this.user)
+    // console.log('session')
+    // console.log(this.user)
   },
   computed: {
     currentUser () {
       var currentUser = this.getCurrentUser()
-      console.log(currentUser)
+      // console.log(currentUser)
       return currentUser
     }
   },

@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { Notify } from 'quasar'
 
 import routes from './routes'
+// import store from './store'
 
 Vue.use(VueRouter)
 
@@ -27,6 +29,44 @@ export default function ({ store, ssrContext }) {
   })
   // initialise state
   // store.commit('init')
+
+  Router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth) {
+      if (store.state.user.currentUser) {
+        console.log(store.state.user.currentUser)
+        if (to.meta.requiresAdmin) {
+          if (
+            store.state.user.currentUser.permissions &&
+            store.state.user.currentUser.permissions === 'Admin'
+          ) {
+            next()
+          } else {
+            Notify.create({
+              message: 'Your account is not authorized to see this page.',
+              color: 'negative'
+            })
+            next('/home')
+          }
+        } else if (
+          to.path === '/'
+        ) {
+          next('/home')
+        } else if (to.path !== '/') {
+          next()
+        } else {
+          next()
+        }
+      } else {
+        if (to.path !== '/') {
+          next('/')
+        } else {
+          next()
+        }
+      }
+    } else {
+      next()
+    }
+  })
 
   return Router
 }

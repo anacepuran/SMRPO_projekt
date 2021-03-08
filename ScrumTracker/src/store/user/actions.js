@@ -8,7 +8,7 @@ export function Login ({ commit }, payload) {
     })
       .then(result => {
         console.log(result)
-        commit('SET_CURRENT_USER', result.data.user)
+        commit('SET_CURRENT_USER', result.data)
         resolve()
       })
       .catch(error => {
@@ -35,6 +35,7 @@ export function fetchUsers ({ commit }) {
     })
 }
 export function postUser ({ commit }, payload) {
+  console.log('post user')
   console.log(payload)
   this.$axios.post('users/add', {
     name: payload.name,
@@ -43,6 +44,25 @@ export function postUser ({ commit }, payload) {
     username: payload.username,
     password: payload.password,
     permissions: payload.permissions
+  })
+    .then((res) => {
+      commit('PUSH_NEW_USER', res.data)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+export function updateUser ({ commit }, payload) {
+  console.log('update user')
+  console.log(payload)
+  this.$axios.post('/users/update', {
+    name: payload.name,
+    surname: payload.surname,
+    email: payload.email,
+    username: payload.username,
+    password: payload.password,
+    permissions: payload.permissions,
+    _id: payload._id
   })
     .then((res) => {
       commit('PUSH_NEW_USER', res.data)

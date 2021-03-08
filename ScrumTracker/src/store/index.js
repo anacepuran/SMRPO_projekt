@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 
 import user from './user'
 
+import createPersistedState from 'vuex-persistedstate'
+// import * as Cookies from 'js-cookie'
+
 Vue.use(Vuex)
 
 /*
@@ -19,6 +22,9 @@ export default function (/* { ssrContext } */) {
     modules: {
       user
     },
+    plugins: [
+      createPersistedState({ storage: window.sessionStorage })
+    ],
 
     // enable strict mode (adds overhead!)
     // for dev mode only
