@@ -31,7 +31,7 @@
                 flat
                 color="primary"
                 label="Edit profile"
-                @click="$router.push('/profile')"
+                @click="$router.push('home/profile')"
                 v-close-popup
               />
               <q-btn
