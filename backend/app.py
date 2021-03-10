@@ -3,8 +3,7 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from flask_bcrypt import generate_password_hash, check_password_hash
-from datetime import datetime
+from auxiliary_functions import *
 
 
 app = Flask(__name__)
@@ -14,36 +13,12 @@ mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 
 
-def hash_password(password):
-    password = generate_password_hash(password).decode('utf8')
-    return password
-
-
-def check_password(password, password_hash):
-    return check_password_hash(password, password_hash)
-
-
-def date_time():
-    # datetime object containing current date and time
-    now = datetime.now()
-
-    print("now =", now)
-
-    # dd/mm/YY H:M:S
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    print("date and time =", dt_string)
-
-    return dt_string
-
-
 @app.route('/')
 def test_api():
     return "api works"
 
 
 """ USER LOGIN """
-
-
 @app.route('/users/authenticate', methods=['POST'])
 def user_authenticate():
     username = request.json['username']
@@ -77,8 +52,6 @@ def user_authenticate():
 
 
 """ USERS """
-
-
 @app.route('/users/add', methods=['POST'])
 def add_user():
     name = request.json['name']
@@ -171,35 +144,80 @@ def delete_user():
 
 
 """ PROJECTS """
+@app.route('/projects/get', methods=['GET'])
+def get_projects():
+    projects = {}
+    data = mongo.db.projects.find()
+
+    for d in data:
+        key = str(d["_id"])
+        a = d.copy()
+        a["_id"] = key
+        projects[key] = a
+    print(projects)
+    return projects
+
+
+@app.route('/projects/add', methods=['POST'])
+def add_projects():
+    name = request.json['name']
+    users = request.json['users']
+
+    if name and users:
+        project_id = mongo.db.projects.insert(
+            {'name': name,
+             'users': users
+            })
+        response = {
+            '_id': str(project_id),
+            'name': name,
+            'users': users,
+        }
+        print(response)
+        return response
+    else:
+        return jsonify('Error')
+
+
+@app.route('/projects/delete', methods=['DELETE'])
+def delete_project():
+    project_id = request.json['_id']
+    mongo.db.projects.delete_one({'_id': ObjectId(project_id)})
+    return "Deleted " + project_id
+
+
 
 """ CARDS """
+@app.route('/cards/get', methods=['GET'])
+def get_cards():
+    cards = {}
+    data = mongo.db.cards.find()
+
+    for d in data:
+        key = str(d["_id"])
+        a = d.copy()
+        a["_id"] = key
+        cards[key] = a
+    print(cards)
+    return cards
+
+
 
 """ SCRUMS """
+@app.route('/scrums/get', methods=['GET'])
+def get_scrums():
+    scrums = {}
+    data = mongo.db.scrums.find()
+
+    for d in data:
+        key = str(d["_id"])
+        a = d.copy()
+        a["_id"] = key
+        scrums[key] = a
+    print(scrums)
+    return scrums
+
+
 
 if __name__ == '__main__':
     app.run()
-
-'''
-@app.route('/add', methods=['POST'])
-def add_todo():
-    new_todo = request.form.get('new-todo')
-    todos.insert_one({'text' : new_todo, 'complete' : False})
-    return redirect(url_for('index'))
-
-@app.route('/complete/<oid>')
-def complete(oid):
-    todo_item = todos.find_one({'_id': ObjectId(oid)})
-    todo_item['complete'] = True
-    todos.save(todo_item)
-    return redirect(url_for('index'))
-
-@app.route('/delete_completed')
-def delete_completed():
-    todos.delete_many({'complete' : True})
-    return redirect(url_for('index'))
-
-@app.route('/delete_all')
-def delete_all():
-    todos.delete_many({})
-    return redirect(url_for('index'))
-'''
