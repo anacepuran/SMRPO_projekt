@@ -54,61 +54,8 @@
           <q-space />
           <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
         </q-card-section>
-        <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-          class="q-gutter-md"
-        >
-          <q-input
-            filled
-            v-model="newUser.name"
-            label="Name"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="newUser.surname"
-            label="Surname"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="newUser.email"
-            label="Email"
-            type="email"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="newUser.username"
-            label="Username"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            v-if="changePassword"
-            filled
-            v-model="newUser.password"
-            label="Password"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-btn class="q-ma-md" size="sm" v-if="!changePassword" @click="changePassword=true" label="Change password"/>
-          <q-btn size="sm" v-if="changePassword && editUser" @click="changePassword=false" label="Leave the old password" style="margin-top: -10px"/>
-          <div>
-            <q-select filled v-model="newUser.permissions" :options="permissionOptions" label="Permissions" width="100%"/>
-          </div>
-          <q-card-actions horizontal align="right">
-            <q-btn label="Submit" type="submit" color="primary"/>
-            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          </q-card-actions>
-          <div class="q-ma-md text-center">
-            <p style="color: red;" v-if="error != ''">{{error}}</p>
-          </div>
-        </q-form>
+        <!-- USER FORM COMPONENT -->
+        <UserForm :newUser="newUser" :editUser="editUser" @submitUser="showUsers"></UserForm>
       </q-card>
     </q-dialog>
   </q-page>
@@ -116,10 +63,15 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import UserForm from 'components/UserForm.vue'
 export default {
   name: 'Users',
+  components: { UserForm },
   data () {
     return {
+      pagination: {
+        rowsPerPage: 0
+      },
       newUser: {
         name: '',
         surname: '',
@@ -132,19 +84,10 @@ export default {
       dialogTitle: '',
       loading: false,
       allUsers: [],
-      numOfUsers: 0,
-      pagination: {
-        rowsPerPage: 0
-      },
-      permissionOptions: ['Admin', 'User'],
       addUser: false,
-      error: '',
       deleteUserId: '',
-      editUserId: '',
       confirmDelete: false,
       editUser: false,
-      changePassword: true,
-      oldUsername: '',
       columns: [
         { name: 'username', required: true, label: 'Username', align: 'center', field: row => row.username, sortable: true },
         { name: 'name', align: 'center', label: 'Name', field: 'name' },
@@ -167,18 +110,8 @@ export default {
     ]),
     ...mapActions('user', [
       'fetchUsers',
-      'postUser',
-      'deleteUser',
-      'updateUser'
+      'deleteUser'
     ]),
-    sendApi () {
-      this.postUser(this.newUser)
-      this.onReset()
-    },
-    postApi () {
-      this.updateUser(this.newUser)
-      this.onReset()
-    },
     deleteFunction (id) {
       this.deleteUser(id)
       this.loading = true
@@ -188,14 +121,13 @@ export default {
         textColor: 'white',
         icon: 'delete',
         message: 'User deleted.',
-        position: 'top-right'
+        position: 'top-right',
+        timeout: 1000
       })
     },
     editFunction (user) {
       this.dialogTitle = 'Edit user'
       this.editUser = true
-      this.changePassword = false
-      console.log(user)
       this.newUser.name = user.name
       this.newUser.surname = user.surname
       this.newUser.email = user.email
@@ -207,11 +139,13 @@ export default {
       this.addUser = true
     },
     showUsers () {
+      this.addUser = false
+      this.loading = true
       setTimeout(() => {
         var users = this.getUsers()
         this.allUsers = this.usersToArray(users)
         this.loading = false
-      }, 1000)
+      }, 1500)
     },
     usersToArray (users) {
       var data = []
@@ -220,45 +154,6 @@ export default {
       }
       return data
     },
-    onSubmit () {
-      // CHECK IF USER WITH USERNAME ALREADY EXISTS
-      if (this.oldUsername !== this.newUser.username) {
-        var alreadyExists = false
-        for (var user in this.allUsers) {
-          if (this.newUser.username === this.allUsers[user].username) {
-            alreadyExists = true
-            this.error = 'User with the username "' + this.newUser.username + '" already exists.'
-          }
-        }
-      }
-      var submitMessage = ''
-      if (!alreadyExists) {
-        if (this.editUser) {
-          submitMessage = 'User updated.'
-          this.postApi()
-          console.log('post user')
-          console.log(this.newUser)
-        } else {
-          submitMessage = 'User added.'
-          this.sendApi()
-        }
-        this.$q.notify({
-          color: 'green',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: submitMessage,
-          position: 'top-right'
-        })
-        this.error = ''
-        this.addUser = false
-        this.editUser = false
-        this.loading = true
-        this.changePassword = true
-        this.oldUsername = ''
-        // this.onReset()
-        this.showUsers()
-      }
-    },
     onReset () {
       this.newUser.name = ''
       this.newUser.surname = ''
@@ -266,7 +161,8 @@ export default {
       this.newUser.username = ''
       this.newUser.password = ''
       this.newUser.permissions = null
-      this.error = ''
+      this.newUser._id = ''
+      this.editUser = false
     }
   }
 }

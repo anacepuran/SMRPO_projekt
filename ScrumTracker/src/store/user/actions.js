@@ -34,6 +34,7 @@ export function fetchUsers ({ commit }) {
       console.error(error)
     })
 }
+
 export function postUser ({ commit }, payload) {
   console.log('post user')
   console.log(payload)
@@ -52,9 +53,8 @@ export function postUser ({ commit }, payload) {
       console.error(error)
     })
 }
+
 export function updateUser ({ commit }, payload) {
-  console.log('update user')
-  console.log(payload)
   this.$axios.post('/users/update', {
     name: payload.name,
     surname: payload.surname,
@@ -62,6 +62,7 @@ export function updateUser ({ commit }, payload) {
     username: payload.username,
     password: payload.password,
     permissions: payload.permissions,
+    last_login: payload.last_login,
     _id: payload._id
   })
     .then((res) => {
@@ -71,6 +72,7 @@ export function updateUser ({ commit }, payload) {
       console.error(error)
     })
 }
+
 export function deleteUser ({ commit }, id) {
   commit('DELETE_USER', id)
   this.$axios.delete('users/delete', { data: { _id: id } })
@@ -80,4 +82,9 @@ export function deleteUser ({ commit }, id) {
     .catch((error) => {
       console.error(error)
     })
+}
+
+export function updateCurrentUser ({ commit }, user) {
+  console.log('update current user')
+  commit('SET_CURRENT_USER', user)
 }

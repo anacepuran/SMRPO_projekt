@@ -33,7 +33,6 @@ export default function ({ store, ssrContext }) {
   Router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth) {
       if (store.state.user.currentUser) {
-        console.log(store.state.user.currentUser)
         if (to.meta.requiresAdmin) {
           if (
             store.state.user.currentUser.permissions &&

@@ -26,8 +26,7 @@ export default {
       required: true
     },
     link: {
-      type: String,
-      default: '#'
+      type: String
     },
     icon: {
       type: String,

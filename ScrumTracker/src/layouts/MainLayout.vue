@@ -25,13 +25,13 @@
           <div class="row no-wrap q-pa-md">
             <div class="column items-center">
               <q-avatar size="64px" icon="person" color="primary" text-color="white"/>
-              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ user.username }}</div>
+              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ currentUser.username }}</div>
               <hr style="color:primary; width: 100%" />
               <q-btn
                 flat
                 color="primary"
                 label="Edit profile"
-                @click="$router.push('home/profile')"
+                @click="$router.replace('/profile')"
                 v-close-popup
               />
               <q-btn
@@ -88,7 +88,7 @@ export default {
         {
           title: 'Manage users',
           icon: 'manage_accounts',
-          link: 'home/users',
+          link: '/users',
           permissions: 'Admin'
         },
         {
@@ -109,18 +109,12 @@ export default {
   mounted () {
     this.$q.localStorage.set(this.user, this.currentUser)
     this.user = this.$q.localStorage.getItem(this.user)
-    // console.log('local')
-    // console.log(this.user)
     this.$q.sessionStorage.set(this.user, this.currentUser)
     this.user = this.$q.sessionStorage.getItem(this.user)
-    // console.log('session')
-    // console.log(this.user)
   },
   computed: {
     currentUser () {
-      var currentUser = this.getCurrentUser()
-      // console.log(currentUser)
-      return currentUser
+      return this.getCurrentUser()
     }
   },
   methods: {

@@ -61,7 +61,8 @@ def user_authenticate():
                     'email': user['email'],
                     'username': user['username'],
                     'permissions': user['permissions'],
-                    'last_login': date_time()
+                    'last_login': date_time(),
+                    '_id': str(user['_id'])
                 }
                 return response, 200
             else:
@@ -133,6 +134,7 @@ def update_user():
     username = request.json['username']
     password = request.json['password']
     permissions = request.json['permissions']
+    last_login = request.json['last_login']
     user_id = request.json['_id']
     print(user_id)
     user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
@@ -141,7 +143,9 @@ def update_user():
     user['surname'] = surname
     user['email'] = email
     user['username'] = username
-    user['permissions'] = permissions
+    user['last_login'] = last_login
+    if permissions != '':
+        user['permissions'] = permissions
     if password != '':
         print('change password')
         user['password'] = hash_password(password)
@@ -152,7 +156,8 @@ def update_user():
         'surname': surname,
         'email': email,
         'username': username,
-        'permissions': permissions
+        'permissions': permissions,
+        'last_login': last_login
     }
     return response, 200
 

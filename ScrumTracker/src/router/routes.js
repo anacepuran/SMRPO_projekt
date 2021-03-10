@@ -9,12 +9,12 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: false }
       },
       {
-        path: 'profile',
+        path: '/profile',
         component: () => import('pages/Profile.vue'),
         meta: { requiresAuth: true, requiresAdmin: false }
       },
       {
-        path: 'users',
+        path: '/users',
         component: () => import('pages/Users.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
       }
