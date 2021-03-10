@@ -11,20 +11,18 @@ def add_projects():
     name = request.json['name']
     users = request.json['users']
 
-    if name and users:
-        project_id = mongo.db.projects.insert(
+    project_id = mongo.db.projects.insert(
             {'name': name,
              'users': users
             })
-        response = {
+    response = {
             '_id': str(project_id),
             'name': name,
             'users': users,
         }
-        print(response)
-        return response
-    else:
-        return jsonify('Error')
+    print(response)
+    return response
+
 
 
 @projects_route.route('/projects/get', methods=['GET'])
