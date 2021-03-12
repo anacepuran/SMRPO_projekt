@@ -25,16 +25,16 @@
         <div class="text-white text-h6">My projects</div>
       </q-card-section>
       <q-list  bordered separator>
-          <q-item v-for="project in myProjects" :key="project.name" clickable v-ripple>
-            <q-item-section style="width: 3%" class="col-1">
-              <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ project.name }}</q-item-label>
-              <q-item-label class="q-ma-sm" caption>Deadline: {{ project.deadline }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <q-item v-for="project in myProjects" :key="project.name" clickable v-ripple>
+          <q-item-section style="width: 3%" class="col-1">
+            <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ project.name }}</q-item-label>
+            <q-item-label class="q-ma-sm" caption>Deadline: {{ project.deadline }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
     </q-card>
     <q-dialog v-model="editUserData">
       <q-card class="q-pa-md" style="width: 80vh">

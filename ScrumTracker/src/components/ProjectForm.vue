@@ -44,7 +44,7 @@
         </q-list>
         <div class="row">
             <div class="col q-ma-sm">
-                <q-btn label="select deadline" icon="event" color="primary" @click="datePicker=true" />
+                <q-btn label="Select deadline" icon="event" color="secondary" @click="datePicker=true" />
             </div>
             <div class="col q-ma-md">
                 <q-badge color="secondary">
