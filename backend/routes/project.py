@@ -10,19 +10,21 @@ projects_route = Blueprint('projects_route', __name__)
 def add_projects():
     name = request.json['name']
     users = request.json['users']
+    deadline = request.json['deadline']
 
     project_id = mongo.db.projects.insert(
             {'name': name,
-             'users': users
+             'users': users,
+             'deadline': deadline
             })
     response = {
             '_id': str(project_id),
             'name': name,
             'users': users,
+            'deadline': deadline
         }
     print(response)
     return response
-
 
 
 @projects_route.route('/projects/get', methods=['GET'])
@@ -51,15 +53,18 @@ def update_project():
     name = request.json['name']
     users = request.json['users']
     project_id = request.json['_id']
+    deadline = request.json['deadline']
 
     project = mongo.db.projects.find_one({'_id': ObjectId(project_id)})
     project['name'] = name
     project['users'] = users
-  
+    project['deadline'] = deadline
+
     mongo.db.projects.save(project)
     response = {
         '_id': str(project_id),
         'name': name,
-        'users': users
+        'users': users,
+        'deadline': deadline
     }
     return response, 200

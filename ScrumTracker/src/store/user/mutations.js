@@ -1,7 +1,5 @@
 export function SET_CURRENT_USER (state, loggedUser) {
   state.currentUser = loggedUser
-  console.log('mutation')
-  console.log(state.currentUser)
 }
 export function SET_LOGGED_OUT (state, fetchedUsers) {
   state.currentUser = null

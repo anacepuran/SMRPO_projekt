@@ -71,7 +71,8 @@ export default {
         email: '',
         username: '',
         password: '',
-        permissions: ''
+        permissions: '',
+        last_login: ''
       }
     }
   },
@@ -110,8 +111,8 @@ export default {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
       if (this.pushUser.username !== this.newUser.username) {
         var alreadyExists = false
-        for (var user in this.$props.allUsers) {
-          if (this.pushUser.username === this.$props.allUsers[user].username) {
+        for (var user in this.allUsers) {
+          if (this.pushUser.username === this.allUsers[user].username) {
             alreadyExists = true
             this.error = 'User with the username "' + this.pushUser.username + '" already exists.'
           }

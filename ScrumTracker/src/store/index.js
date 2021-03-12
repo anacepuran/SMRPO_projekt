@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import user from './user'
+import project from './project'
 
 import createPersistedState from 'vuex-persistedstate'
 // import * as Cookies from 'js-cookie'
@@ -20,7 +21,8 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      user
+      user,
+      project
     },
     plugins: [
       createPersistedState({ storage: window.sessionStorage })

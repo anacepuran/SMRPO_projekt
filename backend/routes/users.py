@@ -8,6 +8,8 @@ users_route = Blueprint('users_route', __name__)
 
 
 """ USER LOGIN """
+
+
 @users_route.route('/users/authenticate', methods=['POST'])
 def user_authenticate():
     username = request.json['username']
@@ -19,15 +21,18 @@ def user_authenticate():
         if user:
             if check_password(user['password'], password):
                 print(user)
+                last_login = date_time()
                 response = {
                     'name': user['name'],
                     'surname': user['surname'],
                     'email': user['email'],
                     'username': user['username'],
                     'permissions': user['permissions'],
-                    'last_login': date_time(),
+                    'last_login': last_login,
                     '_id': str(user['_id'])
                 }
+                user['last_login'] = last_login
+                mongo.db.users.save(user)
                 return response, 200
             else:
                 print('password mismatch')
@@ -56,7 +61,8 @@ def add_user():
              'email': email,
              'username': username,
              'password': hash_password(password),
-             'permissions': permissions}
+             'permissions': permissions,
+             'last_login': 'This user has not yet logged in.'}
         )
         response = {
             '_id': str(user_id),
@@ -64,7 +70,8 @@ def add_user():
             'surname': surname,
             'email': email,
             'username': username,
-            'permissions': permissions
+            'permissions': permissions,
+            'last_login': 'This user has not yet logged in.'
         }
         print(response)
         return response

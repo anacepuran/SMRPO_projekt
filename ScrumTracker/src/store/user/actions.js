@@ -27,7 +27,6 @@ export function Logout ({ commit }) {
 export function fetchUsers ({ commit }) {
   this.$axios.get('users/get')
     .then((res) => {
-      console.log(res.data)
       commit('SET_USERS', res.data)
     })
     .catch((error) => {
@@ -36,15 +35,14 @@ export function fetchUsers ({ commit }) {
 }
 
 export function postUser ({ commit }, payload) {
-  console.log('post user')
-  console.log(payload)
   this.$axios.post('users/add', {
     name: payload.name,
     surname: payload.surname,
     email: payload.email,
     username: payload.username,
     password: payload.password,
-    permissions: payload.permissions
+    permissions: payload.permissions,
+    last_login: 'User has not yet logged in.'
   })
     .then((res) => {
       commit('PUSH_NEW_USER', res.data)

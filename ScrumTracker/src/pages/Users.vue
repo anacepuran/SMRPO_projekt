@@ -29,7 +29,7 @@
             </div>
           </q-td>
         </template>
-        </q-table>
+      </q-table>
       <div class="row q-ma-md">
         <q-space/>
         <q-btn color="primary" size="md" label="ADD NEW USER" @click="dialogTitle='Add user'; addUser = true"/>
@@ -79,7 +79,8 @@ export default {
         username: '',
         password: '',
         permissions: null,
-        _id: ''
+        _id: '',
+        last_login: ''
       },
       dialogTitle: '',
       loading: false,
@@ -94,6 +95,7 @@ export default {
         { name: 'surname', align: 'center', label: 'Surname', field: 'surname', sortable: true },
         { name: 'email', align: 'center', label: 'Email', field: 'email' },
         { name: 'permissions', align: 'center', label: 'Permissions', field: 'permissions' },
+        { name: 'last_login', align: 'center', label: 'Last login', field: 'last_login' },
         { name: 'edit', align: 'center', label: 'Edit user', field: 'edit' },
         { name: 'delete', align: 'center', label: 'Delete user', field: 'delete' }
       ]
@@ -134,8 +136,8 @@ export default {
       this.newUser.username = user.username
       this.newUser.password = ''
       this.newUser.permissions = user.permissions
-      this.oldUsername = user.username
       this.newUser._id = user._id
+      this.newUser.last_login = user.last_login
       this.addUser = true
     },
     showUsers () {
@@ -145,7 +147,7 @@ export default {
         var users = this.getUsers()
         this.allUsers = this.usersToArray(users)
         this.loading = false
-      }, 1500)
+      }, 1000)
     },
     usersToArray (users) {
       var data = []
@@ -162,6 +164,7 @@ export default {
       this.newUser.password = ''
       this.newUser.permissions = null
       this.newUser._id = ''
+      this.newUser.last_login = ''
       this.editUser = false
     }
   }

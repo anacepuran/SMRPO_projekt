@@ -25,10 +25,13 @@
         <div class="text-white text-h6">My projects</div>
       </q-card-section>
       <q-list  bordered separator>
-          <q-item v-for="project in projects" :key="project.name" clickable v-ripple>
+          <q-item v-for="project in myProjects" :key="project.name" clickable v-ripple>
+            <q-item-section style="width: 3%" class="col-1">
+              <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
+            </q-item-section>
             <q-item-section>
-              <q-item-label>{{ project.name }}</q-item-label>
-              <q-item-label caption>{{ project.caption }}</q-item-label>
+              <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ project.name }}</q-item-label>
+              <q-item-label class="q-ma-sm" caption>Deadline: {{ project.deadline }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -57,20 +60,22 @@ export default {
       user: {},
       editUserData: false,
       dialogTitle: 'Edit your profile information',
-      projects: [
-        {
-          name: 'Project 1',
-          description: 'Project 1'
-        },
-        {
-          name: 'Project 2',
-          description: 'Project 2'
-        },
-        {
-          name: 'Project 3',
-          description: 'Project 3'
+      projects: []
+    }
+  },
+  computed: {
+    myProjects () {
+      console.log(this.user.username)
+      var allProjects = this.getProjects()
+      var myProjects = []
+      for (var project in allProjects) {
+        for (var user in allProjects[project].users) {
+          if (allProjects[project].users[user].user_name === this.user.username) {
+            myProjects.push(allProjects[project])
+          }
         }
-      ]
+      }
+      return myProjects
     }
   },
   methods: {
@@ -80,6 +85,12 @@ export default {
     ...mapActions('user', [
       'updateUser',
       'updateCurrentUser'
+    ]),
+    ...mapGetters('project', [
+      'getProjects'
+    ]),
+    ...mapActions('project', [
+      'fetchProjects'
     ]),
     updateProfileInfo () {
       this.editUserData = false
@@ -92,8 +103,7 @@ export default {
   },
   mounted () {
     this.user = this.getCurrentUser()
-    console.log('current')
-    console.log(this.user)
+    this.fetchProjects()
   }
 }
 </script>

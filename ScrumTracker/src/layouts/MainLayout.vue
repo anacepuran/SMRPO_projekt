@@ -15,17 +15,17 @@
         </q-toolbar-title>
         <q-btn-dropdown
           rounded
+          flat
           class="q-ma-md"
-          color="white"
           no-icon-animation
           dropdown-icon="person"
           size="md"
-          text-color="primary"
+          text-color="white"
         >
           <div class="row no-wrap q-pa-md">
             <div class="column items-center">
               <q-avatar size="64px" icon="person" color="primary" text-color="white"/>
-              <div class="text-subtitle1 q-mt-md q-mb-xs">{{ currentUser.username }}</div>
+              <div class="text-subtitle1 q-mt-md q-mb-xs" v-if="currentUser!==null">{{ currentUser.username }}</div>
               <hr style="color:primary; width: 100%" />
               <q-btn
                 flat
@@ -85,6 +85,12 @@ export default {
       user: {},
       leftDrawerOpen: false,
       linksData: [
+        {
+          title: 'Projects',
+          icon: 'home',
+          link: '/home',
+          permissions: ''
+        },
         {
           title: 'Manage users',
           icon: 'manage_accounts',
