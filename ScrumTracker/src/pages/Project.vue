@@ -40,33 +40,117 @@
       <q-card class="q-ma-md">
         <q-card-section class="bg-secondary" >
             <div class="text-white text-h6">Sprints</div>
+          <div class="q-ma-sm col-2">
+            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addProject=true" />
+          </div>
         </q-card-section>
-        <q-list  bordered separator>
+
+        <div class="row q-ma-md">
+          <q-table
+            class="full-width"
+            :data="filteredProjects"
+            :columns="columns"
+            row-key="name"
+            virtual-scroll
+            :pagination.sync="pagination"
+            :rows-per-page-options="[0]"
+            :loading="loading"
+          >
+            <template v-slot:loading>
+              <q-inner-loading showing color="primary" />
+            </template>
+            <template v-slot:body-cell-name="propsName">
+              <q-td :props="propsName" @click="openSprint(propsName.row._id)">
+                <div>
+                  <q-icon class="q-ma-sm" size="sm" color="secondary" name="folder_open" />
+                  <span class="q-ma-sm" style="font-size: 2vh">{{propsName.row.name}}</span>
+                </div>
+              </q-td>
+            </template>
+            <template v-slot:body-cell-users="propsUsers">
+              <q-td :props="propsUsers">
+                <div class="row" v-for="user in propsUsers.row.users" :key="user.user_name">
+                  <div clasS=" col-1">
+                    <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
+                  </div>
+                  <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{user.user_role}}</span>
+                </div>
+              </q-td>
+            </template>
+            <template v-slot:body-cell-delete="propsDelete" v-if="user.permissions === 'Admin'">
+              <q-td :props="propsDelete">
+                <div>
+                  <q-btn @click="confirmDelete=true; deleteProjectId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
+                </div>
+              </q-td>
+            </template>
+          </q-table>
+        </div>
+        <q-dialog v-model="confirmDelete">
+          <q-card>
+            <q-card-section class="row items-center">
+              <q-avatar icon="delete" color="primary" text-color="white" />
+              <span class="q-ml-sm">Are you sure you want to delete this project?</span>
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn flat @click="deleteProjectId=''" label="Cancel" color="primary" v-close-popup />
+              <q-btn flat @click="deleteFunction(deleteProjectId)" label="DELETE" color="negative" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+        <q-dialog v-model="addProject">
+          <q-card class="q-pa-md" style="width: 80vh">
+            <q-card-section class="row items-center">
+              <div class="text-h6 q-ma-md">Create new Sprint</div>
+              <q-space />
+              <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
+            </q-card-section>
+            <!-- USER FORM COMPONENT -->
+            <SprintForm :newProject="newSprint" :editProject="false" @submitProject="showSprints"></SprintForm>
+          </q-card>
+        </q-dialog>
+
+        <!--<q-list  bordered separator>
             <q-item v-for="sprint in projectSprints" :key="sprint._id" clickable v-ripple>
+              <q-td @click="openSprint(sprint._id)">
               <q-item-section style="width: 3%" class="col-1">
                 <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
               </q-item-section>
               <q-item-section>
                 <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ sprint.name }}</q-item-label>
               </q-item-section>
+
               <q-item-section>
                 <q-item-label class="q-ma-sm"><span style="opacity: .6">From: </span>{{ sprint.start_date }}</q-item-label>
                 <q-item-label class="q-ma-sm"><span style="opacity: .6">To: </span>{{ sprint.end_date }}</q-item-label>
               </q-item-section>
+              </q-td>
             </q-item>
-        </q-list>
+        </q-list>-->
       </q-card>
     </q-page>
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import ProjectForm from 'components/ProjectForm.vue'
+import SprintForm from 'components/SprintForm.vue'
+
 export default {
   name: 'Project',
-  components: { ProjectForm },
+  components: { ProjectForm, SprintForm },
   data () {
     return {
       user: {},
+      pagination: {
+        rowsPerPage: 0
+      },
+      loading: false,
+      search: '',
+      addProject: false,
+      deleteProjectId: '',
+      confirmDelete: false,
+      sprints: [],
+
       projectId: '',
       editProjectData: false,
       dialogTitle: 'Edit project',
@@ -76,6 +160,14 @@ export default {
         deadline: '',
         _id: ''
       },
+      newSprint: {
+        name: '',
+        id: '',
+        startdate: '',
+        enddate: '',
+        expectedtime: ''
+      }
+      /*
       projectSprints: [
         {
           name: 'Sprint 1',
@@ -95,10 +187,13 @@ export default {
           end_date: '22/04/2021',
           _id: '3'
         }
-      ]
+      ] */
     }
   },
   computed: {
+    filteredProjects () {
+      return this.getSearchFilteredSprints(this.search)
+    },
     project () {
       var allProjects = this.getProjects()
       for (var project in allProjects) {
@@ -107,20 +202,78 @@ export default {
         }
       }
       return 'No project found.'
+    },
+    columns () {
+      if (this.user.permissions === 'Admin') {
+        return [
+          {
+            name: 'name',
+            required: true,
+            label: 'Name',
+            align: 'left',
+            field: row => row.name,
+            sortable: true
+          },
+          { name: 'users', align: 'left', label: 'Users', field: 'users' },
+          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true },
+          { name: 'delete', align: 'center', label: 'Delete project', field: 'delete' }
+        ]
+      } else {
+        return [
+          {
+            name: 'name',
+            required: true,
+            label: 'Name',
+            align: 'left',
+            field: row => row.name,
+            sortable: true
+          },
+          { name: 'users', align: 'left', label: 'Users', field: 'users' },
+          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true }
+        ]
+      }
     }
   },
   methods: {
     ...mapGetters('user', [
       'getCurrentUser'
     ]),
+    ...mapGetters('sprint', [
+      'getSprints'
+    ]),
+    ...mapActions('sprint', [
+      'fetchSprint',
+      'deleteSprint'
+    ]),
     ...mapGetters('project', [
       'getProjects'
     ]),
-    ...mapActions('project', [
-      'fetchProjects'
-    ]),
+    openSprint (sprintId) {
+      console.log(sprintId)
+      this.$router.push('/sprints/' + sprintId)
+    },
     updateProjectInfo () {
       this.editProjectData = false
+    },
+    deleteFunction (sprintId) {
+      this.deleteSprint(sprintId)
+      this.showSprints()
+    },
+    showSprints () {
+      this.addProject = false
+      this.loading = true
+      setTimeout(() => {
+        var projects = this.getSprints()
+        this.sprints = this.projectsToArray(projects)
+        this.loading = false
+      }, 1000)
+    },
+    projectsToArray (sprintss) {
+      var data = []
+      for (var project in sprintss) {
+        data.push(sprintss[project])
+      }
+      return data
     },
     checkRole () {
       if (this.user !== {}) {
@@ -150,12 +303,34 @@ export default {
       }
       this.editProject.users = userTable
       this.editProjectData = true
+    },
+    onReset () {
+      this.newProject.name = ''
+      this.newProject.users = []
+      this.newProject.deadline = ''
+    },
+
+    getSearchFilteredSprints (search) {
+      if (this.search !== '') {
+        var filteredItems = []
+        for (var project in this.newSprint) {
+          const projectName = this.sprints[project].name.toLowerCase()
+          if (projectName.startsWith(search.toLowerCase())) {
+          // console.log(checkedItems[i].title.toLowerCase().startsWith(searchString))
+            filteredItems.push(this.sprints[project])
+          }
+        }
+        return filteredItems
+      }
+      return this.sprints
     }
   },
   mounted () {
     this.user = this.getCurrentUser()
-    this.fetchProjects()
+    this.fetchSprint()
     this.projectId = this.$route.params.id
+    this.newSprint.id = this.projectId
+    this.showSprints()
   }
 }
 </script>
