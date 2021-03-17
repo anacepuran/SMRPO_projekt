@@ -42,7 +42,8 @@ export function postUser ({ commit }, payload) {
     username: payload.username,
     password: payload.password,
     permissions: payload.permissions,
-    last_login: 'User has not yet logged in.'
+    last_login: 'User has not yet logged in.',
+    this_login: 'User has not yet logged in.'
   })
     .then((res) => {
       commit('PUSH_NEW_USER', res.data)

@@ -21,16 +21,23 @@ def user_authenticate():
         if user:
             if check_password(user['password'], password):
                 print(user)
-                last_login = date_time()
+                if user['last_login'] == 'This user has not yet logged in.':
+                    last_login = date_time() + ' (First login)'
+                    this_login = date_time()
+                else:
+                    last_login = user['this_login']
+                    this_login = date_time()
                 response = {
                     'name': user['name'],
                     'surname': user['surname'],
                     'email': user['email'],
                     'username': user['username'],
                     'permissions': user['permissions'],
+                    'this_login': this_login,
                     'last_login': last_login,
                     '_id': str(user['_id'])
                 }
+                user['this_login'] = this_login
                 user['last_login'] = last_login
                 mongo.db.users.save(user)
                 return response, 200
@@ -62,6 +69,7 @@ def add_user():
              'username': username,
              'password': hash_password(password),
              'permissions': permissions,
+             'this_login': 'This user has not yet logged in.',
              'last_login': 'This user has not yet logged in.'}
         )
         response = {
@@ -103,6 +111,7 @@ def update_user():
     password = request.json['password']
     permissions = request.json['permissions']
     last_login = request.json['last_login']
+    this_login = request.json['this_login']
     user_id = request.json['_id']
     print(user_id)
     user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
@@ -112,6 +121,7 @@ def update_user():
     user['email'] = email
     user['username'] = username
     user['last_login'] = last_login
+    user['this_login'] = this_login
     if permissions != '':
         user['permissions'] = permissions
     if password != '':
@@ -125,7 +135,8 @@ def update_user():
         'email': email,
         'username': username,
         'permissions': permissions,
-        'last_login': last_login
+        'last_login': last_login,
+        'this_login': this_login
     }
     return response, 200
 

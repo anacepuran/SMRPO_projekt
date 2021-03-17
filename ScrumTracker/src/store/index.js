@@ -5,7 +5,6 @@ import user from './user'
 import project from './project'
 
 import createPersistedState from 'vuex-persistedstate'
-// import * as Cookies from 'js-cookie'
 
 Vue.use(Vuex)
 

@@ -65,7 +65,6 @@ export default {
   },
   computed: {
     myProjects () {
-      console.log(this.user.username)
       var allProjects = this.getProjects()
       var myProjects = []
       for (var project in allProjects) {
