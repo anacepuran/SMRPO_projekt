@@ -8,7 +8,6 @@
     "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
@@ -18,7 +17,6 @@
     "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
     "quasar": "^1.0.0"
   },
   "scripts": {
