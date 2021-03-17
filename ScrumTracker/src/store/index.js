@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import user from './user'
 import project from './project'
+import sprint from './sprint'
 
 import createPersistedState from 'vuex-persistedstate'
 
@@ -21,7 +22,8 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       user,
-      project
+      project,
+      sprint
     },
     plugins: [
       createPersistedState({ storage: window.sessionStorage })
