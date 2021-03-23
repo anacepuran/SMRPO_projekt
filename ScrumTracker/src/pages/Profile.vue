@@ -25,7 +25,7 @@
         <div class="text-white text-h6">My projects</div>
       </q-card-section>
       <q-list  bordered separator>
-        <q-item v-for="project in myProjects" :key="project.name" clickable v-ripple>
+        <q-item v-for="project in myProjects" :key="project.name" clickable v-ripple @click="$router.push(`/project/${project._id}`)">
           <q-item-section style="width: 3%" class="col-1">
             <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
           </q-item-section>
