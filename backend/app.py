@@ -29,7 +29,7 @@ app.register_blueprint(cards_route)
 # Set up the index route
 @app.route('/')
 def index():
-    return send_from_directory('./ScrumTracker/dist/spa', 'index.html')
+    return send_from_directory('../ScrumTracker/dist/spa', 'index.html')
 
 
 if __name__ == '__main__':
