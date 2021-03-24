@@ -28,7 +28,7 @@
         </q-card-section>
       </q-card-section>
     </q-card>
-    <q-dialog v-model="editProjectData">
+    <q-dialog v-model="editCardData">
       <q-card class="q-pa-md" style="width: 80vh">
         <q-card-section class="row items-center">
           <div class="text-h6">{{ dialogTitle }}</div>
@@ -36,7 +36,7 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <!-- USER FORM COMPONENT -->
-        <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
+        <CardForm :newCard="editCard" :editCard="editCardData" @submitCard="updateCardInfo()"></CardForm>
       </q-card>
     </q-dialog>
 
@@ -44,7 +44,7 @@
       <q-card-section class="bg-secondary" >
         <div class="text-white text-h6">Uporabniske Zgodbe</div>
         <div class="q-ma-sm col-2">
-          <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Zgodba" icon="create_new_folder" @click="addProject=true" />
+          <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Card" icon="create_new_folder" @click="addCard=true" />
         </div>
       </q-card-section>
       <!--
@@ -149,19 +149,21 @@ export default {
       },
       loading: false,
       search: '',
-      addProject: false,
+      addCard: false,
       deleteProjectId: '',
       confirmDelete: false,
       sprints: [],
 
       projectId: '',
-      editProjectData: false,
-      dialogTitle: 'Edit project',
-      editProject: {
-        name: '',
-        users: [],
-        deadline: '',
-        _id: ''
+      editCardData: false,
+      dialogTitle: 'Edit card',
+      editCard: {
+        card_name: '',
+        description: '',
+        acceptance_test: '',
+        priority: '',
+        value: '',
+        subtasks: ''
       },
       newSprint: {
         name: '',
