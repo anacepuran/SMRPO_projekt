@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
@@ -13,7 +13,7 @@ from backend.routes.sprints import sprints_route
 from backend.routes.users import users_route
 load_dotenv()
 
-app = Flask(__name__, static_folder="./ScrumTracker/dist/spa", template_folder="./ScrumTracker")
+app = Flask(__name__, static_folder="../ScrumTracker/dist/spa", template_folder="../ScrumTracker/dist/spa")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['MONGO_URI'] = 'mongodb+srv://admin:smrpoadmin@clustertest.ef9bm.mongodb.net/testdb?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE'
 mongo.init_app(app)
@@ -29,7 +29,7 @@ app.register_blueprint(cards_route)
 # Set up the index route
 @app.route('/')
 def index():
-    return send_from_directory('../ScrumTracker/dist/spa', 'index.html')
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
