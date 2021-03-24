@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
@@ -29,7 +29,7 @@ app.register_blueprint(cards_route)
 # Set up the index route
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return send_from_directory('./ScrumTracker/dist/spa', 'index.html')
 
 
 if __name__ == '__main__':
