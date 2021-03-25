@@ -28,6 +28,7 @@
         </q-card-section>
       </q-card-section>
     </q-card>
+    <!--
     <q-dialog v-model="editCardData">
       <q-card class="q-pa-md" style="width: 80vh">
         <q-card-section class="row items-center">
@@ -35,11 +36,11 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-        <!-- USER FORM COMPONENT -->
+
         <CardForm :newCard="editCard" :editCard="editCardData" @submitCard="updateCardInfo()"></CardForm>
       </q-card>
     </q-dialog>
-   <!-- <q-card class="q-ma-md">
+   <q-card class="q-ma-md">
       <q-card-section class="bg-secondary" >
         <div class="text-white text-h6">Uporabniske Zgodbe</div>
         <div class="q-ma-sm col-2">
