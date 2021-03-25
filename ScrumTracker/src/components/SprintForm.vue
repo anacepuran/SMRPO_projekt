@@ -127,6 +127,24 @@ export default {
     setdates () {
       this.pushProject.startdate = this.selectDeadline.from
       this.pushProject.enddate = this.selectDeadline.to
+      var d1 = this.pushProject.startdate
+      var d2 = this.today
+      if (d1 < d2) {
+        // d1 = d2
+        this.pushProject.startdate = 'No Past Dates'
+        this.pushProject.enddate = 'No Past Dates'
+      }
+      /*
+      var users = this.getSprints()
+      for (var user in users) {
+        var userData = {
+          label: users[user].startdate,
+          value: users[user].startdate
+        }
+        if (userData.value === this.pushProject.startdate) {
+          this.pushProject.startdate = 'already started'
+        }
+      } */
     },
     usersPushData (users) {
       var data = []
@@ -186,6 +204,7 @@ export default {
           this.postSprint(this.pushProject)
           this.onReset()
         }
+        // if(this.pushProject.startdate )
         this.$q.notify({
           color: 'green',
           textColor: 'white',
