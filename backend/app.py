@@ -29,7 +29,8 @@ app.register_blueprint(cards_route)
 # Set up the index route
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return "Hello World"
+    # return app.send_static_file('index.html')
 
 
 if __name__ == '__main__':
