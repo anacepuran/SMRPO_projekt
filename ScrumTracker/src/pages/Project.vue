@@ -167,27 +167,6 @@ export default {
         enddate: '',
         expectedtime: ''
       }
-      /*
-      projectSprints: [
-        {
-          name: 'Sprint 1',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '1'
-        },
-        {
-          name: 'Sprint 2',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '2'
-        },
-        {
-          name: 'Sprint 3',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '3'
-        }
-      ] */
     }
   },
   computed: {
@@ -263,15 +242,18 @@ export default {
       this.addProject = false
       this.loading = true
       setTimeout(() => {
-        var projects = this.getSprints()
-        this.sprints = this.projectsToArray(projects)
+        var projectSprints = this.getSprints()
+        this.sprints = this.projectsToArray(projectSprints)
         this.loading = false
       }, 1000)
     },
-    projectsToArray (sprintss) {
+    projectsToArray (projectSprints) {
       var data = []
-      for (var project in sprintss) {
-        data.push(sprintss[project])
+      for (var sprint in projectSprints) {
+        var currentSprint = projectSprints[sprint]
+        if (currentSprint.project_id === this.projectId) {
+          data.push(projectSprints[sprint])
+        }
       }
       return data
     },
