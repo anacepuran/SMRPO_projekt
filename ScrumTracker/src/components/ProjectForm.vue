@@ -1,46 +1,43 @@
 <template>
-    <q-form
-        @submit="onSubmit"
-        @reset="onReset"
-        class="q-gutter-md"
-    >
-        <q-input
-            filled
-            v-model="pushProject.name"
-            label="Project name"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-        />
-        <div class="row">
-            <div class="col-8">
-                <q-select
-                    filled
-                    v-model="pushProject.users"
-                    multiple
-                    :options="allUsers"
-                    label="Users"
-                    color="secondary"
-                    use-chips
-                    stack-label
-                />
-            </div>
-            <q-space/>
-            <div class="col q-ma-md">
-                <q-btn size="md" label="Set user roles" color="secondary" @click="setRoles=!setRoles"/>
-            </div>
+  <q-form
+      @submit="onSubmit"
+      @reset="onReset"
+      class="q-gutter-md"
+  >
+      <q-input
+        filled
+        v-model="pushProject.name"
+        label="Project name"
+        lazy-rules
+        :rules="[ val => val && val.length > 0 || 'Please type something']"
+      />
+      <div class="row">
+          <div class="col">
+            <q-select
+              filled
+              v-model="pushProject.users"
+              multiple
+              :options="allUsers"
+              label="Users"
+              color="secondary"
+              use-chips
+              stack-label
+            />
+          </div>
         </div>
-        <q-list v-if="setRoles" separator>
-            <q-item v-for="user in pushProject.users" :key="user.label">
-                <q-item-section>{{user.label}}</q-item-section>
-                <q-space/>
-                <q-select
-                    filled
-                    v-model="user.role"
-                    :options="roleOptions"
-                    label="Users"
-                    style="width: 250px"
-                />
-            </q-item>
+        <q-list separator>
+          <q-item v-for="user in pushProject.users" :key="user.label">
+            <q-item-section>{{user.label}}</q-item-section>
+            <q-space/>
+            <div class="q-gutter-sm">
+              <q-checkbox v-if="disablePO(user.role)" v-model="user.role" val="Product Owner" label="Product Owner" color="teal"/>
+              <q-checkbox v-else disable v-model="user.role" val="Product Owner" label="Product Owner" color="teal"/>
+              <q-checkbox v-if="disableOption(user.role)" v-model="user.role" val="Scrum Master" label="Scrum Master" color="orange"/>
+              <q-checkbox v-else disable v-model="user.role" val="Scrum Master" label="Scrum Master" color="orange"/>
+              <q-checkbox v-if="disableOption(user.role)" v-model="user.role" val="Developer" label="Developer" color="red"/>
+              <q-checkbox v-else disable v-model="user.role" val="Developer" label="Developer" color="red" />
+            </div>
+          </q-item>
         </q-list>
         <div class="row">
             <div class="col q-ma-sm">
@@ -68,7 +65,7 @@
             </q-card>
         </q-dialog>
         <q-card-actions horizontal align="right">
-            <q-btn label="Submit" type="submit" color="primary" />
+            <q-btn label="Submit" type="submit" color="primary"/>
             <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
         </q-card-actions>
         <div class="q-ma-md text-center">
@@ -83,7 +80,23 @@ export default {
   data () {
     return {
       error: '',
-      roleOptions: ['Product Manager', 'Development Team Member', 'Methodology Admin'],
+      roleOptions: [
+        {
+          label: 'Product Owner',
+          value: 'Product Owner',
+          disable: false
+        },
+        {
+          label: 'Developer',
+          value: 'Developer',
+          disable: false
+        },
+        {
+          label: 'Scrum Master',
+          value: 'Scrum Master',
+          disable: false
+        }
+      ],
       allProjects: [],
       setRoles: false,
       datePicker: false,
@@ -112,11 +125,10 @@ export default {
         var userData = {
           label: users[user].username,
           value: users[user].username,
-          role: ''
+          role: [null]
         }
         data.push(userData)
       }
-      console.log(data)
       return data
     }
   },
@@ -157,6 +169,8 @@ export default {
       for (var user in users) {
         for (var isUser in allUsers) {
           if (users[user].label === allUsers[isUser].username) {
+            users[user].role.sort()
+            users[user].role.reverse()
             var push = {
               user_name: allUsers[isUser].username,
               user_id: allUsers[isUser]._id,
@@ -173,22 +187,49 @@ export default {
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
     },
-    checkProjectName () {
-      // CHECK IF USER WITH USERNAME ALREADY EXISTS
-      var alreadyExists = false
-      if (this.pushProject.name !== this.newProject.name) {
+    checkProject () {
+      var accept = true
+      // CHECK IF PROJECT WITH THIS NAME ALREADY EXISTS
+      if (this.pushProject.name.toLowerCase() !== this.newProject.name.toLowerCase()) {
         for (var project in this.allProjects) {
-          if (this.pushProject.name === this.allProjects[project].name) {
-            alreadyExists = true
+          if (this.pushProject.name.toLowerCase() === this.allProjects[project].name.toLowerCase()) {
+            accept = false
             this.error = 'Project with the name "' + this.pushProject.name + '" already exists.'
           }
         }
-      } else {
-        alreadyExists = true
       }
-      return alreadyExists
+      // CHECK IF THERE IS MORE THAN ONE PROJECT OWNERS
+      var numOfPO = 0
+      for (var user in this.pushProject.users) {
+        for (var role in this.pushProject.users[user].role) {
+          if (this.pushProject.users[user].role[role] === 'Product Owner') {
+            numOfPO++
+            if (numOfPO > 1) {
+              accept = false
+              this.error = 'There can only be one Project Owner.'
+            }
+          }
+        }
+      }
+      return accept
     },
-    setPushUser () {
+    disablePO (userRole) {
+      for (var option in userRole) {
+        if (userRole[option] === 'Developer' || userRole[option] === 'Scrum Master') {
+          return false
+        }
+      }
+      return true
+    },
+    disableOption (userRole) {
+      for (var option in userRole) {
+        if (userRole[option] === 'Product Owner') {
+          return false
+        }
+      }
+      return true
+    },
+    setPushData () {
       this.pushProject.users = this.usersPushData(this.pushProject.users)
       if (this.selectDeadline !== '' && this.today !== this.selectDeadline) {
         this.pushProject.deadline = this.selectDeadline
@@ -198,8 +239,8 @@ export default {
     },
     onSubmit () {
       var submitMessage = ''
-      if (!this.checkProjectName()) {
-        this.setPushUser()
+      if (this.checkProject()) {
+        this.setPushData()
         if (this.$props.editProject) {
           submitMessage = 'Project updated.'
           this.updateProject(this.pushProject)
@@ -222,6 +263,10 @@ export default {
       }
     },
     onReset () {
+      console.log('reset')
+      for (var user in this.pushProject.users) {
+        this.pushProject.users[user].role = [null]
+      }
       this.pushProject.name = this.$props.newProject.name
       this.pushProject.users = this.$props.newProject.users
       this.pushProject.deadline = this.$props.newProject.deadline

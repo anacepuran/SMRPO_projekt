@@ -44,9 +44,9 @@
         <q-td :props="propsUsers">
           <div class="row" v-for="user in propsUsers.row.users" :key="user.user_name">
             <div clasS=" col-1">
-              <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
+              <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
             </div>
-            <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{user.user_role}}</span>
+            <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-dark-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
           </div>
         </q-td>
       </template>
@@ -172,6 +172,30 @@ export default {
         this.projects = this.projectsToArray(projects)
         this.loading = false
       }, 1000)
+    },
+    formatUserRoles (userRoles) {
+      var roles = ''
+      for (var i = 1; i < userRoles.length; i++) {
+        roles += userRoles[i]
+        if (i < userRoles.length - 1) {
+          roles += ' + '
+        }
+      }
+      return roles
+    },
+    avatarColor (userRole) {
+      console.log(userRole)
+      var color = ''
+      if (userRole[1] === 'Product Owner') {
+        color = 'teal'
+      }
+      if (userRole[1] === 'Scrum Master') {
+        color = 'orange'
+      }
+      if (userRole[1] === 'Developer') {
+        color = 'red'
+      }
+      return color
     },
     projectsToArray (projects) {
       var data = []

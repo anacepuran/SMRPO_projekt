@@ -4,18 +4,18 @@
       <q-card class="q-ma-lg" flat bordered>
         <q-card-section horizontal>
           <q-card-section class="q-ma-md bg-primary">
-            <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 150%;">Project</div>
+            <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 50%;">Project</div>
           </q-card-section>
-          <q-card-section class="q-ma-md">
+          <q-card-section class="q-ma-md" style="width: 40%">
             <div class="text-h5 q-ma-md">{{ project.name }}</div>
             <div class="text-overline q-ma-md">Deadline: {{ project.deadline }}</div>
           </q-card-section>
           <q-separator vertical />
-          <q-card-section style="width: 50%">
+          <q-card-section style="width: 70%">
             <div class="row q-ma-md" v-for="user in project.users" :key="user.user_name">
-                <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
+                <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
                 <span class="q-ma-xs" style="font-weight: bold;">{{user.user_name}}</span>
-                <span class="text-caption text-dark-grey q-ma-xs"> {{user.user_role}}</span>
+                <span class="text-caption text-dark-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
             </div>
           </q-card-section>
           <q-card-section class="full-width">
@@ -33,18 +33,17 @@
             <q-space />
             <q-btn icon="close" flat round dense v-close-popup />
           </q-card-section>
-          <!-- USER FORM COMPONENT -->
           <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
         </q-card>
       </q-dialog>
       <q-card class="q-ma-md">
-        <q-card-section class="bg-secondary" >
-            <div class="text-white text-h6">Sprints</div>
-          <div class="q-ma-sm col-2">
+        <q-card-section class="row bg-secondary" >
+          <div class="text-white text-h6 q-ma-sm">Sprints</div>
+          <q-space/>
+          <div class="q-ma-sm">
             <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addProject=true" />
           </div>
         </q-card-section>
-
         <div class="row q-ma-md">
           <q-table
             class="full-width"
@@ -167,27 +166,6 @@ export default {
         enddate: '',
         expectedtime: ''
       }
-      /*
-      projectSprints: [
-        {
-          name: 'Sprint 1',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '1'
-        },
-        {
-          name: 'Sprint 2',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '2'
-        },
-        {
-          name: 'Sprint 3',
-          start_date: '02/04/2021',
-          end_date: '22/04/2021',
-          _id: '3'
-        }
-      ] */
     }
   },
   computed: {
@@ -263,15 +241,18 @@ export default {
       this.addProject = false
       this.loading = true
       setTimeout(() => {
-        var projects = this.getSprints()
-        this.sprints = this.projectsToArray(projects)
+        var projectSprints = this.getSprints()
+        this.sprints = this.projectsToArray(projectSprints)
         this.loading = false
       }, 1000)
     },
-    projectsToArray (sprintss) {
+    projectsToArray (projectSprints) {
       var data = []
-      for (var project in sprintss) {
-        data.push(sprintss[project])
+      for (var sprint in projectSprints) {
+        var currentSprint = projectSprints[sprint]
+        if (currentSprint.project_id === this.projectId) {
+          data.push(projectSprints[sprint])
+        }
       }
       return data
     },
@@ -281,7 +262,7 @@ export default {
           return true
         }
         for (var user in this.project.users) {
-          if (this.project.users[user].user_role === 'Methodology Admin') {
+          if (this.project.users[user].user_role === 'Scrum Master') {
             return true
           }
         }
@@ -309,7 +290,6 @@ export default {
       this.newProject.users = []
       this.newProject.deadline = ''
     },
-
     getSearchFilteredSprints (search) {
       if (this.search !== '') {
         var filteredItems = []
@@ -323,6 +303,31 @@ export default {
         return filteredItems
       }
       return this.sprints
+    },
+    formatUserRoles (userRoles) {
+      console.log('format')
+      var roles = ''
+      for (var i = 1; i < userRoles.length; i++) {
+        roles += userRoles[i]
+        if (i < userRoles.length - 1) {
+          roles += ' + '
+        }
+      }
+      return roles
+    },
+    avatarColor (userRole) {
+      console.log(userRole)
+      var color = ''
+      if (userRole[1] === 'Product Owner') {
+        color = 'teal'
+      }
+      if (userRole[1] === 'Scrum Master') {
+        color = 'orange'
+      }
+      if (userRole[1] === 'Developer') {
+        color = 'red'
+      }
+      return color
     }
   },
   mounted () {

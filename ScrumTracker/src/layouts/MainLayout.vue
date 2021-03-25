@@ -58,7 +58,7 @@
           header
           class="text-grey-8"
         >
-         MenuLinks
+         ScrumTracker
         </q-item-label>
         <MenuLinks
           v-for="link in linksData"
@@ -96,18 +96,6 @@ export default {
           icon: 'manage_accounts',
           link: '/users',
           permissions: 'Admin'
-        },
-        {
-          title: 'Github',
-          icon: 'code',
-          link: 'https://github.com/quasarframework',
-          permissions: ''
-        },
-        {
-          title: 'Discord Chat Channel',
-          icon: 'chat',
-          link: 'https://chat.quasar.dev',
-          permissions: ''
         }
       ]
     }
