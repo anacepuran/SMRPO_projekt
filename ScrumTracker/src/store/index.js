@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import user from './user'
 import project from './project'
 import sprint from './sprint'
+import card from './card'
 
 import createPersistedState from 'vuex-persistedstate'
 
@@ -23,7 +24,8 @@ export default function (/* { ssrContext } */) {
     modules: {
       user,
       project,
-      sprint
+      sprint,
+      card
     },
     plugins: [
       createPersistedState({ storage: window.sessionStorage })

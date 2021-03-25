@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from db import mongo
+from backend.db import mongo
 
 sprints_route = Blueprint('sprints_route', __name__)
 
@@ -56,7 +56,7 @@ def delete_sprints():
 
 @sprints_route.route('/sprints/update', methods=['PUT'])
 def update_sprints():
-    name = requets.json['name']
+    name = request.json['name']
     start_date = request.json['start_date']
     end_date = request.json['end_date']
     expected_time = request.json['expected_time']

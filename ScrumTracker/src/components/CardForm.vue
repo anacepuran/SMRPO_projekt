@@ -46,10 +46,11 @@ export default {
       error: '',
       roleOptions: ['Product Manager', 'Development Team Member', 'Methodology Admin'],
       allProjects: [],
+      allCards: [],
       pushCard: {
-        card_name: '',
+        cardname: '',
         description: '',
-        acceptance_test: '',
+        acceptancetest: '',
         priority: '',
         subtasks: '',
         value: ''
@@ -97,8 +98,7 @@ export default {
     ...mapActions('card', [
       'fetchCard',
       'postCard',
-      'updateCard',
-      'deleteCard'
+      'updateCard'
     ]),
     ...mapActions('user', [
       'fetchUsers'
@@ -136,12 +136,12 @@ export default {
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
     },
-    checkCardName () {
+    checkProjectName () {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
       var alreadyExists = false
-      if (this.pushCard.name !== this.newCard.name) {
+      if (this.pushCard.cardname !== this.newCard.cardname) {
         for (var card in this.allCards) {
-          if (this.pushCard.name === this.allCards[card].name) {
+          if (this.pushCard.cardname === this.allCards[card].cardname) {
             alreadyExists = true
             this.error = 'Card with the name "' + this.pushCard.name + '" already exists.'
           }
@@ -153,11 +153,6 @@ export default {
     },
     setPushUser () {
       this.pushProject.users = this.usersPushData(this.pushProject.users)
-      if (this.selectDeadline !== '' && this.today !== this.selectDeadline) {
-        this.pushProject.deadline = this.selectDeadline
-      } else {
-        this.pushProject.deadline = 'No deadline'
-      }
     },
     onSubmit () {
       var submitMessage = ''
@@ -185,10 +180,10 @@ export default {
       }
     },
     onReset () {
-      this.pushCard.card_name = this.$props.newCard.card_name
+      this.pushCard.cardname = this.$props.newCard.cardname
       this.pushCard.description = this.$props.newCard.description
       this.pushCard.value = this.$props.newCard.value
-      this.pushCard.acceptance_test = this.$props.newCard.acceptance_test
+      this.pushCard.acceptancetest = this.$props.newCard.acceptancetest
       this.pushCard.subtasks = this.$props.newCard.subtasks
       this.error = ''
     }
