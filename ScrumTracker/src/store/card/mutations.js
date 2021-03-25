@@ -13,6 +13,6 @@ export function PUSH_NEW_CARD (state, newCard) {
   }
   state.cards[newCard._id] = pushCard
 }
-export function DELETE_CARD (state, projectId) {
-  delete state.cards[projectId]
+export function DELETE_CARD (state, cardId) {
+  delete state.cards[cardId]
 }

@@ -1,6 +1,7 @@
-export function fetchCard ({ commit }) {
+export function fetchCards ({ commit }) {
   this.$axios.get('cards/get')
     .then((res) => {
+      console.log(res.data)
       commit('SET_CARD', res.data)
     })
     .catch((error) => {

@@ -1,7 +1,7 @@
 # SMRPO projekt
 
 Orodje za podporo razvoju programske opreme po metodi Scrum
- 
+
 # GET STARTED
 
 FRONTEND
@@ -16,6 +16,6 @@ $ quasar dev
 BACKEND
 
 $ cd backend
-$ pip install requirements.txt
+$ pip install requirements.txt (pip install -r requirements.txt)
 $ FLASK_APP=app.py
 $ flask run
