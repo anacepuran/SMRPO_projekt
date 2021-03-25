@@ -13,7 +13,7 @@ from routes.sprints import sprints_route
 from routes.users import users_route
 load_dotenv()
 
-app = Flask(__name__, static_folder='../ScrumTracker/dist/spa',    static_url_path='/')
+app = Flask(__name__, static_folder='dist/spa',    static_url_path='/')
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['MONGO_URI'] = 'mongodb+srv://admin:smrpoadmin@clustertest.ef9bm.mongodb.net/testdb?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE'
 mongo.init_app(app)
