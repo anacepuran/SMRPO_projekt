@@ -33,18 +33,17 @@
             <q-space />
             <q-btn icon="close" flat round dense v-close-popup />
           </q-card-section>
-          <!-- USER FORM COMPONENT -->
           <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
         </q-card>
       </q-dialog>
       <q-card class="q-ma-md">
-        <q-card-section class="bg-secondary" >
-            <div class="text-white text-h6">Sprints</div>
-          <div class="q-ma-sm col-2">
+        <q-card-section class="row bg-secondary" >
+          <div class="text-white text-h6 q-ma-sm">Sprints</div>
+          <q-space/>
+          <div class="q-ma-sm">
             <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addProject=true" />
           </div>
         </q-card-section>
-
         <div class="row q-ma-md">
           <q-table
             class="full-width"
@@ -291,7 +290,6 @@ export default {
       this.newProject.users = []
       this.newProject.deadline = ''
     },
-
     getSearchFilteredSprints (search) {
       if (this.search !== '') {
         var filteredItems = []

@@ -72,7 +72,8 @@ export default {
         username: '',
         password: '',
         permissions: '',
-        last_login: ''
+        last_login: '',
+        this_login: ''
       }
     }
   },
@@ -150,6 +151,7 @@ export default {
       this.pushUser.permissions = this.$props.newUser.permissions
       this.pushUser._id = this.$props.newUser._id
       this.pushUser.last_login = this.$props.newUser.last_login
+      this.pushUser.this_login = this.$props.newUser.this_login
       this.error = ''
     }
   }

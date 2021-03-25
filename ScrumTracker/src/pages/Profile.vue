@@ -69,7 +69,7 @@ export default {
       var myProjects = []
       for (var project in allProjects) {
         for (var user in allProjects[project].users) {
-          if (allProjects[project].users[user].user_name === this.user.username) {
+          if (allProjects[project].users[user].user_id === this.user._id) {
             myProjects.push(allProjects[project])
           }
         }
@@ -95,8 +95,6 @@ export default {
       this.editUserData = false
       setTimeout(() => {
         this.user = this.getCurrentUser()
-        console.log('updated')
-        console.log(this.user)
       }, 1000)
     }
   },
