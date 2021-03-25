@@ -38,6 +38,7 @@ def add_card():
     print(response)
     return response
 
+
 @cards_route.route('/cards/get', methods=['GET'])
 def get_cards():
     cards = {}
