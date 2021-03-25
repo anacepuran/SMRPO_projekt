@@ -62,6 +62,7 @@ export function updateUser ({ commit }, payload) {
     password: payload.password,
     permissions: payload.permissions,
     last_login: payload.last_login,
+    this_login: payload.this_login,
     _id: payload._id
   })
     .then((res) => {

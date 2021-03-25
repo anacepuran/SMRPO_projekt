@@ -69,7 +69,9 @@ export default {
       var myProjects = []
       for (var project in allProjects) {
         for (var user in allProjects[project].users) {
-          if (allProjects[project].users[user].user_name === this.user.username) {
+          console.log(allProjects[project].users[user])
+          console.log(this.user)
+          if (allProjects[project].users[user].user_id === this.user._id) {
             myProjects.push(allProjects[project])
           }
         }

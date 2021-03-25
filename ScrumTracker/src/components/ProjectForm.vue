@@ -30,17 +30,17 @@
             </div>
         </div>
         <q-list v-if="setRoles" separator>
-            <q-item v-for="user in pushProject.users" :key="user.label">
-                <q-item-section>{{user.label}}</q-item-section>
-                <q-space/>
-                <q-select
-                    filled
-                    v-model="user.role"
-                    :options="roleOptions"
-                    label="Users"
-                    style="width: 250px"
-                />
-            </q-item>
+          <q-item v-for="user in pushProject.users" :key="user.label">
+            <q-item-section>{{user.label}}</q-item-section>
+            <q-space/>
+            <q-select
+                filled
+                v-model="user.role"
+                :options="roleOptions"
+                label="Users"
+                style="width: 250px"
+            />
+          </q-item>
         </q-list>
         <div class="row">
             <div class="col q-ma-sm">
@@ -157,6 +157,9 @@ export default {
       for (var user in users) {
         for (var isUser in allUsers) {
           if (users[user].label === allUsers[isUser].username) {
+            console.log(users[user].label)
+            console.log(allUsers[isUser])
+            console.log(allUsers[isUser]._id)
             var push = {
               user_name: allUsers[isUser].username,
               user_id: allUsers[isUser]._id,
