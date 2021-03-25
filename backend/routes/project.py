@@ -1,8 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from backend.db import mongo
-
+from db import mongo
 
 projects_route = Blueprint('projects_route', __name__)
 
