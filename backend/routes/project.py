@@ -13,16 +13,16 @@ def add_projects():
     deadline = request.json['deadline']
 
     project_id = mongo.db.projects.insert(
-            {'name': name,
-             'users': users,
-             'deadline': deadline
-            })
+        {'name': name,
+         'users': users,
+         'deadline': deadline
+         })
     response = {
-            '_id': str(project_id),
-            'name': name,
-            'users': users,
-            'deadline': deadline
-        }
+        '_id': str(project_id),
+        'name': name,
+        'users': users,
+        'deadline': deadline
+    }
     print(response)
     return response
 

@@ -7,491 +7,143 @@
           <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 225%;">Sprint</div>
         </q-card-section>
         <q-card-section class="q-ma-sm" style="width: 30%">
-          <div class="text-h5 q-ma-md">{{ sprint.name }}</div>
-          <div class="text-overline q-ma-md">StartDate: {{ sprint.start_date }}</div>
-          <div class="text-overline q-ma-md">EndDate: {{ sprint.end_date }}</div>
-          <div class="text-overline q-ma-md">Expected Time: {{sprint.expected_time}} days</div>
+          <div class="text-h5 q-ma-md">{{ sprints.name }}</div>
+          <div class="text-overline q-ma-md">StartDate: {{ sprints.start_date }}</div>
+          <div class="text-overline q-ma-md">EndDate: {{ sprints.end_date }}</div>
+          <div class="text-overline q-ma-md">Expected Time: {{sprints.expected_time}} days</div>
         </q-card-section>
         <q-separator vertical />
         <q-card-section class="full-width">
           <div class="row">
             <q-space/>
-            <!--<q-btn v-if="checkRole()" size="md" class="q-ma-md" icon="edit" color="primary" label="Edit project" @click="editFunction" />
-            -->
+            <div class="q-ma-sm">
+            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Card" icon="create_new_folder" @click="addCard=true" />
+            </div>
           </div>
         </q-card-section>
       </q-card-section>
     </q-card>
-    <div class="row">
-      <div class="col-12">
-        <q-btn v-if="$q.screen.gt.xs" outline dense no-wrap icon="add" no-caps color="green" label="Add Task" class="q-mt-sm q-ml-sm q-pr-sm bg-white" @click="add_new = true"></q-btn>
-      </div>
-    </div>
     <draggable class="row q-mt-xs" group="columns" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-      <div class="col-3 q-px-xs">
+      <div class="col-3 q-px-xs" v-for="(element, index) in sections" v-bind:key="index">
         <div class="q-pa-xs column-background">
-          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm to-do-title">
+          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm" :class="element.theme">
             <q-item-section avatar style="min-width:25px">
               <q-icon name="list" class="q-pa-none q-ma-none"/>
             </q-item-section>
-            <q-item-section class="text-h6 text-weight-bolder">To do</q-item-section>
-            <q-item-section avatar>
-              <q-icon name="more_vert" class="cursor-pointer">
-                <q-menu transition-show="rotate" transition-hide="rotate">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable>
-                      <q-item-section>Mark all as completed</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as in progress</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as hold</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-icon>
-            </q-item-section>
+            <q-item-section class="text-h6 text-weight-bolder">{{element.name}}</q-item-section>
           </q-item>
-          <draggable class="list-group" :list="task_to_do" group="tasks" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-            <q-card
-              square
-              v-for="(element, index) in task_to_do"
-              v-bind:key="index"
-              flat
-              bordered
-              class="box-shadow cursor-move bg-white q-mt-xs list-group-item border-todo"
-              :style="element.task_type=='bug'?'border-left: 5px solid red !important':''"
-              @mouseover="task_index.to_do_index = index"
-              @mouseleave="task_index.to_do_index = null"
-            >
-              <q-avatar
-                class="q-pa-none"
-                size="25px"
-                dense
-                :class="element.task_type=='bug'? 'bug bottom-right-radius':'feature-to-do bottom-right-radius'"
-                text-color="white"
-              >
-                <q-icon
-                  filled
-                  size="xs"
-                  :name="element.task_type=='bug'? 'bug_report':'assignment'"
-                />
-              </q-avatar>
-              <span class="text-caption text-grey-9 q-ml-xs">
-                #{{element.id}}
-                <q-icon
-                  filled
-                  size="xs"
-                  name="close"
-                  class="float-right text-weight-bolder"
-                  :style="{'visibility':index==task_index.to_do_index?'visible':'hidden'}"
-                  @click="deleteTask('task_to_do', task_index.to_do_index)"
-                />
-                <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
-              </span>
-              <q-card-section class="q-pt-sm">
-                <div class="row items-center no-wrap">
-                  <div class="col">
-                    <div>{{element.task_title}}</div>
+          <draggable class="list-group" :list="cards" group="tasks" v-bind="dragOptions" @start="drag = true" @end="drag = false">
+            <div v-for="(card, index) in allCards" v-bind:key="index">
+              <q-card square v-if="card.round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item" :class="element.border">
+                <span class="text-caption text-grey-9 q-ml-xs">
+                  {{card.card_name}}
+                </span>
+                <q-card-section class="q-pt-sm">
+                  <div class="row items-center no-wrap">
+                    <div class="col">
+                      <div>{{card.description}}</div>
+                    </div>
                   </div>
-                </div>
-              </q-card-section>
-              <q-badge
-                outline
-                class="q-mx-xs text-bold tag-badge"
-                v-bind:key="index"
-                v-for="(tag, index) in element.tags"
-                :color="tag.color"
-              >{{tag.name}}
-              </q-badge>
-              <q-card-actions>
-                <q-btn size="xs" dense filled round color="blue" icon="message"/>
-                <q-btn size="xs" dense filled round color="orange" icon="flag"/>
-                <q-btn size="xs" dense filled round color="grey" icon="attachment"/>
-              </q-card-actions>
-            </q-card>
-          </draggable>
-        </div>
-      </div>
-
-      <div class="col-3 q-px-xs">
-        <div class="q-pa-xs column-background">
-          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm in-progress-title">
-            <q-item-section avatar style="min-width:25px">
-              <q-icon name="sync" class="q-pa-none q-ma-none"/>
-            </q-item-section>
-            <q-item-section class="text-h6 text-weight-bolder">In progress</q-item-section>
-            <q-item-section avatar>
-              <q-icon name="more_vert" class="cursor-pointer">
-                <q-menu transition-show="rotate" transition-hide="rotate">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable>
-                      <q-item-section>Mark all as completed</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as in progress</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as hold</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-icon>
-            </q-item-section>
-          </q-item>
-          <draggable
-            class="list-group"
-            :list="task_in_progress"
-            group="tasks"
-            v-bind="dragOptions"
-            @start="drag = true"
-            @end="drag = false"
-          >
-            <q-card
-              square
-              v-for="(element, index) in task_in_progress"
-              v-bind:key="index"
-              flat
-              bordered
-              class="box-shadow cursor-move bg-white q-mt-xs list-group-item border-in-progress"
-              :style="element.task_type=='bug'?'border-left: 5px solid red !important':''"
-              @mouseover="task_index.in_progress_index = index"
-              @mouseleave="task_index.in_progress_index = null"
-            >
-              <q-avatar
-                class="q-pa-none"
-                size="25px"
-                dense
-                :class="element.task_type=='bug'? 'bug bottom-right-radius':'feature-in-progress bottom-right-radius'"
-                text-color="white"
-              >
-                <q-icon
-                  filled
-                  size="xs"
-                  :name="element.task_type=='bug'? 'bug_report':'assignment'"
-                />
-              </q-avatar>
-              <span class="text-caption text-grey-9 q-ml-xs">
-                #{{element.id}}
-                <q-icon
-                  filled
-                  size="xs"
-                  name="close"
-                  class="float-right text-weight-bolder"
-                  :style="{'visibility':index==task_index.in_progress_index?'visible':'hidden'}"
-                  @click="deleteTask('task_in_progress', task_index.in_progress_index)"
-                />
-                <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
-              </span>
-              <q-card-section class="q-pt-sm">
-                <div class="row items-center no-wrap">
-                  <div class="col">
-                    <div class>{{element.task_title}}</div>
-                  </div>
-                </div>
-              </q-card-section>
-              <q-badge
-                outline
-                v-bind:key="index"
-                class="q-mx-xs text-bold tag-badge tag-badge"
-                v-for="(tag, index) in element.tags"
-                :color="tag.color"
-              >{{tag.name}}
-              </q-badge>
-              <q-card-actions>
-                <q-btn size="xs" dense filled round color="blue" icon="message"/>
-                <q-btn size="xs" dense filled round color="orange" icon="flag"/>
-                <q-btn size="xs" dense filled round color="grey" icon="attachment"/>
-              </q-card-actions>
-            </q-card>
-          </draggable>
-        </div>
-      </div>
-
-      <div class="col-3 q-px-xs">
-        <div class="q-pa-xs column-background">
-          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm test-title">
-            <q-item-section avatar style="min-width:25px">
-              <q-icon name="compare_arrows" class="q-pa-none q-ma-none"/>
-            </q-item-section>
-            <q-item-section class="text-h6 text-weight-bolder">Test</q-item-section>
-            <q-item-section avatar>
-              <q-icon name="more_vert" class="cursor-pointer">
-                <q-menu transition-show="rotate" transition-hide="rotate">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable>
-                      <q-item-section>Mark all as completed</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as in progress</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as hold</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-icon>
-            </q-item-section>
-          </q-item>
-          <draggable
-            class="list-group"
-            :list="task_test"
-            group="tasks"
-            v-bind="dragOptions"
-            @start="drag = true"
-            @end="drag = false"
-          >
-            <q-card
-              square
-              v-for="(element, index) in task_test"
-              v-bind:key="index"
-              flat
-              bordered
-              class="box-shadow cursor-move bg-white q-mt-xs list-group-item border-test"
-              :style="element.task_type=='bug'?'border-left: 5px solid red !important':''"
-              @mouseover="task_index.test_index = index"
-              @mouseleave="task_index.test_index = null"
-            >
-              <q-avatar
-                class="q-pa-none"
-                size="25px"
-                dense
-                :class="element.task_type=='bug'? 'bug bottom-right-radius':'feature-test bottom-right-radius'"
-                text-color="white"
-              >
-                <q-icon
-                  filled
-                  size="xs"
-                  :name="element.task_type=='bug'? 'bug_report':'assignment'"
-                />
-              </q-avatar>
-              <span class="text-caption text-grey-9 q-ml-xs">
-                #{{element.id}}
-                <q-icon
-                  filled
-                  size="xs"
-                  name="close"
-                  class="float-right text-weight-bolder"
-                  :style="{'visibility':index==task_index.test_index?'visible':'hidden'}"
-                  @click="deleteTask('task_test',task_index.test_index)"
-                />
-                <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
-              </span>
-              <q-card-section class="q-pt-sm">
-                <div class="row items-center no-wrap">
-                  <div class="col">
-                    <div>{{element.task_title}}</div>
-                  </div>
-                </div>
-              </q-card-section>
-              <q-badge
-                outline
-                v-bind:key="index"
-                class="q-mx-xs text-bold tag-badge tag-badge"
-                v-for="(tag, index) in element.tags"
-                :color="tag.color"
-              >{{tag.name}}
-              </q-badge>
-              <q-card-actions>
-                <q-btn size="xs" dense filled round color="blue" icon="message"/>
-                <q-btn size="xs" dense filled round color="orange" icon="flag"/>
-                <q-btn size="xs" dense filled round color="grey" icon="attachment"/>
-              </q-card-actions>
-            </q-card>
-          </draggable>
-        </div>
-      </div>
-
-      <div class="col-3 q-px-xs">
-        <div class="q-pa-xs column-background">
-          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm done-title">
-            <q-item-section avatar style="min-width:25px">
-              <q-icon name="las la-check-circle" class="q-pa-none q-ma-none"/>
-            </q-item-section>
-            <q-item-section class="text-h6 text-weight-bolder">Done</q-item-section>
-            <q-item-section avatar>
-              <q-icon name="more_vert" class="cursor-pointer">
-                <q-menu transition-show="rotate" transition-hide="rotate">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable>
-                      <q-item-section>Mark all as completed</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as in progress</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Mark all as hold</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-icon>
-            </q-item-section>
-          </q-item>
-          <draggable
-            class="list-group"
-            :list="task_done"
-            group="tasks"
-            v-bind="dragOptions"
-            @start="drag = true"
-            @end="drag = false"
-          >
-            <q-card
-              square
-              v-for="(element, index) in task_done"
-              v-bind:key="index"
-              flat
-              bordered
-              class="box-shadow cursor-move bg-white q-mt-xs list-group-item border-done"
-              :style="element.task_type=='bug'?'border-left: 5px solid red !important':''"
-              @mouseover="task_index.done_index = index"
-              @mouseleave="task_index.done_index = null"
-            >
-              <q-avatar
-                class="q-pa-none"
-                size="25px"
-                dense
-                :class="element.task_type=='bug'? 'bug bottom-right-radius':'feature-done bottom-right-radius'"
-                text-color="white"
-              >
-                <q-icon
-                  filled
-                  size="xs"
-                  :name="element.task_type=='bug'? 'bug_report':'assignment'"
-                />
-              </q-avatar>
-              <span class="text-caption text-grey-9 q-ml-xs">
-                #{{element.id}}
-                <q-icon
-                  filled
-                  size="xs"
-                  name="close"
-                  class="float-right text-weight-bolder"
-                  :style="{'visibility':index==task_index.done_index?'visible':'hidden'}"
-                  @click="deleteTask('task_done',task_index.done_index)"
-                />
-                <q-avatar class="float-right q-my-md" size="md">
-                  <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
-                </q-avatar>
-              </span>
-              <q-card-section class="q-pt-sm">
-                <div class="row items-center no-wrap">
-                  <div class="col">
-                    <div class>{{element.task_title}}</div>
-                  </div>
-                </div>
-              </q-card-section>
-              <q-badge
-                outline
-                v-bind:key="index"
-                class="q-mx-xs text-bold tag-badge tag-badge"
-                v-for="(tag, index) in element.tags"
-                :color="tag.color"
-              >{{tag.name}}
-              </q-badge>
-              <q-card-actions>
-                <q-btn size="xs" dense filled round color="blue" icon="message"/>
-                <q-btn size="xs" dense filled round color="orange" icon="flag"/>
-                <q-btn size="xs" dense filled round color="grey" icon="attachment"/>
-              </q-card-actions>
-            </q-card>
-          </draggable>
-        </div>
-      </div>
-    </draggable>
-    <q-dialog v-model="add_new" position="left">
-      <q-card style="width: 300px">
-        <q-card-section>
-          <div class="text-h6">Add New Task</div>
-        </q-card-section>
-        <q-separator/>
-        <q-card-section class="row items-center no-wrap">
-          <q-form class="q-gutter-md full-width">
-            <q-input filled v-model="task_item.task_title" label="Card Name" class="q-ml-none"/>
-            <q-input filled v-model="task_item.task_type" label="Description" class="q-ml-none"/>
-            <q-input filled v-model="task_item.priority" label="Priority" class="q-ml-none"/>
-            <q-input filled v-model="task_item.value" label="value" class="q-ml-none"/>
-            <div class="text-right">
-              <q-btn @click="add_new=false" label="Cancel" type="submit" color="primary"/>
-              <q-btn
-                @click="addNewTask"
-                style="width: 90px"
-                class="q-ml-sm"
-                label="Add"
-                type="submit"
-                color="green"
-              />
+                </q-card-section>
+              </q-card>
             </div>
-          </q-form>
+          </draggable>
+        </div>
+      </div>
+
+    </draggable>
+    <q-dialog v-model="addCard">
+      <q-card class="q-pa-md" style="width: 80vh">
+        <q-card-section class="row items-center">
+          <div class="text-h6 q-ma-md">Add new card</div>
+          <q-space />
+          <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
         </q-card-section>
+        <!-- CARD FORM COMPONENT -->
+        <CardsForm @submitCard="showCards"></CardsForm>
       </q-card>
     </q-dialog>
   </q-page>
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
-// import CardsForm from 'components/CardsVue'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
+import CardsForm from 'components/CardsForm.vue'
 
 Vue.component('draggable', draggable)
 
 export default {
   name: 'Zgodbe',
-  // components: { CardsForm },
+  components: { CardsForm },
   data () {
     return {
+      addCard: false,
+      sections: {
+        1: {
+          name: 'To do',
+          theme: 'to-do-title',
+          border: 'border-todo'
+        },
+        2: {
+          name: 'In progress',
+          theme: 'in-progress-title',
+          border: 'border-in-progress'
+        },
+        3: {
+          name: 'Test',
+          theme: 'test-title',
+          border: 'border-test'
+        },
+        4: {
+          name: 'Done',
+          theme: 'done-title',
+          border: 'border-done'
+        }
+      },
+      sprints: [],
       user: {},
       pagination: {
         rowsPerPage: 0
       },
-      cards: {
-        id: '',
+      allCards: [],
+      newCard: {
         sprint_id: '',
         card_name: '',
         description: '',
         acceptance_test: '',
         priority: '',
         value: '',
-        subtasks: ''
+        subtasks: '',
+        round: ''
       },
       sprintId: '',
-      task_index: {
-        to_do_index: null,
-        in_progress_index: null,
-        test_index: null,
-        done_index: null
-      },
-      task_item: {
-        sprint_id: '',
-        task_title: '', // card name
-        task_type: '', // description
-        acceptance_test: '',
-        priority: '',
-        value: '',
-        subtasks: ''
-      },
       add_new: false,
-      drag: false,
-      task_to_do: [
-        {
-          task_title: 'Develop the add new call feature',
-          task_type: 'feature',
-          id: 1,
-          tags: [
-            { name: 'css', color: 'yellow' },
-            { name: 'html', color: 'pink' }
-          ]
-        }
-      ]
+      drag: false
     }
   },
   mounted () {
+    this.fetchCards()
     this.user = this.getCurrentUser()
     this.sprintId = this.$route.params.id
-    this.fetchCards()
+    this.sprints = this.sprint()
+    this.showCards()
   },
-  computed: {
+  methods: {
+    ...mapGetters('user', [
+      'getCurrentUser'
+    ]),
+    ...mapGetters('card', [
+      'getCards'
+    ]),
+    ...mapGetters('sprint', [
+      'getSprints'
+    ]),
+    ...mapActions('card', [
+      'fetchCards',
+      'postCard',
+      'updateCard'
+    ]),
     sprint () {
       var sprints = this.getSprints()
       for (var s in sprints) {
@@ -500,6 +152,21 @@ export default {
         }
       }
       return 'No sprint found.'
+    },
+    showCards () {
+      setTimeout(() => {
+        var cards = this.getCards()
+        this.allCards = this.cardsToArray(cards)
+      }, 1000)
+    },
+    cardsToArray (cards) {
+      var allCards = []
+      for (var card in cards) {
+        if (cards[card].sprint_id === this.sprintId) {
+          allCards.push(cards[card])
+        }
+      }
+      return allCards
     },
     columns () {
       if (this.user.permissions === 'Admin') {
@@ -542,20 +209,7 @@ export default {
         disabled: false,
         ghostClass: 'ghost'
       }
-    }
-  },
-  methods: {
-    ...mapGetters('user', [
-      'getCurrentUser'
-    ]),
-    ...mapGetters('sprint', [
-      'getSprints'
-    ]),
-    ...mapActions('card', [
-      'fetchCard',
-      'postCard',
-      'updateCard'
-    ]),
+    },
     addNewTask () {
       const maxid = Math.max.apply(
         Math,

@@ -1,4 +1,4 @@
-pii<template>
+<template>
   <q-item
     v-if="permissions === '' || this.user.permissions === 'Admin'"
     clickable

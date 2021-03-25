@@ -15,26 +15,29 @@ def add_card():
     priority = request.json['priority']
     value = request.json['value']
     subtasks = request.json['subtasks']
+    card_round = request.json['round']
 
     card_id = mongo.db.cards.insert(
-            {'sprint_id': sprint_id,
-             'card_name': card_name,
-             'description': description,
-             'priority': priority,
-             'acceptance_test': acceptance_test,
-             'value': value,
-             'subtasks': subtasks
-            })
+        {'sprint_id': sprint_id,
+         'card_name': card_name,
+         'description': description,
+         'priority': priority,
+         'acceptance_test': acceptance_test,
+         'value': value,
+         'round': card_round,
+         'subtasks': subtasks
+         })
     response = {
-            '_id': str(card_id),
-            'sprint_id': str(sprint_id),
-            'card_name': card_name,
-            'description': description,
-            'priority': priority,
-            'acceptance_test': acceptance_test,
-            'value': value,
-            'subtasks': subtasks
-        }
+        '_id': str(card_id),
+        'sprint_id': str(sprint_id),
+        'card_name': card_name,
+        'description': description,
+        'priority': priority,
+        'acceptance_test': acceptance_test,
+        'value': value,
+        'round': card_round,
+        'subtasks': subtasks
+    }
     print(response)
     return response
 
@@ -70,13 +73,14 @@ def update_sprint_of_card():
 
     mongo.db.cards.save(current_card)
     response = {
-            '_id': str(card_id),
-            'sprint_id': str(sprint_id),
-            'card_name': current_card['card_name'],
-            'description': current_card['description'],
-            'priority': current_card['priority'],
-            'acceptance_test': current_card['acceptance_test'],
-            'value': current_card['value'],
-            'subtasks': current_card['subtasks']
+        '_id': str(card_id),
+        'sprint_id': str(sprint_id),
+        'card_name': current_card['card_name'],
+        'description': current_card['description'],
+        'priority': current_card['priority'],
+        'acceptance_test': current_card['acceptance_test'],
+        'value': current_card['value'],
+        'subtasks': current_card['subtasks'],
+        'round': current_card['round']
     }
     return response
