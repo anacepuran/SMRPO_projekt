@@ -108,19 +108,31 @@ export default {
       }
       return data
     },
-    onSubmit () {
+    checkUserData () {
+      var alreadyExists = false
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
-      if (this.pushUser.username !== this.newUser.username) {
-        var alreadyExists = false
-        for (var user in this.allUsers) {
-          if (this.pushUser.username === this.allUsers[user].username) {
+      if (this.pushUser.username.toLowerCase() !== this.newUser.username.toLowerCase()) {
+        for (var userN in this.allUsers) {
+          if (this.pushUser.username.toLowerCase() === this.allUsers[userN].username.toLowerCase()) {
             alreadyExists = true
             this.error = 'User with the username "' + this.pushUser.username + '" already exists.'
           }
         }
       }
+      // CHECK IF USER WITH EMAIL ALREADY EXISTS
+      if (this.pushUser.email.toLowerCase() !== this.newUser.email.toLowerCase()) {
+        for (var userE in this.allUsers) {
+          if (this.pushUser.email.toLowerCase() === this.allUsers[userE].email.toLowerCase()) {
+            alreadyExists = true
+            this.error = 'User with the email "' + this.pushUser.email + '" already exists.'
+          }
+        }
+      }
+      return alreadyExists
+    },
+    onSubmit () {
       var submitMessage = ''
-      if (!alreadyExists) {
+      if (!this.checkUserData()) {
         if (this.$props.editUser) {
           submitMessage = 'User updated.'
           this.updateUser(this.pushUser)

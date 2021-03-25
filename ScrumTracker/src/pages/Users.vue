@@ -138,6 +138,7 @@ export default {
       this.newUser.permissions = user.permissions
       this.newUser._id = user._id
       this.newUser.last_login = user.last_login
+      this.newUser.this_login = user.this_login
       this.addUser = true
     },
     showUsers () {
@@ -165,6 +166,7 @@ export default {
       this.newUser.permissions = null
       this.newUser._id = ''
       this.newUser.last_login = ''
+      this.newUser.this_login = ''
       this.editUser = false
     }
   }

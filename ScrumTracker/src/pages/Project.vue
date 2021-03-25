@@ -4,18 +4,18 @@
       <q-card class="q-ma-lg" flat bordered>
         <q-card-section horizontal>
           <q-card-section class="q-ma-md bg-primary">
-            <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 150%;">Project</div>
+            <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 50%;">Project</div>
           </q-card-section>
-          <q-card-section class="q-ma-md">
+          <q-card-section class="q-ma-md" style="width: 40%">
             <div class="text-h5 q-ma-md">{{ project.name }}</div>
             <div class="text-overline q-ma-md">Deadline: {{ project.deadline }}</div>
           </q-card-section>
           <q-separator vertical />
-          <q-card-section style="width: 50%">
+          <q-card-section style="width: 70%">
             <div class="row q-ma-md" v-for="user in project.users" :key="user.user_name">
-                <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
+                <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
                 <span class="q-ma-xs" style="font-weight: bold;">{{user.user_name}}</span>
-                <span class="text-caption text-dark-grey q-ma-xs"> {{user.user_role}}</span>
+                <span class="text-caption text-dark-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
             </div>
           </q-card-section>
           <q-card-section class="full-width">
@@ -280,7 +280,7 @@ export default {
           return true
         }
         for (var user in this.project.users) {
-          if (this.project.users[user].user_role === 'Methodology Admin') {
+          if (this.project.users[user].user_role === 'Scrum Master') {
             return true
           }
         }
@@ -321,6 +321,31 @@ export default {
         return filteredItems
       }
       return this.sprints
+    },
+    formatUserRoles (userRoles) {
+      console.log('format')
+      var roles = ''
+      for (var i = 1; i < userRoles.length; i++) {
+        roles += userRoles[i]
+        if (i < userRoles.length - 1) {
+          roles += ' + '
+        }
+      }
+      return roles
+    },
+    avatarColor (userRole) {
+      console.log(userRole)
+      var color = ''
+      if (userRole[1] === 'Product Owner') {
+        color = 'teal'
+      }
+      if (userRole[1] === 'Scrum Master') {
+        color = 'orange'
+      }
+      if (userRole[1] === 'Developer') {
+        color = 'red'
+      }
+      return color
     }
   },
   mounted () {

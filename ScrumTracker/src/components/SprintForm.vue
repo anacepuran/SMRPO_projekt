@@ -54,7 +54,7 @@ export default {
   data () {
     return {
       error: '',
-      roleOptions: ['Product Manager', 'Development Team Member', 'Methodology Admin'],
+      roleOptions: ['Product Owner', 'Developer', 'Scrum Master'],
       allProjects: [],
       setRoles: false,
       datePicker: false,

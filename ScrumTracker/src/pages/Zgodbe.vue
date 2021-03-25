@@ -901,7 +901,7 @@ export default {
           return true
         }
         for (var user in this.project.users) {
-          if (this.project.users[user].user_role === 'Methodology Admin') {
+          if (this.project.users[user].user_role === 'Scrum Master') {
             return true
           }
         }
