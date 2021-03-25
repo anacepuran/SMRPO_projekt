@@ -1,11 +1,9 @@
 {
-  "name": "scrumtracker123",
+  "name": "scrumtracker-smrpo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "core-js": "^3.6.5",
-    "eslint": "^7.13.0",
-    "vue": "^2.6.11"
+    "quasar": "^1.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -16,12 +14,9 @@
     "eslint-plugin-vue": "^6.2.2",
     "vue-template-compiler": "^2.6.11"
   },
-  "dependencies": {
-    "quasar": "^1.0.0"
-  },
   "scripts": {
     "start": "gunicorn backend.app:app",
-    "build": "cd ScrumTracker && npm run build"
+    "build": "cd ScrumTracker && npm install -g @quasar/cli && npm run build"
   },
   "eslintConfig": {
     "extends": "plugin:vue/recommended"
