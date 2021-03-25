@@ -1,4 +1,4 @@
-from flask import request, jsonifyc
+from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
 from backend.db import mongo
