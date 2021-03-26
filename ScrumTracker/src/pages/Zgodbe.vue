@@ -23,136 +23,8 @@
         </q-card-section>
       </q-card-section>
     </q-card>
-
-    <!--
-    <q-dialog v-model="editCardData">
-      <q-card class="q-pa-md" style="width: 80vh">
-        <q-card-section class="row items-center">
-          <div class="text-h6">{{ dialogTitle }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <CardForm :newCard="editCard" :editCard="editCardData" @submitCard="updateCardInfo()"></CardForm>
-      </q-card>
-    </q-dialog>
-   <q-card class="q-ma-md">
-      <q-card-section class="bg-secondary" >
-        <div class="text-white text-h6">Uporabniske Zgodbe</div>
-        <div class="q-ma-sm col-2">
-          <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Card" icon="create_new_folder" @click="addCard=true" />
-        </div>
-      </q-card-section>
-    </q-card> -->
-      <!--
-      <div class="row q-ma-md">
-        <q-table
-          class="full-width"
-          :data="filteredProjects"
-          :columns="columns"
-          row-key="name"
-          virtual-scroll
-          :pagination.sync="pagination"
-          :rows-per-page-options="[0]"
-          :loading="loading"
-        >
-          <template v-slot:loading>
-            <q-inner-loading showing color="primary" />
-          </template>
-          <template v-slot:body-cell-name="propsName">
-            <q-td :props="propsName" @click="openSprint(propsName.row._id)">
-              <div>
-                <q-icon class="q-ma-sm" size="sm" color="secondary" name="folder_open" />
-                <span class="q-ma-sm" style="font-size: 2vh">{{propsName.row.name}}</span>
-              </div>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-users="propsUsers">
-            <q-td :props="propsUsers">
-              <div class="row" v-for="user in propsUsers.row.users" :key="user.user_name">
-                <div clasS=" col-1">
-                  <q-avatar class="q-ma-xs" size="20px" font-size="15px" color="secondary" text-color="white" icon="person" />
-                </div>
-                <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{user.user_role}}</span>
-              </div>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-delete="propsDelete" v-if="user.permissions === 'Admin'">
-            <q-td :props="propsDelete">
-              <div>
-                <q-btn @click="confirmDelete=true; deleteProjectId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
-              </div>
-            </q-td>
-          </template>
-        </q-table>
-      </div>
-      <q-dialog v-model="confirmDelete">
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-avatar icon="delete" color="primary" text-color="white" />
-            <span class="q-ml-sm">Are you sure you want to delete this project?</span>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn flat @click="deleteProjectId=''" label="Cancel" color="primary" v-close-popup />
-            <q-btn flat @click="deleteFunction(deleteProjectId)" label="DELETE" color="negative" v-close-popup />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-      <q-dialog v-model="addProject">
-        <q-card class="q-pa-md" style="width: 80vh">
-          <q-card-section class="row items-center">
-            <div class="text-h6 q-ma-md">Create new Sprint</div>
-            <q-space />
-            <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
-          </q-card-section>
-           USER FORM COMPONENT
-          <SprintForm :newProject="newSprint" :editProject="false" @submitProject="showSprints"></SprintForm>
-        </q-card>
-      </q-dialog>
-        -->
-      <!--<q-list  bordered separator>
-          <q-item v-for="sprint in projectSprints" :key="sprint._id" clickable v-ripple>
-            <q-td @click="openSprint(sprint._id)">
-            <q-item-section style="width: 3%" class="col-1">
-              <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ sprint.name }}</q-item-label>
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label class="q-ma-sm"><span style="opacity: .6">From: </span>{{ sprint.start_date }}</q-item-label>
-              <q-item-label class="q-ma-sm"><span style="opacity: .6">To: </span>{{ sprint.end_date }}</q-item-label>
-            </q-item-section>
-            </q-td>
-          </q-item>
-      </q-list>-->
-    <div class="row">
-      <div class="col-12">
-        <q-btn
-          v-if="$q.screen.gt.xs"
-          outline
-          dense
-          no-wrap
-          icon="add"
-          no-caps
-          color="green"
-          label="Add Task"
-          class="q-mt-sm q-ml-sm q-pr-sm bg-white"
-          @click="add_new = true"
-        ></q-btn>
-      </div>
-    </div>
-    <draggable
-      class="row q-mt-xs"
-      group="columns"
-      v-bind="dragOptions"
-      @start="drag = true"
-      @end="drag = false"
-    >
     <draggable class="row q-mt-xs" group="columns" v-bind="dragOptions" @start="drag = true" @end="drag = false">
       <div class="col-3 q-px-xs" v-for="(element, index) in sections" v-bind:key="index">
-
         <div class="q-pa-xs column-background">
           <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm" :class="element.theme">
             <q-item-section avatar style="min-width:25px">
@@ -162,14 +34,27 @@
           </q-item>
           <draggable class="list-group" :list="cards" group="tasks" v-bind="dragOptions" @start="drag = true" @end="drag = false">
             <div v-for="(card, index) in allCards" v-bind:key="index">
-              <q-card square v-if="card.round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item" :class="element.border">
-                <span class="text-caption text-grey-9 q-ml-xs">
-                  {{ cards.card_name }}
+              <q-card square v-if="card.card_round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item" :class="element.border">
+                <span class="text-h6 text-capitalize text-grey-9 q-ml-xs">
+                  {{ card.card_name }}
+                </span>
+                <span class="text-subtitle-2 float-right text-uppercase">
+                  {{ card.priority }}
                 </span>
                 <q-card-section class="q-pt-sm">
                   <div class="row items-center no-wrap">
                     <div class="col">
-                      <div>{{ cards.description }}</div>
+                      <div><b>DESCRIPTION:</b> {{ card.description }}</div>
+                    </div>
+                  </div>
+                  <div class="row items-center no-wrap">
+                    <div class="col">
+                      <div><b>ACCEPTANCE TEST:</b> {{ card.acceptance_test }}</div>
+                    </div>
+                  </div>
+                  <div class="row items-center no-wrap">
+                    <div class="col">
+                      <div><b>VALUE:</b> {{ card.value }}</div>
                     </div>
                   </div>
                 </q-card-section>
@@ -179,18 +64,15 @@
         </div>
       </div>
     </draggable>
-    </draggable>
     <q-dialog v-model="addCard">
-      <q-card class="q-pa-md" style="width: 300px">
-        <q-card-section class="row items-center no-wrap">
-          <q-form class="q-gutter-md full-width">
+      <q-card class="q-pa-md" style="width: 80vh">
+        <q-card-section class="row items-center">
           <div class="text-h6 q-ma-md">Add new card</div>
           <q-space />
           <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
-          </q-form>
         </q-card-section>
         <!-- CARD FORM COMPONENT -->
-        <CardsForm :newProject="newCard" @submitCard="showCardsshowCards"></CardsForm>
+        <CardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="showCards"></CardsForm>
       </q-card>
     </q-dialog>
   </q-page>
@@ -209,6 +91,7 @@ export default {
   data () {
     return {
       addCard: false,
+      editCard: true,
       sections: {
         1: {
           name: 'To do',
@@ -239,30 +122,19 @@ export default {
       },
       allCards: [],
       newCard: {
-        sprint_id: '',
+        sprint_id: this.$route.params.id,
         card_name: '',
         description: '',
         acceptance_test: '',
         priority: '',
         value: '',
         subtasks: '',
-        round: ''
+        card_round: 'to do'
       },
       sprintId: '',
       add_new: false,
       drag: false,
       cardId: ''
-    }
-  },
-  computed: {
-    project () {
-      var allCards = this.getCards()
-      for (var project in allCards) {
-        if (allCards[project]._id === this.cardId) {
-          return allCards[project]
-        }
-      }
-      return 'No project found.'
     }
   },
   mounted () {
@@ -297,23 +169,12 @@ export default {
       return 'No sprint found.'
     },
     showCards () {
-      this.addProject = false
-      this.loading = true
+      this.addCard = false
       setTimeout(() => {
-        var projectCards = this.getCards()
-        this.cards = this.projectsToArray(projectCards)
-        this.loading = false
+        var cards = this.getCards()
+        console.log(cards)
+        this.allCards = this.cardsToArray(cards)
       }, 1000)
-    },
-    projectsToArray (projectCards) {
-      var data = []
-      for (var sprint in projectCards) {
-        var currentSprint = projectCards[sprint]
-        if (currentSprint.card_id === this.cardId) {
-          data.push(projectCards[sprint])
-        }
-      }
-      return data
     },
     cardsToArray (cards) {
       var allCards = []
@@ -322,6 +183,7 @@ export default {
           allCards.push(cards[card])
         }
       }
+      console.log(allCards)
       return allCards
     },
     columns () {
@@ -359,15 +221,15 @@ export default {
       }
     },
     onReset () {
-      this.newProject.sprint_id = ''
-      this.newProject.description = ''
-      this.newProject.card_name = ''
-      this.newProject.users = []
-      this.newProject.acceptance_test = ''
-      this.newProject.value = ''
-      this.newProject.subtasks = ''
-      this.newProject.round = ''
-      this.newProject.priority = ''
+      this.newCard.sprint_id = this.$route.params.id
+      this.newCard.description = ''
+      this.newCard.card_name = ''
+      this.newCard.users = []
+      this.newCard.acceptance_test = ''
+      this.newCard.value = ''
+      this.newCard.subtasks = ''
+      this.newCard.card_round = 'to do'
+      this.newCard.priority = ''
     },
     dragOptions () {
       return {

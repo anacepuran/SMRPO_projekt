@@ -1,8 +1,8 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from backend.db import mongo
-from backend.auxiliary_functions import *
+from db import mongo
+from auxiliary_functions import *
 
 users_route = Blueprint('users_route', __name__)
 

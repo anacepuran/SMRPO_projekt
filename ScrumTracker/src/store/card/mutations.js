@@ -9,7 +9,8 @@ export function PUSH_NEW_CARD (state, newCard) {
     acceptance_test: newCard.acceptance_test,
     priority: newCard.priority,
     subtasks: newCard.subtasks,
-    value: newCard.value
+    value: newCard.value,
+    card_round: newCard.card_round
   }
   state.cards[newCard._id] = pushCard
 }

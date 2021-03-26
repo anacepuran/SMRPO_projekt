@@ -16,9 +16,11 @@ export function postCard ({ commit }, payload) {
     acceptance_test: payload.acceptance_test,
     priority: payload.priority,
     subtasks: payload.subtasks,
-    value: payload.value
+    value: payload.value,
+    card_round: payload.card_round
   })
     .then((res) => {
+      console.log(res.data)
       commit('PUSH_NEW_CARD', res.data)
     })
     .catch((error) => {
@@ -34,7 +36,8 @@ export function updateCard ({ commit }, payload) {
     acceptance_test: payload.acceptance_test,
     priority: payload.priority,
     subtasks: payload.subtasks,
-    value: payload.value
+    value: payload.value,
+    card_round: payload.card_round
   })
     .then((res) => {
       commit('PUSH_NEW_CARD', res.data)
