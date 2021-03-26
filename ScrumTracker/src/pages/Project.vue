@@ -41,13 +41,13 @@
           <div class="text-white text-h6 q-ma-sm">Sprints</div>
           <q-space/>
           <div class="q-ma-sm">
-            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addProject=true" />
+            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
           </div>
         </q-card-section>
         <div class="row q-ma-md">
           <q-table
             class="full-width"
-            :data="filteredProjects"
+            :data="filteredSprints"
             :columns="columns"
             row-key="name"
             virtual-scroll
@@ -97,7 +97,7 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
-        <q-dialog v-model="addProject">
+        <q-dialog v-model="addSprint">
           <q-card class="q-pa-md" style="width: 80vh">
             <q-card-section class="row items-center">
               <div class="text-h6 q-ma-md">Create new Sprint</div>
@@ -105,7 +105,7 @@
               <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
             </q-card-section>
             <!-- USER FORM COMPONENT -->
-            <SprintForm :newProject="newSprint" :editProject="false" @submitProject="showSprints"></SprintForm>
+            <SprintForm :newSprint="newSprint" :editProject="false" @submitSprint="showSprints"></SprintForm>
           </q-card>
         </q-dialog>
 
@@ -145,7 +145,7 @@ export default {
       },
       loading: false,
       search: '',
-      addProject: false,
+      addSprint: false,
       deleteProjectId: '',
       confirmDelete: false,
       sprints: [],
@@ -161,15 +161,16 @@ export default {
       },
       newSprint: {
         name: '',
-        id: '',
+        project_id: '',
         startdate: '',
         enddate: '',
-        expectedtime: ''
+        expectedtime: '',
+        numOfUsers: 0
       }
     }
   },
   computed: {
-    filteredProjects () {
+    filteredSprints () {
       return this.getSearchFilteredSprints(this.search)
     },
     project () {
@@ -192,8 +193,9 @@ export default {
             field: row => row.name,
             sortable: true
           },
-          { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true },
+          { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
+          { name: 'end_date', align: 'center', label: 'End date', field: 'end_date', sortable: true },
+          { name: 'expected_time', align: 'center', label: 'Expected time', field: 'expected_time' },
           { name: 'delete', align: 'center', label: 'Delete project', field: 'delete' }
         ]
       } else {
@@ -238,15 +240,17 @@ export default {
       this.showSprints()
     },
     showSprints () {
-      this.addProject = false
+      this.addSprint = false
       this.loading = true
       setTimeout(() => {
         var projectSprints = this.getSprints()
-        this.sprints = this.projectsToArray(projectSprints)
+        console.log(projectSprints)
+        this.sprints = this.sprintsToArray(projectSprints)
+        console.log(this.sprints)
         this.loading = false
       }, 1000)
     },
-    projectsToArray (projectSprints) {
+    sprintsToArray (projectSprints) {
       var data = []
       for (var sprint in projectSprints) {
         var currentSprint = projectSprints[sprint]
@@ -286,26 +290,16 @@ export default {
       this.editProjectData = true
     },
     onReset () {
-      this.newProject.name = ''
-      this.newProject.users = []
-      this.newProject.deadline = ''
+      this.newSprint.name = ''
+      this.newSprint.startdate = ''
+      this.newSprint.enddate = ''
+      this.newSprint.expectedtime = ''
+      this.newSprint.numOfUsers = this.project.users.length
     },
     getSearchFilteredSprints (search) {
-      if (this.search !== '') {
-        var filteredItems = []
-        for (var project in this.newSprint) {
-          const projectName = this.sprints[project].name.toLowerCase()
-          if (projectName.startsWith(search.toLowerCase())) {
-          // console.log(checkedItems[i].title.toLowerCase().startsWith(searchString))
-            filteredItems.push(this.sprints[project])
-          }
-        }
-        return filteredItems
-      }
       return this.sprints
     },
     formatUserRoles (userRoles) {
-      console.log('format')
       var roles = ''
       for (var i = 1; i < userRoles.length; i++) {
         roles += userRoles[i]
@@ -316,7 +310,6 @@ export default {
       return roles
     },
     avatarColor (userRole) {
-      console.log(userRole)
       var color = ''
       if (userRole[1] === 'Product Owner') {
         color = 'teal'
@@ -334,7 +327,10 @@ export default {
     this.user = this.getCurrentUser()
     this.fetchSprint()
     this.projectId = this.$route.params.id
-    this.newSprint.id = this.projectId
+    this.newSprint.project_id = this.projectId
+    this.newSprint.numOfUsers = this.project.users.length
+    console.log('this.project.users.length')
+    console.log(this.project.users.length)
     this.showSprints()
   }
 }

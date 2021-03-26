@@ -1,15 +1,17 @@
 export function SET_SPRINT (state, fetchedProjects) {
   state.sprints = fetchedProjects
 }
-export function PUSH_NEW_SPRINT (state, newProject) {
-  var pushProject = {
-    name: newProject.name,
-    project_id: newProject.id,
-    start_date: newProject.startdate,
-    end_date: newProject.enddate,
-    expected_time: newProject.expectedtime
+export function PUSH_NEW_SPRINT (state, newSprint) {
+  console.log(newSprint)
+  var pushSprint = {
+    name: newSprint.name,
+    project_id: newSprint.project_id,
+    start_date: newSprint.start_date,
+    end_date: newSprint.end_date,
+    expected_time: newSprint.expected_time,
+    _id: newSprint._id
   }
-  state.sprints[newProject._id] = pushProject
+  state.sprints[newSprint._id] = pushSprint
 }
 export function DELETE_SPRINT (state, projectId) {
   delete state.sprints[projectId]

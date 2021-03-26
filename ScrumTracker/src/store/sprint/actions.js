@@ -8,9 +8,10 @@ export function fetchSprint ({ commit }) {
     })
 }
 export function postSprint ({ commit }, payload) {
+  console.log(payload)
   this.$axios.post('sprints/add', {
     name: payload.name,
-    project_id: payload.id,
+    project_id: payload.project_id,
     start_date: payload.startdate,
     end_date: payload.enddate,
     expected_time: payload.expectedtime
