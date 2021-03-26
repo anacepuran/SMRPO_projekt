@@ -129,6 +129,7 @@ export default {
       this.pushProject.enddate = this.selectDeadline.to
       var d1 = this.pushProject.startdate
       var d2 = this.today
+      // var d3 = this.allProjects
       if (d1 < d2) {
         // d1 = d2
         this.pushProject.startdate = 'No Past Dates'

@@ -57,6 +57,11 @@
                       <div><b>VALUE:</b> {{ card.value }}</div>
                     </div>
                   </div>
+                    <q-td :props="propsDelete">
+                      <div>
+                        <q-btn @click="confirmDelete=true; deleteCardId=card._id" size="sm" round color="negative" icon="delete"  />
+                      </div>
+                    </q-td>
                 </q-card-section>
               </q-card>
             </div>
@@ -64,6 +69,18 @@
         </div>
       </div>
     </draggable>
+    <q-dialog v-model="confirmDelete">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="delete" color="primary" text-color="white" />
+          <span class="q-ml-sm">Are you sure you want to delete this project?</span>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat @click="deleteCardId=''" label="Cancel" color="primary" v-close-popup />
+          <q-btn flat @click="deleteFunction(deleteCardId)" label="DELETE" color="negative" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-dialog v-model="addCard">
       <q-card class="q-pa-md" style="width: 80vh">
         <q-card-section class="row items-center">
@@ -92,6 +109,8 @@ export default {
     return {
       addCard: false,
       editCard: true,
+      confirmDelete: false,
+      deleteCardId: '',
       sections: {
         1: {
           name: 'To do',
@@ -157,8 +176,13 @@ export default {
     ...mapActions('card', [
       'fetchCards',
       'postCard',
-      'updateCard'
+      'updateCard',
+      'deleteCard'
     ]),
+    deleteFunction (cardId) {
+      this.deleteCard(cardId)
+      this.showCards()
+    },
     sprint () {
       var sprints = this.getSprints()
       for (var s in sprints) {

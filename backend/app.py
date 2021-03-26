@@ -3,14 +3,14 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from db import mongo
+from backend.db import mongo
 import os
 from dotenv import load_dotenv
-from routes.project import projects_route
-from routes.cards import cards_route
-from routes.scrums import scrums_route
-from routes.sprints import sprints_route
-from routes.users import users_route
+from backend.routes.project import projects_route
+from backend.routes.cards import cards_route
+from backend.routes.scrums import scrums_route
+from backend.routes.sprints import sprints_route
+from backend.routes.users import users_route
 load_dotenv()
 
 app = Flask(__name__, static_folder='../ScrumTracker/dist/spa/',
