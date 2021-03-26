@@ -57,13 +57,24 @@
                       <div><b>VALUE:</b> {{ card.value }}</div>
                     </div>
                   </div>
-                    <q-td :props="propsDelete">
                       <div>
-                        <q-btn @click="confirmDelete=true; deleteCardId=card._id" size="sm" round color="negative" icon="delete"  />
+                        <q-btn @click="confirmDelete=true; deleteCardId=card._id" size="sm" round color="negative" icon="delete"/>
                       </div>
-                    </q-td>
+                        <div>
+                          <q-btn @click="editFunction" size="sm" class="q-ma-md" icon="edit" color="primary" label="Edit Card"/>
+                        </div>
                 </q-card-section>
               </q-card>
+              <q-dialog v-model="editCardData">
+                <q-card class="q-pa-md" style="width: 80vh">
+                  <q-card-section class="row items-center">
+                    <div class="text-h6">{{ dialogTitle }}</div>
+                    <q-space />
+                    <q-btn icon="close" flat round dense v-close-popup />
+                  </q-card-section>
+                  <CardsForm :newCard="editCards" :editCard="editCardData" @submitCard="updateCardInfo()"></CardsForm>
+                </q-card>
+              </q-dialog>
             </div>
           </draggable>
         </div>
@@ -140,6 +151,16 @@ export default {
         rowsPerPage: 0
       },
       allCards: [],
+      editCards: {
+        sprint_id: this.$route.params.id,
+        card_name: '',
+        description: '',
+        acceptance_test: '',
+        priority: '',
+        value: '',
+        subtasks: '',
+        card_round: 'to do'
+      },
       newCard: {
         sprint_id: this.$route.params.id,
         card_name: '',
@@ -153,7 +174,19 @@ export default {
       sprintId: '',
       add_new: false,
       drag: false,
-      cardId: ''
+      cardId: '',
+      editCardData: false,
+      dialogTitle: 'Edit card'
+    }
+  },
+  computed: {
+    dragOptions () {
+      return {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
     }
   },
   mounted () {
@@ -183,6 +216,9 @@ export default {
       this.deleteCard(cardId)
       this.showCards()
     },
+    updateCardInfo () {
+      this.editCardData = false
+    },
     sprint () {
       var sprints = this.getSprints()
       for (var s in sprints) {
@@ -191,6 +227,15 @@ export default {
         }
       }
       return 'No sprint found.'
+    },
+    card () {
+      var allCards = this.getCards()
+      for (var card in allCards) {
+        if (allCards[card]._id === this.cardId) {
+          return allCards[card]
+        }
+      }
+      return 'No project found.'
     },
     showCards () {
       this.addCard = false
@@ -210,6 +255,7 @@ export default {
       console.log(allCards)
       return allCards
     },
+
     columns () {
       if (this.user.permissions === 'Admin') {
         return [
@@ -244,6 +290,28 @@ export default {
         ]
       }
     },
+
+    EditFunction () {
+      this.editCards.description = this.card.description
+      this.editCards.card_name = this.card.card_name
+      this.editCards.acceptance_test = this.card.acceptance_test
+      this.editCards.value = this.card.value
+      this.editCards.subtasks = this.card.subtasks
+      // this.editCards.card_round = this.card_round
+      this.editCards.priority = this.card.priority
+      var userTable = []
+      for (var user in this.card.users) {
+        var userData = {
+          label: this.card.users[user].user_name,
+          value: this.card.users[user].user_name
+          // role: this.card.users[user].user_role
+        }
+        userTable.push(userData)
+      }
+      this.editCardData.users = userTable
+      this.editCardData = true
+    },
+
     onReset () {
       this.newCard.sprint_id = this.$route.params.id
       this.newCard.description = ''
@@ -254,14 +322,6 @@ export default {
       this.newCard.subtasks = ''
       this.newCard.card_round = 'to do'
       this.newCard.priority = ''
-    },
-    dragOptions () {
-      return {
-        animation: 200,
-        group: 'description',
-        disabled: false,
-        ghostClass: 'ghost'
-      }
     },
     addNewTask () {
       const maxid = Math.max.apply(
