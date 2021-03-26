@@ -4,40 +4,56 @@
         @reset="onReset"
         class="q-gutter-md"
     >
+      <q-input
+          filled
+          v-model="pushSprint.name"
+          label="Sprint name"
+          lazy-rules
+          :rules="[ val => val && val.length > 0 || 'Please type something']"
+      />
+      <div class="row">
+        <div class="col q-ma-md">
+          <q-btn label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
+          <q-badge class="q-ma-sm" color="secondary">
+            Duration: {{ selectDuration }}
+        </q-badge>
+      </div>
+      <div class="col q-ma-sm">
         <q-input
             filled
-            v-model="pushProject.name"
-            label="Project name"
+            v-model="pushSprint.expectedtime"
+            type="number"
+            label="Expected Time"
+            min="1" max="50"
+            hint="Please specify Sprint expected time"
             lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
+            :rules="[
+              val => val !== null && val !== '' || 'Please select expected time',
+              val => val > 0 && val < 51 || 'Please type a valid expected time'
+            ]"
         />
-            <div class="col q-ma-sm">
-                <q-btn label="Select deadline" icon="event" color="secondary" @click="datePicker=true" />
-            </div>
-            <div class="col q-ma-md">
-                <q-badge color="secondary">
-                    Deadline: {{ selectDeadline }}
-                </q-badge>
-            </div>
-
+      </div>
+      </div>
         <q-dialog v-model="datePicker">
             <q-card class="q-ma-md">
                 <div class="row">
                     <q-date
+                        class="q-ma-md"
                         mask="DD/MM/YYYY"
-                        v-model="selectDeadline"
+                        v-model="selectDuration"
                         minimal
                         range
                     />
                 </div>
                 <div class="row q-ma-md flex flex-center">
-                    <q-btn label="Save" color="primary" @click="setdates()" v-close-popup/>
-
-                    <q-btn label="Reset" flat color="primary" @click="selectDeadline=''" v-close-popup />
+                    <q-btn label="Save" color="primary" @click="setdates()"/>
+                    <q-btn label="Reset" flat color="primary" @click="selectDuration=''; dateError = ''" />
                 </div>
+                <q-card-section class="text-center">
+                  <p style="color: red; font-size:1.5vh;word-break: break-all;" v-if="dateError != ''">{{dateError}}</p>
+                </q-card-section>
             </q-card>
         </q-dialog>
-        <q-input v-model="pushProject.expectedtime" type="number" name="Expected Time" min="1" max="50"/>
         <q-card-actions horizontal align="right">
             <q-btn label="Submit" type="submit" color="primary" />
             <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
@@ -49,31 +65,34 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import moment from 'moment'
 export default {
   name: 'SprintForm',
   data () {
     return {
       error: '',
-      roleOptions: ['Product Owner', 'Developer', 'Scrum Master'],
-      allProjects: [],
-      setRoles: false,
+      dateError: '',
+      allSprints: [],
       datePicker: false,
-      selectDeadline: '',
-      pushProject: {
+      selectDuration: '',
+      projectId: '',
+      pushSprint: {
         name: '',
         _id: '',
         startdate: '',
         enddate: '',
-        expectedtime: ''
+        expectedtime: '',
+        project_id: ''
       },
-      today: ''
+      today: '',
+      numOfUsers: 0
     }
   },
   props: {
     editProject: {
       type: Boolean
     },
-    newProject: {
+    newSprint: {
       type: Object
     }
   },
@@ -96,11 +115,13 @@ export default {
   mounted () {
     this.fetchSprint()
     this.fetchUsers()
-    var projects = this.getSprints()
-    this.allProjects = this.projectsToArray(projects)
     this.onReset()
+    var sprints = this.getSprints()
+    this.allSprints = this.sprintsToArray(sprints)
     this.today = this.getDate()
-    this.selectDeadline = this.pushProject.deadline
+    this.selectDuration = this.pushSprint.deadline
+    this.projectId = this.$props.newSprint.project_id
+    this.numOfUsers = this.$props.newSprint.numOfUsers
   },
   methods: {
     ...mapGetters('sprint', [
@@ -117,95 +138,92 @@ export default {
     ...mapActions('user', [
       'fetchUsers'
     ]),
-    projectsToArray (projects) {
+    sprintsToArray (sprints) {
       var data = []
-      for (var project in projects) {
-        data.push(projects[project])
+      for (var sprint in sprints) {
+        if (sprints[sprint].project_id === this.pushSprint.project_id) {
+          data.push(sprints[sprint])
+        }
       }
       return data
     },
     setdates () {
-      this.pushProject.startdate = this.selectDeadline.from
-      this.pushProject.enddate = this.selectDeadline.to
-      var d1 = this.pushProject.startdate
-      var d2 = this.today
-      // var d3 = this.allProjects
-      if (d1 < d2) {
-        // d1 = d2
-        this.pushProject.startdate = 'No Past Dates'
-        this.pushProject.enddate = 'No Past Dates'
+      this.dateError = ''
+      var diff = moment(this.selectDuration.from, 'DD/MM/YYYY').diff(moment(), 'days')
+      if (diff < 0) {
+        this.dateError = 'Please select a start date in the future.'
       }
-      /*
-      var users = this.getSprints()
-      for (var user in users) {
-        var userData = {
-          label: users[user].startdate,
-          value: users[user].startdate
+      for (var sprint in this.allSprints) {
+        if (this.dateOverlaps(this.selectDuration.from, this.selectDuration.to, this.allSprints[sprint].start_date, this.allSprints[sprint].end_date)) {
+          this.dateError = 'Sprint duration overleaps with the ' + this.allSprints[sprint].name + ' duration.'
         }
-        if (userData.value === this.pushProject.startdate) {
-          this.pushProject.startdate = 'already started'
-        }
-      } */
+      }
+      if (this.dateError === '') {
+        this.pushSprint.startdate = this.selectDuration.from
+        this.pushSprint.enddate = this.selectDuration.to
+        this.dateError = ''
+        this.datePicker = false
+      }
     },
-    usersPushData (users) {
-      var data = []
-      var allUsers = this.getUsers()
-      for (var user in users) {
-        for (var isUser in allUsers) {
-          if (users[user].label === allUsers[isUser].username) {
-            var push = {
-              user_name: allUsers[isUser].username,
-              user_id: allUsers[isUser]._id,
-              user_role: users[user].role
-            }
-            data.push(push)
-          }
-        }
-      }
-      return data
+    dateOverlaps (Astart, Aend, Bstart, Bend) {
+      var ASmoment = moment(Astart, 'DD/MM/YYYY')
+      var AEmoment = moment(Aend, 'DD/MM/YYYY')
+      var BSmoment = moment(Bstart, 'DD/MM/YYYY')
+      var BEmoment = moment(Bend, 'DD/MM/YYYY')
+      if (ASmoment <= BSmoment && BSmoment <= AEmoment) return true // b starts in a
+      if (ASmoment <= BEmoment && BEmoment <= AEmoment) return true // b ends in a
+      if (BSmoment < ASmoment && AEmoment < BEmoment) return true // a in b
+      return false
     },
     getDate () {
       var d = new Date()
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
     },
-    checkProjectName () {
+    checkSprintName () {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
       var alreadyExists = false
-      if (this.pushProject.name !== this.newProject.name) {
-        for (var project in this.allProjects) {
-          if (this.pushProject.name === this.allProjects[project].name) {
+      if (this.pushSprint.name.toLowerCase() !== this.newSprint.name.toLowerCase()) {
+        for (var sprint in this.allSprints) {
+          if (this.pushSprint.name.toLowerCase() === this.allSprints[sprint].name.toLowerCase()) {
             alreadyExists = true
-            this.error = 'Project with the name "' + this.pushProject.name + '" already exists.'
+            this.error = 'Sprint with the name "' + this.pushSprint.name + '" already exists in this project.'
           }
         }
-      } else {
-        alreadyExists = true
       }
       return alreadyExists
     },
-    setPushUser () {
-      this.pushProject.users = this.usersPushData(this.pushProject.users)
-      if (this.selectDeadline !== '' && this.today !== this.selectDeadline) {
-        this.pushProject.deadline = this.selectDeadline
-      } else {
-        this.pushProject.deadline = 'No deadline'
+    checkSprintExpDuration () {
+      // CHECK IF THE DURATION VALUE IS VALID
+      var validDuration = true
+      var diff = moment(this.pushSprint.enddate, 'DD/MM/YYYY').diff(moment(this.pushSprint.startdate, 'DD/MM/YYYY'), 'days')
+      console.log(diff)
+      var weeks = parseInt(diff / 7)
+      var workDays = weeks * 5
+      var modWorkDays = (diff % workDays) % weeks
+      var totalDays = workDays + modWorkDays
+      console.log(totalDays)
+      var expTime = this.pushSprint.expectedtime
+      var daysPerPerson = parseInt(expTime / this.numOfUsers)
+      console.log(daysPerPerson)
+      if (daysPerPerson > totalDays) {
+        validDuration = false
       }
+      return validDuration
     },
     onSubmit () {
       var submitMessage = ''
-      if (!this.checkProjectName()) {
-        this.setPushUser()
+      if (!this.checkSprintName() && this.checkSprintExpDuration()) {
         if (this.$props.editProject) {
-          submitMessage = 'Project updated.'
-          this.updateSprint(this.pushProject)
+          submitMessage = 'Sprint updated.'
+          this.updateSprint(this.pushSprint)
           this.onReset()
         } else {
-          submitMessage = 'Project added.'
-          this.postSprint(this.pushProject)
+          submitMessage = 'Sprint added.'
+          this.postSprint(this.pushSprint)
           this.onReset()
         }
-        // if(this.pushProject.startdate )
+        // if(this.pushSprint.startdate )
         this.$q.notify({
           color: 'green',
           textColor: 'white',
@@ -215,16 +233,17 @@ export default {
           timeout: 1000
         })
         this.error = ''
-        this.$emit('submitProject')
+        this.$emit('submitSprint')
       }
     },
     onReset () {
-      this.pushProject.name = this.$props.newProject.name
-      this.pushProject.id = this.$props.newProject.id
-      this.pushProject.startdate = this.$props.newProject.startdate
-      this.pushProject.enddate = this.$props.newProject.enddate
-      this.pushProject.expectedtime = this.$props.newProject.expectedtime
+      this.pushSprint.name = this.$props.newSprint.name
+      this.pushSprint.project_id = this.$props.newSprint.project_id
+      this.pushSprint.startdate = this.$props.newSprint.startdate
+      this.pushSprint.enddate = this.$props.newSprint.enddate
+      this.pushSprint.expectedtime = this.$props.newSprint.expectedtime
       this.error = ''
+      this.dateError = ''
     }
   }
 }
