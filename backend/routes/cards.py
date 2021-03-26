@@ -15,7 +15,7 @@ def add_card():
     priority = request.json['priority']
     value = request.json['value']
     subtasks = request.json['subtasks']
-    card_round = request.json['round']
+    #card_round = request.json['card_round']
 
     card_id = mongo.db.cards.insert(
         {'sprint_id': sprint_id,
@@ -24,7 +24,7 @@ def add_card():
          'priority': priority,
          'acceptance_test': acceptance_test,
          'value': value,
-         'round': card_round,
+         #'card_round': card_round,
          'subtasks': subtasks
          })
     response = {
@@ -35,7 +35,7 @@ def add_card():
         'priority': priority,
         'acceptance_test': acceptance_test,
         'value': value,
-        'round': card_round,
+        #'card_round': card_round,
         'subtasks': subtasks
     }
     print(response)
@@ -67,9 +67,22 @@ def delete_cards():
 def update_sprint_of_card():
     sprint_id = request.json['sprint_id']
     card_id = request.json['card_id']
+    description = request.json['description']
+    acceptance_test = request.json['acceptance_test']
+    priority = request.json['priority']
+    value = request.json['value']
+    subtasks = request.json['subtasks']
+   # card_round = request.json['card_round']
 
     current_card = mongo.db.cards.find_one({'_id': ObjectId(card_id)})
     current_card['sprint_id'] = sprint_id
+    card_id = request.json['card_id'] = card_id
+    description = request.json['description'] = description
+    acceptance_test = request.json['acceptance_test'] = acceptance_test
+    priority = request.json['priority'] = priority
+    value = request.json['value'] = value
+    subtasks = request.json['subtasks'] = subtasks
+    #card_round = request.json['card_round'] = card_round
 
     mongo.db.cards.save(current_card)
     response = {
@@ -80,7 +93,7 @@ def update_sprint_of_card():
         'priority': current_card['priority'],
         'acceptance_test': current_card['acceptance_test'],
         'value': current_card['value'],
-        'subtasks': current_card['subtasks'],
-        'round': current_card['round']
+        'subtasks': current_card['subtasks']
+        #'card_round': current_card['card_round']
     }
     return response

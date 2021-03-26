@@ -30,7 +30,7 @@ const routes = [
       },
       {
         path: '/cards/:id',
-        component: () => import('pages/Zgodbe.vue'),
+        component: () => import('pages/Naloge.vue'),
         meta: { requiresAuth: true, requiresAdmin: false }
       }
     ]

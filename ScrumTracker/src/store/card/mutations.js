@@ -3,7 +3,7 @@ export function SET_CARD (state, fetchedCards) {
 }
 export function PUSH_NEW_CARD (state, newCard) {
   var pushCard = {
-    sprint_id: newCard.sprintid,
+    sprint_id: newCard.sprint_id,
     card_name: newCard.card_name,
     description: newCard.description,
     acceptance_test: newCard.acceptance_test,

@@ -164,12 +164,12 @@
             <div v-for="(card, index) in allCards" v-bind:key="index">
               <q-card square v-if="card.round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item" :class="element.border">
                 <span class="text-caption text-grey-9 q-ml-xs">
-                  {{ cards.card_name }}
+                  {{card.card_name}}
                 </span>
                 <q-card-section class="q-pt-sm">
                   <div class="row items-center no-wrap">
                     <div class="col">
-                      <div>{{ cards.description }}</div>
+                      <div>{{card.description}}</div>
                     </div>
                   </div>
                 </q-card-section>
@@ -180,7 +180,7 @@
       </div>
     </draggable>
     </draggable>
-    <q-dialog v-model="addCard">
+    <q-dialog v-model="addCard" position="left">
       <q-card class="q-pa-md" style="width: 300px">
         <q-card-section class="row items-center no-wrap">
           <q-form class="q-gutter-md full-width">
@@ -252,17 +252,6 @@ export default {
       add_new: false,
       drag: false,
       cardId: ''
-    }
-  },
-  computed: {
-    project () {
-      var allCards = this.getCards()
-      for (var project in allCards) {
-        if (allCards[project]._id === this.cardId) {
-          return allCards[project]
-        }
-      }
-      return 'No project found.'
     }
   },
   mounted () {
