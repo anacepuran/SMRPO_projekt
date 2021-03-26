@@ -11,7 +11,7 @@ export function postProject ({ commit }, payload) {
   this.$axios.post('projects/add', {
     name: payload.name,
     users: payload.users,
-    deadline: payload.deadline
+    description: payload.description
   })
     .then((res) => {
       commit('PUSH_NEW_PROJECT', res.data)
@@ -24,7 +24,7 @@ export function updateProject ({ commit }, payload) {
   this.$axios.put('projects/update', {
     name: payload.name,
     users: payload.users,
-    deadline: payload.deadline,
+    description: payload.description,
     _id: payload._id
   })
     .then((res) => {

@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from backend.db import mongo
+from db import mongo
 
 projects_route = Blueprint('projects_route', __name__)
 
@@ -10,18 +10,18 @@ projects_route = Blueprint('projects_route', __name__)
 def add_projects():
     name = request.json['name']
     users = request.json['users']
-    deadline = request.json['deadline']
+    description = request.json['description']
 
     project_id = mongo.db.projects.insert(
         {'name': name,
          'users': users,
-         'deadline': deadline
+         'description': description
          })
     response = {
         '_id': str(project_id),
         'name': name,
         'users': users,
-        'deadline': deadline
+        'description': description
     }
     print(response)
     return response
@@ -53,18 +53,18 @@ def update_project():
     name = request.json['name']
     users = request.json['users']
     project_id = request.json['_id']
-    deadline = request.json['deadline']
+    description = request.json['description']
 
     project = mongo.db.projects.find_one({'_id': ObjectId(project_id)})
     project['name'] = name
     project['users'] = users
-    project['deadline'] = deadline
+    project['description'] = description
 
     mongo.db.projects.save(project)
     response = {
         '_id': str(project_id),
         'name': name,
         'users': users,
-        'deadline': deadline
+        'description': description
     }
     return response, 200

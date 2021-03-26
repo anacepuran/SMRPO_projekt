@@ -46,8 +46,13 @@
             <div clasS=" col-1">
               <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
             </div>
-            <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-dark-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
+            <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
           </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-description="propsDesc">
+        <q-td :props="propsDesc" class="q-ma-md">
+            <span class="text-caption" style="opacity:.7">{{propsDesc.row.description}}</span>
         </q-td>
       </template>
       <template v-slot:body-cell-delete="propsDelete" v-if="currentUser.permissions === 'Admin'">
@@ -105,7 +110,7 @@ export default {
       newProject: {
         name: '',
         users: [],
-        deadline: ''
+        description: ''
       }
     }
   },
@@ -125,7 +130,7 @@ export default {
             sortable: true
           },
           { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true },
+          { name: 'description', align: 'left', label: 'Description', field: 'description', sortable: true },
           { name: 'delete', align: 'center', label: 'Delete project', field: 'delete' }
         ]
       } else {
@@ -139,7 +144,7 @@ export default {
             sortable: true
           },
           { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true }
+          { name: 'description', align: 'left', label: 'Description', field: 'description', sortable: true }
         ]
       }
     }
@@ -207,7 +212,7 @@ export default {
     onReset () {
       this.newProject.name = ''
       this.newProject.users = []
-      this.newProject.deadline = ''
+      this.newProject.description = ''
     },
     getSearchFiltered (search) {
       if (this.search !== '') {
@@ -232,4 +237,9 @@ export default {
   }
 }
 </script>
-<style></style>
+<style>
+.q-table tbody td {
+  width: 20vw;
+  white-space: normal;
+}
+</style>

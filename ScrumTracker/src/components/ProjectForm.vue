@@ -11,6 +11,16 @@
         lazy-rules
         :rules="[ val => val && val.length > 0 || 'Please type something']"
       />
+      <div class="row q-pa-md" >
+        <q-input
+          class="full-width"
+          label="Description"
+          v-model="pushProject.description"
+          clearable
+          filled
+          autogrow
+        />
+      </div>
       <div class="row">
           <div class="col">
             <q-select
@@ -39,31 +49,6 @@
             </div>
           </q-item>
         </q-list>
-        <div class="row">
-            <div class="col q-ma-sm">
-                <q-btn label="Select deadline" icon="event" color="secondary" @click="datePicker=true" />
-            </div>
-            <div class="col q-ma-md">
-                <q-badge color="secondary">
-                    Deadline: {{ selectDeadline }}
-                </q-badge>
-            </div>
-        </div>
-        <q-dialog v-model="datePicker">
-            <q-card class="q-ma-md">
-                <div class="row">
-                    <q-date
-                        mask="DD/MM/YYYY"
-                        v-model="selectDeadline"
-                        minimal
-                    />
-                </div>
-                <div class="row q-ma-md flex flex-center">
-                    <q-btn label="Save" color="primary" @click="pushProject.deadline=selectDeadline" v-close-popup />
-                    <q-btn label="Reset" flat color="primary" @click="selectDeadline=''" v-close-popup />
-                </div>
-            </q-card>
-        </q-dialog>
         <q-card-actions horizontal align="right">
             <q-btn label="Submit" type="submit" color="primary"/>
             <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
@@ -99,14 +84,11 @@ export default {
       ],
       allProjects: [],
       setRoles: false,
-      datePicker: false,
-      selectDeadline: '',
       pushProject: {
         name: '',
         users: [],
-        deadline: ''
-      },
-      today: ''
+        description: ''
+      }
     }
   },
   props: {
@@ -138,8 +120,6 @@ export default {
     var projects = this.getProjects()
     this.allProjects = this.projectsToArray(projects)
     this.onReset()
-    this.today = this.getDate()
-    this.selectDeadline = this.pushProject.deadline
   },
   methods: {
     ...mapGetters('project', [
@@ -200,13 +180,21 @@ export default {
       }
       // CHECK IF THERE IS MORE THAN ONE PROJECT OWNERS
       var numOfPO = 0
+      var numOfSM = 0
       for (var user in this.pushProject.users) {
         for (var role in this.pushProject.users[user].role) {
           if (this.pushProject.users[user].role[role] === 'Product Owner') {
             numOfPO++
             if (numOfPO > 1) {
               accept = false
-              this.error = 'There can only be one Project Owner.'
+              this.error = 'There can only be one Product Owner.'
+            }
+          }
+          if (this.pushProject.users[user].role[role] === 'Scrum Master') {
+            numOfSM++
+            if (numOfSM > 1) {
+              accept = false
+              this.error = 'There can only be one Scrum Master.'
             }
           }
         }
@@ -229,18 +217,11 @@ export default {
       }
       return true
     },
-    setPushData () {
-      this.pushProject.users = this.usersPushData(this.pushProject.users)
-      if (this.selectDeadline !== '' && this.today !== this.selectDeadline) {
-        this.pushProject.deadline = this.selectDeadline
-      } else {
-        this.pushProject.deadline = 'No deadline'
-      }
-    },
     onSubmit () {
+      console.log('submit')
       var submitMessage = ''
       if (this.checkProject()) {
-        this.setPushData()
+        this.pushProject.users = this.usersPushData(this.pushProject.users)
         if (this.$props.editProject) {
           submitMessage = 'Project updated.'
           this.updateProject(this.pushProject)
@@ -269,9 +250,8 @@ export default {
       }
       this.pushProject.name = this.$props.newProject.name
       this.pushProject.users = this.$props.newProject.users
-      this.pushProject.deadline = this.$props.newProject.deadline
+      this.pushProject.description = this.$props.newProject.description
       this.pushProject._id = this.$props.newProject._id
-      this.selectDeadline = this.$props.newProject.deadline
       this.error = ''
     }
   }

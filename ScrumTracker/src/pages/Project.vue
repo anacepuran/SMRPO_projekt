@@ -6,15 +6,15 @@
           <q-card-section class="q-ma-md bg-primary">
             <div class="text-overline text-white" style="transform: rotate(-90deg); margin-top: 50%;">Project</div>
           </q-card-section>
-          <q-card-section class="q-ma-md" style="width: 40%">
+          <q-card-section style="width: 80%">
             <div class="text-h5 q-ma-md">{{ project.name }}</div>
-            <div class="text-overline q-ma-md">Deadline: {{ project.deadline }}</div>
+            <div class="text-caption text-dark-grey q-ma-md">{{ project.description }}</div>
           </q-card-section>
           <q-separator vertical />
           <q-card-section style="width: 70%">
             <div class="row q-ma-md" v-for="user in project.users" :key="user.user_name">
                 <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
-                <span class="q-ma-xs" style="font-weight: bold;">{{user.user_name}}</span>
+                <span class="q-ma-xs">{{user.user_name}}</span>
                 <span class="text-caption text-dark-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
             </div>
           </q-card-section>
@@ -41,7 +41,7 @@
           <div class="text-white text-h6 q-ma-sm">Sprints</div>
           <q-space/>
           <div class="q-ma-sm">
-            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
+            <q-btn v-if="checkRole()" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
           </div>
         </q-card-section>
         <div class="row q-ma-md">
@@ -76,7 +76,7 @@
                 </div>
               </q-td>
             </template>
-            <template v-slot:body-cell-delete="propsDelete" v-if="user.permissions === 'Admin'">
+            <template v-slot:body-cell-delete="propsDelete" v-if="checkRole()">
               <q-td :props="propsDelete">
                 <div>
                   <q-btn @click="confirmDelete=true; deleteProjectId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
@@ -108,24 +108,6 @@
             <SprintForm :newSprint="newSprint" :editProject="false" @submitSprint="showSprints"></SprintForm>
           </q-card>
         </q-dialog>
-
-        <!--<q-list  bordered separator>
-            <q-item v-for="sprint in projectSprints" :key="sprint._id" clickable v-ripple>
-              <q-td @click="openSprint(sprint._id)">
-              <q-item-section style="width: 3%" class="col-1">
-                <q-avatar size="md" color="secondary" text-color="white" icon="folder_open"/>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="q-ma-sm" style="font-size: 2.2vh">{{ sprint.name }}</q-item-label>
-              </q-item-section>
-
-              <q-item-section>
-                <q-item-label class="q-ma-sm"><span style="opacity: .6">From: </span>{{ sprint.start_date }}</q-item-label>
-                <q-item-label class="q-ma-sm"><span style="opacity: .6">To: </span>{{ sprint.end_date }}</q-item-label>
-              </q-item-section>
-              </q-td>
-            </q-item>
-        </q-list>-->
       </q-card>
     </q-page>
 </template>
@@ -149,14 +131,13 @@ export default {
       deleteProjectId: '',
       confirmDelete: false,
       sprints: [],
-
       projectId: '',
       editProjectData: false,
       dialogTitle: 'Edit project',
       editProject: {
         name: '',
         users: [],
-        deadline: '',
+        description: '',
         _id: ''
       },
       newSprint: {
@@ -171,7 +152,7 @@ export default {
   },
   computed: {
     filteredSprints () {
-      return this.getSearchFilteredSprints(this.search)
+      return this.sprints
     },
     project () {
       var allProjects = this.getProjects()
@@ -183,7 +164,7 @@ export default {
       return 'No project found.'
     },
     columns () {
-      if (this.user.permissions === 'Admin') {
+      if (this.checkRole()) {
         return [
           {
             name: 'name',
@@ -196,7 +177,7 @@ export default {
           { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
           { name: 'end_date', align: 'center', label: 'End date', field: 'end_date', sortable: true },
           { name: 'expected_time', align: 'center', label: 'Expected time', field: 'expected_time' },
-          { name: 'delete', align: 'center', label: 'Delete project', field: 'delete' }
+          { name: 'delete', align: 'center', label: 'Delete sprint', field: 'delete' }
         ]
       } else {
         return [
@@ -208,8 +189,9 @@ export default {
             field: row => row.name,
             sortable: true
           },
-          { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'deadline', align: 'left', label: 'Deadline', field: 'deadline', sortable: true }
+          { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
+          { name: 'end_date', align: 'center', label: 'End date', field: 'end_date', sortable: true },
+          { name: 'expected_time', align: 'center', label: 'Expected time', field: 'expected_time' }
         ]
       }
     }
@@ -244,9 +226,7 @@ export default {
       this.loading = true
       setTimeout(() => {
         var projectSprints = this.getSprints()
-        console.log(projectSprints)
         this.sprints = this.sprintsToArray(projectSprints)
-        console.log(this.sprints)
         this.loading = false
       }, 1000)
     },
@@ -258,24 +238,28 @@ export default {
           data.push(projectSprints[sprint])
         }
       }
+      this.newSprint.name = 'Sprint ' + (data.length + 1)
       return data
     },
     checkRole () {
+      var validRole = false
       if (this.user !== {}) {
         if (this.user.permissions === 'Admin') {
-          return true
+          validRole = true
         }
         for (var user in this.project.users) {
-          if (this.project.users[user].user_role === 'Scrum Master') {
-            return true
+          if (this.user.username === this.project.users[user].user_name) {
+            if (this.project.users[user].user_role[1] === 'Scrum Master') {
+              validRole = true
+            }
           }
         }
       }
-      return false
+      return validRole
     },
     editFunction () {
       this.editProject.name = this.project.name
-      this.editProject.deadline = this.project.deadline
+      this.editProject.description = this.project.description
       this.editProject._id = this.projectId
       var userTable = []
       for (var user in this.project.users) {
@@ -290,14 +274,11 @@ export default {
       this.editProjectData = true
     },
     onReset () {
-      this.newSprint.name = ''
+      this.newSprint.name = 'Sprint ' + (this.sprints.length + 1)
       this.newSprint.startdate = ''
       this.newSprint.enddate = ''
       this.newSprint.expectedtime = ''
       this.newSprint.numOfUsers = this.project.users.length
-    },
-    getSearchFilteredSprints (search) {
-      return this.sprints
     },
     formatUserRoles (userRoles) {
       var roles = ''
@@ -329,8 +310,6 @@ export default {
     this.projectId = this.$route.params.id
     this.newSprint.project_id = this.projectId
     this.newSprint.numOfUsers = this.project.users.length
-    console.log('this.project.users.length')
-    console.log(this.project.users.length)
     this.showSprints()
   }
 }

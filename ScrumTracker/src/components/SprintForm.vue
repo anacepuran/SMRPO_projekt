@@ -4,13 +4,7 @@
         @reset="onReset"
         class="q-gutter-md"
     >
-      <q-input
-          filled
-          v-model="pushSprint.name"
-          label="Sprint name"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Please type something']"
-      />
+      <div class="text-h6">{{pushSprint.name}}</div>
       <div class="row">
         <div class="col q-ma-md">
           <q-btn label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
