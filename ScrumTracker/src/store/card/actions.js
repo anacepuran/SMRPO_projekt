@@ -10,15 +10,17 @@ export function fetchCards ({ commit }) {
 }
 export function postCard ({ commit }, payload) {
   this.$axios.post('cards/add', {
-    sprint_id: payload.sprintid,
-    card_name: payload.cardname,
+    sprint_id: payload.sprint_id,
+    card_name: payload.card_name,
     description: payload.description,
-    acceptance_test: payload.acceptancetest,
+    acceptance_test: payload.acceptance_test,
     priority: payload.priority,
     subtasks: payload.subtasks,
-    value: payload.value
+    value: payload.value,
+    card_round: payload.card_round
   })
     .then((res) => {
+      console.log(res.data)
       commit('PUSH_NEW_CARD', res.data)
     })
     .catch((error) => {
@@ -28,13 +30,14 @@ export function postCard ({ commit }, payload) {
 
 export function updateCard ({ commit }, payload) {
   this.$axios.put('cards/update', {
-    sprint_id: payload.sprintid,
+    sprint_id: payload.sprint_id,
     card_name: payload.card_name,
     description: payload.description,
     acceptance_test: payload.acceptance_test,
     priority: payload.priority,
     subtasks: payload.subtasks,
-    value: payload.value
+    value: payload.value,
+    card_round: payload.card_round
   })
     .then((res) => {
       commit('PUSH_NEW_CARD', res.data)

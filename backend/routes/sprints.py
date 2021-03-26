@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from db import mongo
+from backend.db import mongo
 
 sprints_route = Blueprint('sprints_route', __name__)
 
@@ -15,19 +15,19 @@ def add_sprint():
     expected_time = request.json['expected_time']
 
     sprint_id = mongo.db.sprints.insert(
-            {'project_id': project_id,
-             'name': name,
-             'start_date': start_date,
-             'end_date': end_date,
-             'expected_time': expected_time
-            })
+        {'project_id': project_id,
+         'name': name,
+         'start_date': start_date,
+         'end_date': end_date,
+         'expected_time': expected_time
+         })
     response = {
-            '_id': str(sprint_id),
-            'name': name,
-            'project_id': project_id,
-            'start_date': start_date,
-            'end_date': end_date,
-            'expected_time': expected_time
+        '_id': str(sprint_id),
+        'name': name,
+        'project_id': project_id,
+        'start_date': start_date,
+        'end_date': end_date,
+        'expected_time': expected_time
     }
     print(response)
     return response
@@ -67,7 +67,7 @@ def update_sprints():
     sprint['start_date'] = start_date
     sprint['end_date'] = end_date
     sprint['expected_time'] = expected_time
-  
+
     mongo.db.sprints.save(sprint)
     response = {
         '_id': str(sprint_id),
