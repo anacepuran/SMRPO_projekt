@@ -11,6 +11,7 @@ export function fetchCards ({ commit }) {
 export function postCard ({ commit }, payload) {
   this.$axios.post('cards/add', {
     sprint_id: payload.sprint_id,
+    project_id: payload.project_id,
     card_name: payload.card_name,
     description: payload.description,
     acceptance_test: payload.acceptance_test,
@@ -30,8 +31,10 @@ export function postCard ({ commit }, payload) {
 
 export function updateCard ({ commit }, payload) {
   this.$axios.put('cards/update', {
+    _id: payload._id,
     sprint_id: payload.sprint_id,
     card_name: payload.card_name,
+    project_id: payload.project_id,
     description: payload.description,
     acceptance_test: payload.acceptance_test,
     priority: payload.priority,
@@ -48,6 +51,7 @@ export function updateCard ({ commit }, payload) {
 }
 export function deleteCard ({ commit }, id) {
   commit('DELETE_CARD', id)
+  console.log(id)
   this.$axios.delete('cards/delete', { data: { _id: id } })
     .then(response => {
       console.log(response)

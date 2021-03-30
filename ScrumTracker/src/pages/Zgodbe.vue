@@ -17,14 +17,14 @@
           <div class="row">
             <q-space/>
             <div class="q-ma-sm">
-            <q-btn v-if="user.permissions === 'Admin'" size="md" color="primary" label="Add Card" icon="create_new_folder" @click="addCard=true" />
+            <q-btn size="md" color="primary" label="Add Card to sprint" icon="create_new_folder" @click="addCard=true" />
             </div>
           </div>
         </q-card-section>
       </q-card-section>
     </q-card>
     <draggable class="row q-mt-xs" group="columns" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-      <div class="col-3 q-px-xs" v-for="(element, index) in sections" v-bind:key="index">
+      <div class="col-4 q-px-xs" v-for="(element, index) in sections" v-bind:key="index">
         <div class="q-pa-xs column-background">
           <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm" :class="element.theme">
             <q-item-section avatar style="min-width:25px">
@@ -33,37 +33,37 @@
             <q-item-section class="text-h6 text-weight-bolder">{{element.name}}</q-item-section>
           </q-item>
           <draggable class="list-group" :list="cards" group="tasks" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-            <div v-for="(card, index) in allCards" v-bind:key="index">
-              <q-card square v-if="card.card_round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item" :class="element.border">
-                <span class="text-h6 text-capitalize text-grey-9 q-ml-xs">
-                  {{ card.card_name }}
-                </span>
-                <span class="text-subtitle-2 float-right text-uppercase">
-                  {{ card.priority }}
-                </span>
-                <q-card-section class="q-pt-sm">
-                  <div class="row items-center no-wrap">
-                    <div class="col">
-                      <div><b>DESCRIPTION:</b> {{ card.description }}</div>
-                    </div>
-                  </div>
-                  <div class="row items-center no-wrap">
-                    <div class="col">
-                      <div><b>ACCEPTANCE TEST:</b> {{ card.acceptance_test }}</div>
-                    </div>
-                  </div>
-                  <div class="row items-center no-wrap">
-                    <div class="col">
-                      <div><b>VALUE:</b> {{ card.value }}</div>
-                    </div>
-                  </div>
-                      <div>
-                        <q-btn @click="confirmDelete=true; deleteCardId=card._id" size="sm" round color="negative" icon="delete"/>
-                      </div>
-                        <div>
-                          <q-btn @click="editFunction" size="sm" class="q-ma-md" icon="edit" color="primary" label="Edit Card"/>
-                        </div>
+            <div v-for="(card, index) in allSprintCards" v-bind:key="index">
+              <q-card square v-if="card.card_round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item">
+                <q-card-section class="row" :class="element.border">
+                  <span class="text-white text-h6 q-ma-xxs">{{card.card_name}}</span>
+                  <q-space/>
+                  <span class="text-white text-capitalize q-ml-xxs right">({{ card.priority }})</span>
                 </q-card-section>
+                <q-card-section class="q-pt-sm">
+                    <div class="row items-center no-wrap">
+                    <div class="col">
+                        <div><span class="material-icons text-h5 text-secondary">description</span> {{ card.description }}</div>
+                    </div>
+                    </div>
+                    <div class="row items-center no-wrap">
+                        <div class="col">
+                        <div class="text-overline text-secondary">
+                            VALUE:<span class="text-weight-bolder text-h6 text-black">{{ card.value }}</span>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row items-center no-wrap">
+                        <div class="col">
+                        <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
+                        <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
+                        </div>
+                    </div>
+                    </q-card-section>
+                    <q-card-actions horizontal align="right">
+                      <q-btn flat @click="confirmDelete=true; deleteCardId=card._id" round color="negative" icon="delete"/>
+                      <q-btn flat @click="EditFunction" icon="edit" color="primary" />
+                    </q-card-actions>
               </q-card>
               <q-dialog v-model="editCardData">
                 <q-card class="q-pa-md" style="width: 80vh">
@@ -84,10 +84,10 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm">Are you sure you want to delete this project?</span>
+          <span class="q-ml-sm">Are you sure you want to delete this card?</span>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat @click="deleteCardId=''" label="Cancel" color="primary" v-close-popup />
+        <q-card-actions horizontal align="right">
+          <q-btn flat @click="deleteCardId=''" label="Cancel" color="primary" v-close-popup/>
           <q-btn flat @click="deleteFunction(deleteCardId)" label="DELETE" color="negative" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -95,12 +95,11 @@
     <q-dialog v-model="addCard">
       <q-card class="q-pa-md" style="width: 80vh">
         <q-card-section class="row items-center">
-          <div class="text-h6 q-ma-md">Add new card</div>
+          <div class="text-h6">Add cards to sprint</div>
           <q-space />
-          <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup/>
         </q-card-section>
-        <!-- CARD FORM COMPONENT -->
-        <CardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="showCards"></CardsForm>
+        <AddCard :allCards="allProjectCards" :sprintId="sprintId" @addCard="showCards()"></AddCard>
       </q-card>
     </q-dialog>
   </q-page>
@@ -110,12 +109,13 @@ import { mapGetters, mapActions } from 'vuex'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
 import CardsForm from 'components/CardsForm.vue'
+import AddCard from 'components/AddCardSprint.vue'
 
 Vue.component('draggable', draggable)
 
 export default {
   name: 'Zgodbe',
-  components: { CardsForm },
+  components: { CardsForm, AddCard },
   data () {
     return {
       addCard: false,
@@ -124,22 +124,17 @@ export default {
       deleteCardId: '',
       sections: {
         1: {
-          name: 'To do',
+          name: 'PRODUCT BACKLOG',
           theme: 'to-do-title',
           border: 'border-todo'
         },
         2: {
-          name: 'In progress',
+          name: 'SPRINT BACKLOG',
           theme: 'in-progress-title',
           border: 'border-in-progress'
         },
         3: {
-          name: 'Test',
-          theme: 'test-title',
-          border: 'border-test'
-        },
-        4: {
-          name: 'Done',
+          name: 'DONE',
           theme: 'done-title',
           border: 'border-done'
         }
@@ -150,26 +145,18 @@ export default {
       pagination: {
         rowsPerPage: 0
       },
-      allCards: [],
+      allProjectCards: [],
+      allSprintCards: [],
       editCards: {
         sprint_id: this.$route.params.id,
+        project_id: '',
         card_name: '',
         description: '',
-        acceptance_test: '',
+        acceptance_test: [],
         priority: '',
         value: '',
-        subtasks: '',
-        card_round: 'to do'
-      },
-      newCard: {
-        sprint_id: this.$route.params.id,
-        card_name: '',
-        description: '',
-        acceptance_test: '',
-        priority: '',
-        value: '',
-        subtasks: '',
-        card_round: 'to do'
+        subtasks: [],
+        card_round: 'PRODUCT BACKLOG'
       },
       sprintId: '',
       add_new: false,
@@ -195,6 +182,7 @@ export default {
     this.sprintId = this.$route.params.id
     this.sprints = this.sprint()
     this.showCards()
+    this.allProjectCards = this.projectCards()
   },
   methods: {
     ...mapGetters('user', [
@@ -219,30 +207,32 @@ export default {
     updateCardInfo () {
       this.editCardData = false
     },
+    projectCards () {
+      var cards = this.getCards()
+      var projectCards = []
+      for (var c in cards) {
+        if (cards[c].project_id === this.projectId) {
+          projectCards.push(cards[c])
+        }
+      }
+      return projectCards
+    },
     sprint () {
       var sprints = this.getSprints()
       for (var s in sprints) {
         if (sprints[s]._id === this.sprintId) {
+          this.projectId = sprints[s].project_id
+          console.log(this.projectId)
           return sprints[s]
         }
       }
       return 'No sprint found.'
     },
-    card () {
-      var allCards = this.getCards()
-      for (var card in allCards) {
-        if (allCards[card]._id === this.cardId) {
-          return allCards[card]
-        }
-      }
-      return 'No project found.'
-    },
     showCards () {
       this.addCard = false
       setTimeout(() => {
         var cards = this.getCards()
-        console.log(cards)
-        this.allCards = this.cardsToArray(cards)
+        this.allSprintCards = this.cardsToArray(cards)
       }, 1000)
     },
     cardsToArray (cards) {
@@ -252,10 +242,8 @@ export default {
           allCards.push(cards[card])
         }
       }
-      console.log(allCards)
       return allCards
     },
-
     columns () {
       if (this.user.permissions === 'Admin') {
         return [
@@ -290,7 +278,6 @@ export default {
         ]
       }
     },
-
     EditFunction () {
       this.editCards.description = this.card.description
       this.editCards.card_name = this.card.card_name
@@ -310,35 +297,6 @@ export default {
       }
       this.editCardData.users = userTable
       this.editCardData = true
-    },
-
-    onReset () {
-      this.newCard.sprint_id = this.$route.params.id
-      this.newCard.description = ''
-      this.newCard.card_name = ''
-      this.newCard.users = []
-      this.newCard.acceptance_test = ''
-      this.newCard.value = ''
-      this.newCard.subtasks = ''
-      this.newCard.card_round = 'to do'
-      this.newCard.priority = ''
-    },
-    addNewTask () {
-      const maxid = Math.max.apply(
-        Math,
-        this.task_to_do.map(function (o) {
-          return o.id
-        })
-      )
-      this.task_item.id = maxid + 1
-      this.task_to_do.push(this.task_item)
-      this.add_new = false
-      this.postCard(this.task_item)
-      this.onReset()
-      this.$q.notify({
-        type: 'positive',
-        message: 'The new task is added successfully.'
-      })
     },
     deleteTask (tasklane, index) {
       this[tasklane].splice(index, 1)
@@ -382,11 +340,7 @@ export default {
   }
 
   .border-todo {
-    border-left: 5px solid #060036 !important;
-  }
-
-  .feature-to-do {
-    background-color: #060036;
+    background: #060036;
   }
 
   .to-do-title {
@@ -396,11 +350,7 @@ export default {
   }
 
   .border-in-progress {
-    border-left: 5px solid #ee9835 !important;
-  }
-
-  .feature-in-progress {
-    background-color: #ee9835;
+    background: #ee9835 ;
   }
 
   .in-progress-title {
@@ -409,30 +359,12 @@ export default {
     border-top-right-radius: 3px;
   }
 
-  .border-test {
-    border-left: 5px solid blueviolet !important;
-  }
-
-  .feature-test {
-    background-color: blueviolet;
-  }
-
-  .test-title {
-    background-color: blueviolet;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-  }
-
   .border-done {
-    border-left: 5px solid green !important;
-  }
-
-  .feature-done {
-    background-color: green;
+    background: #0c3e3a;
   }
 
   .done-title {
-    background-color: green;
+    background-color: #0c3e3a;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
   }

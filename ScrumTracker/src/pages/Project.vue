@@ -21,7 +21,15 @@
           <q-card-section class="full-width">
             <div class="row">
                 <q-space/>
-                <q-btn v-if="checkRole()" size="md" class="q-ma-md" icon="edit" color="primary" label="Edit project" @click="editFunction" />
+                <q-btn v-if="checkRole('Scrum Master')" size="md" class="q-ma-md" icon="edit" color="primary" label="Edit project" @click="editFunction" />
+            </div>
+            <div class="row">
+                <q-space/>
+                <q-btn v-if="checkRole('Product Owner')" size="md" class="q-ma-md" icon="add" color="primary" label="Add card to project" @click="addCard=true" />
+            </div>
+            <div class="row">
+                <q-space/>
+                <q-btn v-if="checkRole('Product Owner')" size="md" class="q-ma-md" icon="visibility" color="primary" label="Show project cards" @click="showAllCards=true" />
             </div>
           </q-card-section>
         </q-card-section>
@@ -36,12 +44,12 @@
           <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
         </q-card>
       </q-dialog>
-      <q-card class="q-ma-md">
+      <q-card class="q-ma-md" v-if="checkRole('Scrum Master') || checkRole('Developer')">
         <q-card-section class="row bg-secondary" >
           <div class="text-white text-h6 q-ma-sm">Sprints</div>
           <q-space/>
           <div class="q-ma-sm">
-            <q-btn v-if="checkRole()" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
+            <q-btn v-if="checkRole('Scrum Master')" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
           </div>
         </q-card-section>
         <div class="row q-ma-md">
@@ -76,7 +84,7 @@
                 </div>
               </q-td>
             </template>
-            <template v-slot:body-cell-delete="propsDelete" v-if="checkRole()">
+            <template v-slot:body-cell-delete="propsDelete" v-if="checkRole('Scrum Master')">
               <q-td :props="propsDelete">
                 <div>
                   <q-btn @click="confirmDelete=true; deleteProjectId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
@@ -108,6 +116,23 @@
             <SprintForm :newSprint="newSprint" :editProject="false" @submitSprint="showSprints"></SprintForm>
           </q-card>
         </q-dialog>
+        <q-dialog v-model="addCard">
+          <q-card class="q-pa-md" style="width: 80vw">
+            <q-card-section class="row items-center">
+              <div class="text-h6 q-ma-md">Add new card</div>
+              <q-space />
+              <q-btn icon="close" flat round dense @click="onResetCard" v-close-popup />
+            </q-card-section>
+            <!-- CARD FORM COMPONENT -->
+            <AddCardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="onResetCard"></AddCardsForm>
+          </q-card>
+        </q-dialog>
+        <q-dialog v-model="showAllCards">
+          <q-card class="q-pa-md" style="width: 80vw">
+            <!-- SHOW CARDS COMPONENT -->
+            <ShowCards :allCards="allCards"></ShowCards>
+          </q-card>
+        </q-dialog>
       </q-card>
     </q-page>
 </template>
@@ -115,10 +140,12 @@
 import { mapGetters, mapActions } from 'vuex'
 import ProjectForm from 'components/ProjectForm.vue'
 import SprintForm from 'components/SprintForm.vue'
+import AddCardsForm from 'components/CardsForm.vue'
+import ShowCards from 'components/ShowCards.vue'
 
 export default {
   name: 'Project',
-  components: { ProjectForm, SprintForm },
+  components: { ProjectForm, SprintForm, AddCardsForm, ShowCards },
   data () {
     return {
       user: {},
@@ -147,6 +174,20 @@ export default {
         enddate: '',
         expectedtime: '',
         numOfUsers: 0
+      },
+      addCard: false,
+      showAllCards: false,
+      allCards: [],
+      newCard: {
+        project_id: this.$route.params.id,
+        sprint_id: '',
+        card_name: '',
+        description: '',
+        acceptance_test: [],
+        priority: '',
+        value: '',
+        subtasks: [],
+        card_round: ''
       }
     }
   },
@@ -164,7 +205,7 @@ export default {
       return 'No project found.'
     },
     columns () {
-      if (this.checkRole()) {
+      if (this.checkRole('Scrum Master')) {
         return [
           {
             name: 'name',
@@ -210,6 +251,12 @@ export default {
     ...mapGetters('project', [
       'getProjects'
     ]),
+    ...mapActions('card', [
+      'fetchCards'
+    ]),
+    ...mapGetters('card', [
+      'getCards'
+    ]),
     openSprint (sprintId) {
       console.log(sprintId)
       this.$router.push('/sprints/' + sprintId)
@@ -241,7 +288,7 @@ export default {
       this.newSprint.name = 'Sprint ' + (data.length + 1)
       return data
     },
-    checkRole () {
+    checkRole (currentRole) {
       var validRole = false
       if (this.user !== {}) {
         if (this.user.permissions === 'Admin') {
@@ -249,7 +296,7 @@ export default {
         }
         for (var user in this.project.users) {
           if (this.user.username === this.project.users[user].user_name) {
-            if (this.project.users[user].user_role[1] === 'Scrum Master') {
+            if (this.project.users[user].user_role[1] === currentRole) {
               validRole = true
             }
           }
@@ -280,6 +327,18 @@ export default {
       this.newSprint.expectedtime = ''
       this.newSprint.numOfUsers = this.project.users.length
     },
+    onResetCard () {
+      this.showCards()
+      this.newCard.project_id = this.$route.params.id
+      this.newCard.sprint_id = ''
+      this.newCard.description = ''
+      this.newCard.card_name = ''
+      this.newCard.acceptance_test = []
+      this.newCard.value = ''
+      this.newCard.subtasks = ''
+      this.newCard.card_round = ''
+      this.newCard.priority = ''
+    },
     formatUserRoles (userRoles) {
       var roles = ''
       for (var i = 1; i < userRoles.length; i++) {
@@ -302,15 +361,34 @@ export default {
         color = 'red'
       }
       return color
+    },
+    showCards () {
+      this.addCard = false
+      setTimeout(() => {
+        var cards = this.getCards()
+        this.allCards = this.cardsToArray(cards)
+      }, 1000)
+    },
+    cardsToArray (cards) {
+      var allCards = []
+      for (var card in cards) {
+        if (cards[card].project_id === this.projectId) {
+          allCards.push(cards[card])
+        }
+      }
+      console.log(allCards)
+      return allCards
     }
   },
   mounted () {
     this.user = this.getCurrentUser()
     this.fetchSprint()
+    this.fetchCards()
     this.projectId = this.$route.params.id
     this.newSprint.project_id = this.projectId
     this.newSprint.numOfUsers = this.project.users.length
     this.showSprints()
+    this.showCards()
   }
 }
 </script>

@@ -6,6 +6,7 @@ export function PUSH_NEW_CARD (state, newCard) {
     sprint_id: newCard.sprint_id,
     card_name: newCard.card_name,
     description: newCard.description,
+    project_id: newCard.project_id,
     acceptance_test: newCard.acceptance_test,
     priority: newCard.priority,
     subtasks: newCard.subtasks,
