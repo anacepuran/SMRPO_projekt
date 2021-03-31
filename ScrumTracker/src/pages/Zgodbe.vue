@@ -41,59 +41,33 @@
                   <span class="text-white text-capitalize q-ml-xxs right">({{ card.priority }})</span>
                 </q-card-section>
                 <q-card-section class="q-pt-sm">
-                    <div class="row items-center no-wrap">
+                  <div class="row items-center no-wrap">
+                  <div class="col">
+                      <div><span class="material-icons text-h5 text-secondary">description</span> {{ card.description }}</div>
+                  </div>
+                  </div>
+                  <div class="row items-center no-wrap">
+                      <div class="col">
+                      <div class="text-overline text-secondary">
+                          VALUE:<span class="text-weight-bolder text-h6 text-black">{{ card.value }}</span>
+                      </div>
+                      </div>
+                  </div>
+                  <div class="row items-center no-wrap">
                     <div class="col">
-                        <div><span class="material-icons text-h5 text-secondary">description</span> {{ card.description }}</div>
+                      <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
+                      <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
                     </div>
-                    </div>
-                    <div class="row items-center no-wrap">
-                        <div class="col">
-                        <div class="text-overline text-secondary">
-                            VALUE:<span class="text-weight-bolder text-h6 text-black">{{ card.value }}</span>
-                        </div>
-                        </div>
-                    </div>
-                    <div class="row items-center no-wrap">
-                        <div class="col">
-                        <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
-                        <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
-                        </div>
-                    </div>
-                    </q-card-section>
-                    <q-card-actions horizontal align="right">
-                      <q-btn flat @click="confirmDelete=true; deleteCardId=card._id" round color="negative" icon="delete"/>
-                      <q-btn flat @click="EditFunction" icon="edit" color="primary" />
-                    </q-card-actions>
+                  </div>
+                </q-card-section>
               </q-card>
-              <q-dialog v-model="editCardData">
-                <q-card class="q-pa-md" style="width: 80vh">
-                  <q-card-section class="row items-center">
-                    <div class="text-h6">{{ dialogTitle }}</div>
-                    <q-space />
-                    <q-btn icon="close" flat round dense v-close-popup />
-                  </q-card-section>
-                  <CardsForm :newCard="editCards" :editCard="editCardData" @submitCard="updateCardInfo()"></CardsForm>
-                </q-card>
-              </q-dialog>
             </div>
           </draggable>
         </div>
       </div>
     </draggable>
-    <q-dialog v-model="confirmDelete">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm">Are you sure you want to delete this card?</span>
-        </q-card-section>
-        <q-card-actions horizontal align="right">
-          <q-btn flat @click="deleteCardId=''" label="Cancel" color="primary" v-close-popup/>
-          <q-btn flat @click="deleteFunction(deleteCardId)" label="DELETE" color="negative" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="addCard">
-      <q-card class="q-pa-md" style="width: 80vh">
+    <q-dialog v-model="addCard" full-width>
+      <q-card class="q-pa-md">
         <q-card-section class="row items-center">
           <div class="text-h6">Add cards to sprint</div>
           <q-space />
@@ -108,20 +82,21 @@
 import { mapGetters, mapActions } from 'vuex'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
-import CardsForm from 'components/CardsForm.vue'
 import AddCard from 'components/AddCardSprint.vue'
 
 Vue.component('draggable', draggable)
 
 export default {
   name: 'Zgodbe',
-  components: { CardsForm, AddCard },
+  components: { AddCard },
   data () {
     return {
       addCard: false,
       editCard: true,
+      editCardData: false,
       confirmDelete: false,
       deleteCardId: '',
+      editCardId: '',
       sections: {
         1: {
           name: 'PRODUCT BACKLOG',
@@ -142,28 +117,22 @@ export default {
       sprints: [],
       cards: [],
       user: {},
-      pagination: {
-        rowsPerPage: 0
-      },
       allProjectCards: [],
       allSprintCards: [],
       editCards: {
-        sprint_id: this.$route.params.id,
+        sprint_id: '',
         project_id: '',
+        expected_time: '',
         card_name: '',
         description: '',
         acceptance_test: [],
         priority: '',
         value: '',
         subtasks: [],
-        card_round: 'PRODUCT BACKLOG'
+        card_round: ''
       },
       sprintId: '',
-      add_new: false,
-      drag: false,
-      cardId: '',
-      editCardData: false,
-      dialogTitle: 'Edit card'
+      drag: false
     }
   },
   computed: {
@@ -197,16 +166,8 @@ export default {
     ...mapActions('card', [
       'fetchCards',
       'postCard',
-      'updateCard',
-      'deleteCard'
+      'updateCard'
     ]),
-    deleteFunction (cardId) {
-      this.deleteCard(cardId)
-      this.showCards()
-    },
-    updateCardInfo () {
-      this.editCardData = false
-    },
     projectCards () {
       var cards = this.getCards()
       var projectCards = []
@@ -222,7 +183,6 @@ export default {
       for (var s in sprints) {
         if (sprints[s]._id === this.sprintId) {
           this.projectId = sprints[s].project_id
-          console.log(this.projectId)
           return sprints[s]
         }
       }
@@ -243,63 +203,6 @@ export default {
         }
       }
       return allCards
-    },
-    columns () {
-      if (this.user.permissions === 'Admin') {
-        return [
-          {
-            name: 'name',
-            required: true,
-            label: 'Name',
-            align: 'left',
-            field: row => row.name,
-            sortable: true
-          },
-          { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'startdate', align: 'left', label: 'StartDate', field: 'startdate', sortable: true },
-          { name: 'enddate', align: 'left', label: 'EndDate', field: 'enddate', sortable: true },
-          { name: 'expectedtime', align: 'left', label: 'expectedtime', field: 'expectedtime', sortable: true },
-          { name: 'delete', align: 'center', label: 'Delete project', field: 'delete' }
-        ]
-      } else {
-        return [
-          {
-            name: 'name',
-            required: true,
-            label: 'Name',
-            align: 'left',
-            field: row => row.name,
-            sortable: true
-          },
-          { name: 'users', align: 'left', label: 'Users', field: 'users' },
-          { name: 'startdate', align: 'left', label: 'StartDate', field: 'startdate', sortable: true },
-          { name: 'enddate', align: 'left', label: 'EndDate', field: 'enddate', sortable: true },
-          { name: 'expectedtime', align: 'left', label: 'expectedtime', field: 'expectedtime', sortable: true }
-        ]
-      }
-    },
-    EditFunction () {
-      this.editCards.description = this.card.description
-      this.editCards.card_name = this.card.card_name
-      this.editCards.acceptance_test = this.card.acceptance_test
-      this.editCards.value = this.card.value
-      this.editCards.subtasks = this.card.subtasks
-      // this.editCards.card_round = this.card_round
-      this.editCards.priority = this.card.priority
-      var userTable = []
-      for (var user in this.card.users) {
-        var userData = {
-          label: this.card.users[user].user_name,
-          value: this.card.users[user].user_name
-          // role: this.card.users[user].user_role
-        }
-        userTable.push(userData)
-      }
-      this.editCardData.users = userTable
-      this.editCardData = true
-    },
-    deleteTask (tasklane, index) {
-      this[tasklane].splice(index, 1)
     }
   }
 }

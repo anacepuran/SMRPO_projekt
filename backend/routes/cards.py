@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from db import mongo
+from backend.db import mongo
 
 cards_route = Blueprint('cards_route', __name__)
 
@@ -17,11 +17,13 @@ def add_card():
     value = request.json['value']
     subtasks = request.json['subtasks']
     card_round = request.json['card_round']
+    expected_time = request.json['expected_time']
 
     card_id = mongo.db.cards.insert(
         {'sprint_id': sprint_id,
             'project_id': project_id,
             'card_name': card_name,
+            'expected_time': expected_time,
             'description': description,
             'priority': priority,
             'acceptance_test': acceptance_test,
@@ -35,6 +37,7 @@ def add_card():
         'project_id': str(project_id),
         'card_name': card_name,
         'description': description,
+        'expected_time': expected_time,
         'priority': priority,
         'acceptance_test': acceptance_test,
         'value': value,
@@ -62,7 +65,7 @@ def get_cards():
 @cards_route.route('/cards/delete', methods=['DELETE'])
 def delete_cards():
     card_id = request.json['_id']
-    mongo.db.sprints.delete_one({'_id': ObjectId(card_id)})
+    mongo.db.cards.delete_one({'_id': ObjectId(card_id)})
     return "Deleted " + card_id
 
 
@@ -77,20 +80,25 @@ def update_sprint_of_card():
     value = request.json['value']
     subtasks = request.json['subtasks']
     card_round = request.json['card_round']
-    
+    card_name = request.json['card_name']
+    expected_time = request.json['expected_time']
+
     current_card = mongo.db.cards.find_one({'_id': ObjectId(card_id)})
     current_card['sprint_id'] = sprint_id
     current_card['project_id'] = project_id
+    current_card['expected_time'] = expected_time
     current_card['description'] = description
     current_card['acceptance_test'] = acceptance_test
     current_card['priority'] = priority
     current_card['value'] = value
     current_card['subtasks'] = subtasks
     current_card['card_round'] = card_round
+    current_card['card_name'] = card_name
 
     mongo.db.cards.save(current_card)
     response = {
         '_id': str(card_id),
+        'expected_time': current_card['expected_time'],
         'project_id': str(project_id),
         'sprint_id': str(sprint_id),
         'card_name': current_card['card_name'],
@@ -99,6 +107,7 @@ def update_sprint_of_card():
         'acceptance_test': current_card['acceptance_test'],
         'value': current_card['value'],
         'subtasks': current_card['subtasks'],
-        'card_round': current_card['card_round']
+        'card_round': current_card['card_round'],
+        'card_name': current_card['card_name']
     }
     return response, 200

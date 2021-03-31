@@ -15,30 +15,38 @@
             label="Card description"
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please type something']"/>
-        <div class="text-caption">Write each test in new line!</div>
+        <!-- WHEN ADDING CARD -->
+        <div v-if="editCard === false" class="text-caption">Write each test in new line!</div>
         <q-input
-            filled
-            placeholder="First test
+          v-if="editCard === false"
+          filled
+          placeholder="First test
 Second test
 Third test"
-            type="textarea"
-            v-model="addedCard.acceptance_test"
-            :rows="3"/>
-        <q-input
-            filled
-            v-model="addedCard.value"
-            label="Business value"
-            type="number"
-            style="width: 200px"
-            lazy-rules
-            :rules=" [val => val < 11 && val > 0 && val.length > 0 || 'Range: from 1 to 10!']"/>
-        <q-select
-            filled
-            v-model="addedCard.priority"
-            :options="priority_options"
-            label="Priority"
-            style="width: 200px"
-        />
+          type="textarea"
+          v-model="addedCard.acceptance_test"
+          :rows="3"/>
+        <!-- WHEN EDITING CARD -->
+        <!-- IMPLEMENT ACCEPTANCE TESTS EDIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+        <div v-if="editCard === true">
+        </div>
+        <div class="row">
+          <q-select
+              filled
+              v-model="addedCard.value"
+              :options="value_options"
+              label="Business value"
+              style="width: 230px"
+          />
+          <q-space/>
+          <q-select
+              filled
+              v-model="addedCard.priority"
+              :options="priority_options"
+              label="Priority"
+              style="width: 230px"
+          />
+        </div>
         <q-card-actions horizontal align="right">
             <q-btn label="Submit" type="submit" color="primary" />
             <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
@@ -57,10 +65,13 @@ export default {
   data () {
     return {
       priority_options: ['Must have', 'Could have', 'Should have', 'Won\'t have this time'],
+      value_options: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       error: '',
       numberOfTests: 0,
       addedCard: {
+        id: '',
         project_id: '',
+        expected_time: '',
         sprint_id: '',
         card_name: '',
         description: '',
@@ -81,10 +92,12 @@ export default {
     },
     editCard: {
       type: Boolean
+    },
+    editCardId: {
+      type: String
     }
   },
   mounted () {
-    this.fetchCards()
     this.onReset()
   },
   methods: {
@@ -92,16 +105,14 @@ export default {
       'getCards'
     ]),
     ...mapActions('card', [
-      'fetchCards',
       'postCard',
       'updateCard'
     ]),
     checkCard () {
       var accept = true
       // CHECK IF PROJECT WITH THIS NAME ALREADY EXISTS
-      console.log(this.allCards)
       for (var card in this.allCards) {
-        if (this.addedCard.card_name.toLowerCase() === this.allCards[card].card_name.toLowerCase()) {
+        if (this.addedCard.card_name.toLowerCase() === this.allCards[card].card_name.toLowerCase() && this.allCards[card]._id !== this.addedCard._id) {
           accept = false
           this.error = 'Project with the name "' + this.addedCard.card_name + '" already exists.'
         }
@@ -110,22 +121,31 @@ export default {
         accept = false
         this.error = 'Set priority.'
       }
+      if (this.addedCard.value === '') {
+        accept = false
+        this.error = 'Set business value.'
+      }
       return accept
     },
     splitTests (tests) {
-      const testsArr = tests.split('\n')
+      let testsArr = []
+      if (tests.includes('\n')) {
+        testsArr = tests.split('\n')
+        console.log(testsArr)
+      }
       return testsArr
     },
     onSubmit () {
-      var submitMessage = ''
+      let submitMessage = ''
       if (this.checkCard()) {
+        const acceptanceTestArray = this.splitTests(this.addedCard.acceptance_test)
+        this.addedCard.acceptance_test = acceptanceTestArray
         if (this.$props.editCard) {
           submitMessage = 'Card updated.'
+          console.log(this.addedCard)
           this.updateCard(this.addedCard)
           this.onReset()
         } else {
-          const acceptanceTestArray = this.splitTests(this.addedCard.acceptance_test)
-          this.addedCard.acceptance_test = acceptanceTestArray
           submitMessage = 'Card added.'
           this.postCard(this.addedCard)
           this.onReset()
@@ -143,6 +163,8 @@ export default {
       }
     },
     onReset () {
+      this.addedCard._id = this.$props.newCard._id
+      this.addedCard.expected_time = this.$props.newCard.expected_time
       this.addedCard.sprint_id = this.$props.newCard.sprint_id
       this.addedCard.project_id = this.$props.newCard.project_id
       this.addedCard.card_name = this.$props.newCard.card_name

@@ -11,6 +11,7 @@ export function fetchCards ({ commit }) {
 export function postCard ({ commit }, payload) {
   this.$axios.post('cards/add', {
     sprint_id: payload.sprint_id,
+    expected_time: payload.expected_time,
     project_id: payload.project_id,
     card_name: payload.card_name,
     description: payload.description,
@@ -34,6 +35,7 @@ export function updateCard ({ commit }, payload) {
     _id: payload._id,
     sprint_id: payload.sprint_id,
     card_name: payload.card_name,
+    expected_time: payload.expected_time,
     project_id: payload.project_id,
     description: payload.description,
     acceptance_test: payload.acceptance_test,

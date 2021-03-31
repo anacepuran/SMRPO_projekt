@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from bson.objectid import ObjectId
 from flask import Blueprint
-from db import mongo
+from backend.db import mongo
 
 scrums_route = Blueprint('scrums_route', __name__)
 

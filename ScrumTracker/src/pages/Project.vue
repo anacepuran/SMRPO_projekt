@@ -25,11 +25,11 @@
             </div>
             <div class="row">
                 <q-space/>
-                <q-btn v-if="checkRole('Product Owner')" size="md" class="q-ma-md" icon="add" color="primary" label="Add card to project" @click="addCard=true" />
+                <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" class="q-ma-md" icon="add" color="primary" label="Add card to project" @click="addCard=true" />
             </div>
             <div class="row">
                 <q-space/>
-                <q-btn v-if="checkRole('Product Owner')" size="md" class="q-ma-md" icon="visibility" color="primary" label="Show project cards" @click="showAllCards=true" />
+                <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" class="q-ma-md" icon="visibility" color="primary" label="Show project cards" @click="showAllCards=true" />
             </div>
           </q-card-section>
         </q-card-section>
@@ -44,15 +44,15 @@
           <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
         </q-card>
       </q-dialog>
-      <q-card class="q-ma-md" v-if="checkRole('Scrum Master') || checkRole('Developer')">
-        <q-card-section class="row bg-secondary" >
+      <q-card class="q-ma-md">
+        <q-card-section class="row bg-secondary" v-if="checkRole('Scrum Master') || checkRole('Developer')">
           <div class="text-white text-h6 q-ma-sm">Sprints</div>
           <q-space/>
           <div class="q-ma-sm">
             <q-btn v-if="checkRole('Scrum Master')" size="md" color="primary" label="Add Sprint" icon="create_new_folder" @click="addSprint=true" />
           </div>
         </q-card-section>
-        <div class="row q-ma-md">
+        <div class="row q-ma-md"  v-if="checkRole('Scrum Master') || checkRole('Developer')">
           <q-table
             class="full-width"
             :data="filteredSprints"
@@ -127,10 +127,13 @@
             <AddCardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="onResetCard"></AddCardsForm>
           </q-card>
         </q-dialog>
-        <q-dialog v-model="showAllCards">
-          <q-card class="q-pa-md" style="width: 80vw">
+        <q-dialog v-model="showAllCards" full-width>
+          <q-card class="q-pa-md">
+            <q-card-section class="row items-center">
+              <q-btn icon="close" flat round dense @click="onResetCard" v-close-popup/>
+            </q-card-section>
             <!-- SHOW CARDS COMPONENT -->
-            <ShowCards :allCards="allCards"></ShowCards>
+            <ShowCards :allCards="allCards" :projectId="this.$route.params.id"></ShowCards>
           </q-card>
         </q-dialog>
       </q-card>
@@ -179,8 +182,10 @@ export default {
       showAllCards: false,
       allCards: [],
       newCard: {
+        _id: '',
         project_id: this.$route.params.id,
         sprint_id: '',
+        expected_time: '',
         card_name: '',
         description: '',
         acceptance_test: [],
@@ -334,10 +339,12 @@ export default {
       this.newCard.description = ''
       this.newCard.card_name = ''
       this.newCard.acceptance_test = []
-      this.newCard.value = ''
       this.newCard.subtasks = ''
       this.newCard.card_round = ''
+      this.newaCard.expectedtime = ''
       this.newCard.priority = ''
+      this.newCard.value = ''
+      this.expected_time = ''
     },
     formatUserRoles (userRoles) {
       var roles = ''
