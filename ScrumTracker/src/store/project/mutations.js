@@ -6,7 +6,9 @@ export function PUSH_NEW_PROJECT (state, newProject) {
     _id: newProject._id,
     name: newProject.name,
     users: newProject.users,
-    description: newProject.description
+    description: newProject.description,
+    documentation: newProject.documentation,
+    wall: newProject.wall
   }
   state.projects[newProject._id] = pushProject
 }

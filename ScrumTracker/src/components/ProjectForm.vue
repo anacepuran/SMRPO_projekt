@@ -218,7 +218,6 @@ export default {
       return true
     },
     onSubmit () {
-      console.log('submit')
       var submitMessage = ''
       if (this.checkProject()) {
         this.pushProject.users = this.usersPushData(this.pushProject.users)
@@ -244,13 +243,14 @@ export default {
       }
     },
     onReset () {
-      console.log('reset')
       for (var user in this.pushProject.users) {
         this.pushProject.users[user].role = [null]
       }
       this.pushProject.name = this.$props.newProject.name
       this.pushProject.users = this.$props.newProject.users
       this.pushProject.description = this.$props.newProject.description
+      this.pushProject.documentation = this.$props.newProject.documentation
+      this.pushProject.wall = this.$props.newProject.wall
       this.pushProject._id = this.$props.newProject._id
       this.error = ''
     }

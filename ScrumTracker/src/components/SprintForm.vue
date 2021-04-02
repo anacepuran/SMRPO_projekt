@@ -78,8 +78,7 @@ export default {
         expectedtime: '',
         project_id: ''
       },
-      today: '',
-      numOfUsers: 0
+      today: ''
     }
   },
   props: {
@@ -115,7 +114,6 @@ export default {
     this.today = this.getDate()
     this.selectDuration = this.pushSprint.deadline
     this.projectId = this.$props.newSprint.project_id
-    this.numOfUsers = this.$props.newSprint.numOfUsers
   },
   methods: {
     ...mapGetters('sprint', [
@@ -187,27 +185,9 @@ export default {
       }
       return alreadyExists
     },
-    checkSprintExpDuration () {
-      // CHECK IF THE DURATION VALUE IS VALID
-      var validDuration = true
-      var diff = moment(this.pushSprint.enddate, 'DD/MM/YYYY').diff(moment(this.pushSprint.startdate, 'DD/MM/YYYY'), 'days')
-      console.log(diff)
-      var weeks = parseInt(diff / 7)
-      var workDays = weeks * 5
-      var modWorkDays = (diff % workDays) % weeks
-      var totalDays = workDays + modWorkDays
-      console.log(totalDays)
-      var expTime = this.pushSprint.expectedtime
-      var daysPerPerson = parseInt(expTime / this.numOfUsers)
-      console.log(daysPerPerson)
-      if (daysPerPerson > totalDays) {
-        validDuration = false
-      }
-      return validDuration
-    },
     onSubmit () {
       var submitMessage = ''
-      if (!this.checkSprintName() && this.checkSprintExpDuration()) {
+      if (!this.checkSprintName()) {
         if (this.$props.editProject) {
           submitMessage = 'Sprint updated.'
           this.updateSprint(this.pushSprint)
@@ -238,6 +218,8 @@ export default {
       this.pushSprint.expectedtime = this.$props.newSprint.expectedtime
       this.error = ''
       this.dateError = ''
+      console.log('newSprint form')
+      console.log(this.newSprint)
     }
   }
 }

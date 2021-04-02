@@ -46,7 +46,7 @@
             <div clasS=" col-1">
               <q-avatar class="q-ma-xs" size="20px" font-size="15px" :color="avatarColor(user.user_role)" text-color="white" icon="person" />
             </div>
-            <span class="col-2 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
+            <span class="col-4 q-ma-xs">{{user.user_name}}</span><span class="col text-caption text-grey q-ma-xs"> {{formatUserRoles(user.user_role)}}</span>
           </div>
         </q-td>
       </template>
@@ -162,7 +162,6 @@ export default {
       'deleteProject'
     ]),
     openProject (projectId) {
-      console.log(projectId)
       this.$router.push('/project/' + projectId)
     },
     deleteFunction (projectId) {
@@ -189,7 +188,6 @@ export default {
       return roles
     },
     avatarColor (userRole) {
-      console.log(userRole)
       var color = ''
       if (userRole[1] === 'Product Owner') {
         color = 'teal'
@@ -220,7 +218,6 @@ export default {
         for (var project in this.projects) {
           const projectName = this.projects[project].name.toLowerCase()
           if (projectName.startsWith(search.toLowerCase())) {
-            // console.log(checkedItems[i].title.toLowerCase().startsWith(searchString))
             filteredItems.push(this.projects[project])
           }
         }
@@ -231,7 +228,6 @@ export default {
   },
   mounted () {
     this.currentUser = this.getCurrentUser()
-    // console.log(this.currentUser)
     this.fetchProjects()
     this.showProjects()
   }

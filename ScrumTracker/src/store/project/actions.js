@@ -25,6 +25,8 @@ export function updateProject ({ commit }, payload) {
     name: payload.name,
     users: payload.users,
     description: payload.description,
+    documentation: payload.documentation,
+    wall: payload.wall,
     _id: payload._id
   })
     .then((res) => {

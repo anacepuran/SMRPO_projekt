@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-ma-lg window-width">
-    <q-btn class="q-ma-xs" text-color="primary" flat icon="arrow_back_ios" label="All sprints" @click="$router.back()" />
+    <q-btn class="q-ma-xs" text-color="primary" flat icon="arrow_back_ios" label="Back to project" @click="$router.back()" />
     <q-card class="q-ma-lg" flat bordered>
       <q-card-section horizontal>
         <q-card-section class="q-ma-md bg-primary">
