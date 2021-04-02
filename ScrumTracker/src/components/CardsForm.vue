@@ -131,7 +131,6 @@ export default {
       let testsArr = []
       if (tests.includes('\n')) {
         testsArr = tests.split('\n')
-        console.log(testsArr)
       }
       return testsArr
     },
@@ -142,7 +141,6 @@ export default {
         this.addedCard.acceptance_test = acceptanceTestArray
         if (this.$props.editCard) {
           submitMessage = 'Card updated.'
-          console.log(this.addedCard)
           this.updateCard(this.addedCard)
           this.onReset()
         } else {

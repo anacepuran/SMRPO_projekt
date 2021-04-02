@@ -165,7 +165,6 @@ export default {
     ]),
     ...mapActions('card', [
       'fetchCards',
-      'postCard',
       'updateCard'
     ]),
     projectCards () {
@@ -193,7 +192,7 @@ export default {
       setTimeout(() => {
         var cards = this.getCards()
         this.allSprintCards = this.cardsToArray(cards)
-      }, 1000)
+      }, 100)
     },
     cardsToArray (cards) {
       var allCards = []

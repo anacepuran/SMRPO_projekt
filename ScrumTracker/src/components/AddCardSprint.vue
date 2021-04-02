@@ -51,7 +51,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 export default {
-  name: 'ShowCards',
+  name: 'AddCardSprint',
   props: {
     allCards: {
       type: Array
