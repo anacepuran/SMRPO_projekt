@@ -16,18 +16,15 @@
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please type something']"/>
         <!-- WHEN ADDING CARD -->
-        <div v-if="editCard === false" class="text-caption">Write each test in new line!</div>
+        <div class="text-caption">Write each test in new line!</div>
         <q-input
-          v-if="editCard === false"
           filled
           placeholder="First test
 Second test
 Third test"
           type="textarea"
-          v-model="addedCard.acceptance_test"
+          v-model="acc_tests"
           :rows="3"/>
-        <!-- WHEN EDITING CARD -->
-        <!-- IMPLEMENT ACCEPTANCE TESTS EDIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
         <div v-if="editCard === true">
         </div>
         <div class="row">
@@ -80,7 +77,8 @@ export default {
         value: '',
         subtasks: [],
         card_round: ''
-      }
+      },
+      acc_tests: ''
     }
   },
   props: {
@@ -99,6 +97,7 @@ export default {
   },
   mounted () {
     this.onReset()
+    this.acc_tests = this.setAcceptanceTests()
   },
   methods: {
     ...mapGetters('card', [
@@ -108,6 +107,15 @@ export default {
       'postCard',
       'updateCard'
     ]),
+    setAcceptanceTests () {
+      const tests = this.addedCard.acceptance_test
+      let testsStr = ''
+      for (var v in tests) {
+        testsStr += tests[v]
+        testsStr += '\n'
+      }
+      return testsStr
+    },
     checkCard () {
       var accept = true
       // CHECK IF PROJECT WITH THIS NAME ALREADY EXISTS
@@ -131,14 +139,27 @@ export default {
       let testsArr = []
       if (tests.includes('\n')) {
         testsArr = tests.split('\n')
+      } else {
+        testsArr.push(tests)
+      }
+      if (testsArr[testsArr.length - 1] === '') {
+        testsArr.pop()
       }
       return testsArr
+    },
+    upperCaseArray (tests) {
+      const array = []
+      for (var v in tests) {
+        array.push(tests[v].charAt(0).toUpperCase() + tests[v].slice(1))
+      }
+      return array
     },
     onSubmit () {
       let submitMessage = ''
       if (this.checkCard()) {
-        const acceptanceTestArray = this.splitTests(this.addedCard.acceptance_test)
-        this.addedCard.acceptance_test = acceptanceTestArray
+        const acceptanceTestArray = this.splitTests(this.acc_tests)
+        const accTestsUpperCase = this.upperCaseArray(acceptanceTestArray)
+        this.addedCard.acceptance_test = accTestsUpperCase
         if (this.$props.editCard) {
           submitMessage = 'Card updated.'
           this.updateCard(this.addedCard)

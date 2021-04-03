@@ -111,7 +111,7 @@ export default {
       setTimeout(() => {
         var cards = this.getCards()
         this.projectCards = this.cardsToArray(cards)
-      }, 100)
+      }, 300)
     },
     cardsToArray (cards) {
       var allCards = []

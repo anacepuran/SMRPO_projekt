@@ -40,8 +40,8 @@
           <div class="col">
             <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
               <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
-            </div>
           </div>
+        </div>
         </q-card-section>
         <q-card-actions horizontal align="right" v-if="card.sprint_id === '' && card.card_round !== 'DONE'">
           <q-btn flat @click="confirmDelete=true; deleteCardId=card._id" round color="negative" icon="delete"/>
@@ -78,7 +78,7 @@
         </q-card-section>
         <q-card-actions horizontal align="center">
           <q-card-section class="row">
-            <q-input filled v-model="timeExpected" type="number" label="Expected time" min="1" lazy-rules
+            <q-input filled v-model="timeExpected" type="number" min="1" lazy-rules :label="card.expected_time"
               :rules="[val => val !== null && val !== '' || 'Please select expected time']"/>
           </q-card-section>
           <q-card-section class="row items-center">
