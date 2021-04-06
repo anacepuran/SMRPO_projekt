@@ -32,38 +32,9 @@
               <div class="text-white text-h6 q-ma-sm">Sprint backlog</div>
             </q-card-section>
             <div class="row">
-              <div class="col-3">
-                <q-card-section class="row bg-secondary">
-                  <div class="text-white text-overline">Not assigned</div>
-                </q-card-section>
                 <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                  <CardSprint v-if="card.asignee !== ''" :allCards="allCards" :card="card"></CardSprint>
+                  <CardSprint :allCards="allCards" :card="card"></CardSprint>
                 </div>
-              </div>
-              <div class="col-3">
-                <q-card-section class="row bg-secondary">
-                  <div class="text-white text-overline">Assigned</div>
-                </q-card-section>
-                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                  <CardSprint v-if="card.asignee === ''" :allCards="allCards" :card="card"></CardSprint>
-                </div>
-              </div>
-              <div class="col-3">
-                <q-card-section class="row bg-secondary">
-                  <div class="text-white text-overline">Active</div>
-                </q-card-section>
-                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                  <CardSprint v-if="card.card_round !== 'PRODUCT BACKLOG' && card.card_round !== 'DONE'" :card="card"></CardSprint>
-                </div>
-              </div>
-              <div class="col-3">
-                <q-card-section class="row bg-secondary">
-                  <div class="text-white text-overline">Done</div>
-                </q-card-section>
-                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                  <CardSprint v-if="card.card_round === 'DONE'" :allCards="allCards" :card="card"></CardSprint>
-                </div>
-              </div>
             </div>
           </div>
         </div>
