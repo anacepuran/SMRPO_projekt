@@ -25,15 +25,16 @@
     </q-card>
     <template>
     <div>
-      <div class="q-pa-md ">
+      <div class="q-pa-md">
         <div class="row justify-center items-center content-center ">
-          <div class="col-md-9">
+          <div class="col-12">
             <q-card-section class="row bg-secondary">
-              <h4 class="text-white text-overline text-center ">Sprint Backlog</h4>
+              <div class="text-white text-h6 q-ma-sm">Sprint backlog</div>
             </q-card-section>
-            <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md ">
-              <Card v-if="card.sprint_id !== ''" :allCards="allCards" :card="card" :sprint_id="sprint_id" @updateCardsArrays="updateCardsArrays"></Card>
-              <!-- <Card v-if="card.card_round === 'SPRINT BACKLOG'" :allCards="allCards" :card="card" :sprint_id="sprint_id"></Card>-->
+            <div class="row">
+              <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                <Card :allCards="allCards" :card="card" :sprint_id="sprint_id" @updateCardsArrays="updateCardsArrays"></Card>
+              </div>
             </div>
           </div>
         </div>

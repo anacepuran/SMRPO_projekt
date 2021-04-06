@@ -177,8 +177,8 @@ export default {
           position: 'top-right',
           timeout: 1000
         })
-        this.error = ''
         this.$emit('submitCard')
+        this.error = ''
       }
     },
     onReset () {

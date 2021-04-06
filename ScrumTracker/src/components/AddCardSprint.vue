@@ -64,6 +64,7 @@ export default {
     return {
       error: '',
       user: {},
+      sprint: {},
       editCard: {
         _id: '',
         project_id: '',
@@ -81,6 +82,7 @@ export default {
   },
   mounted () {
     this.user = this.getCurrentUser()
+    this.sprints = this.getSprints()
   },
   methods: {
     ...mapActions('card', [
@@ -88,6 +90,9 @@ export default {
     ]),
     ...mapGetters('user', [
       'getCurrentUser'
+    ]),
+    ...mapGetters('sprint', [
+      'getSprints'
     ]),
     checkRole (currentRole) {
       var validRole = false
@@ -105,9 +110,35 @@ export default {
       }
       return validRole
     },
+    exceedsExpectedTime (newCardExpectedTime) {
+      let currentSprint = {}
+      for (const s in this.sprints) {
+        if (this.sprints[s]._id === this.sprintId) {
+          currentSprint = this.sprints[s]
+        }
+      }
+      const expectedSprintTime = currentSprint.expected_time * 24 // converted from days to hours
+      console.log('sprint time', expectedSprintTime)
+      let currentSprintTime = 0
+      for (const c in this.allCards) {
+        if (this.allCards[c].sprint_id === this.sprintId) {
+          currentSprintTime += parseInt(this.allCards[c].expected_time)
+          console.log('x', this.allCards[c].card_name)
+          console.log('x', parseInt(this.allCards[c].expected_time))
+        }
+      }
+      currentSprintTime += parseInt(newCardExpectedTime)
+      console.log('current time', currentSprintTime)
+      if (currentSprintTime === expectedSprintTime || currentSprintTime < expectedSprintTime) {
+        return false
+      }
+      return true
+    },
     addCardToSprint (card) {
       if (card.priority === 'Won\'t have this time') {
         this.error = 'You can\'t add this card!'
+      } else if (this.exceedsExpectedTime(card.expected_time)) {
+        this.error = 'By adding this card you would exceed the expected time for this sprint.'
       } else {
         this.editCard = card
         this.editCard.card_round = 'PRODUCT BACKLOG'
