@@ -47,7 +47,7 @@
               class="text-secondary"
             >
               <q-tab name="productbacklog" icon="credit_card" label="Product Backlog" />
-              <q-tab name="sprints" icon="dynamic_feed" label="Sprints" />
+              <q-tab name="sprints" icon="dynamic_feed" label="Sprint" />
               <q-tab name="documentation" icon="description" label="Documentation" />
               <q-tab name="wall" icon="post_add" label="Project Wall" />
             </q-tabs>
