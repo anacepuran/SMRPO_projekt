@@ -118,17 +118,13 @@ export default {
         }
       }
       const expectedSprintTime = currentSprint.expected_time * 24 // converted from days to hours
-      console.log('sprint time', expectedSprintTime)
       let currentSprintTime = 0
       for (const c in this.allCards) {
         if (this.allCards[c].sprint_id === this.sprintId) {
           currentSprintTime += parseInt(this.allCards[c].expected_time)
-          console.log('x', this.allCards[c].card_name)
-          console.log('x', parseInt(this.allCards[c].expected_time))
         }
       }
       currentSprintTime += parseInt(newCardExpectedTime)
-      console.log('current time', currentSprintTime)
       if (currentSprintTime === expectedSprintTime || currentSprintTime < expectedSprintTime) {
         return false
       }
@@ -141,7 +137,7 @@ export default {
         this.error = 'By adding this card you would exceed the expected time for this sprint.'
       } else {
         this.editCard = card
-        this.editCard.card_round = 'PRODUCT BACKLOG'
+        this.editCard.card_round = 'SPRINT BACKLOG'
         this.editCard.sprint_id = this.sprintId
         this.updateCard(this.editCard)
         this.$emit('addCard')

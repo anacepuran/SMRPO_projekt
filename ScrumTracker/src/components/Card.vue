@@ -131,7 +131,7 @@ export default {
         priority: '',
         value: '',
         subtasks: [],
-        card_round: ''
+        card_round: 'PRODUCT BACKLOG'
       }
     }
   },

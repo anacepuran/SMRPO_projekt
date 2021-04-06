@@ -32,8 +32,37 @@
               <div class="text-white text-h6 q-ma-sm">Sprint backlog</div>
             </q-card-section>
             <div class="row">
-              <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                <Card :allCards="allCards" :card="card" :sprint_id="sprint_id" @updateCardsArrays="updateCardsArrays"></Card>
+              <div class="col-3">
+                <q-card-section class="row bg-secondary">
+                  <div class="text-white text-overline">Not assigned</div>
+                </q-card-section>
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                  <CardSprint v-if="card.asignee !== ''" :allCards="allCards" :card="card"></CardSprint>
+                </div>
+              </div>
+              <div class="col-3">
+                <q-card-section class="row bg-secondary">
+                  <div class="text-white text-overline">Assigned</div>
+                </q-card-section>
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                  <CardSprint v-if="card.asignee === ''" :allCards="allCards" :card="card"></CardSprint>
+                </div>
+              </div>
+              <div class="col-3">
+                <q-card-section class="row bg-secondary">
+                  <div class="text-white text-overline">Active</div>
+                </q-card-section>
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                  <CardSprint v-if="card.card_round !== 'PRODUCT BACKLOG' && card.card_round !== 'DONE'" :card="card"></CardSprint>
+                </div>
+              </div>
+              <div class="col-3">
+                <q-card-section class="row bg-secondary">
+                  <div class="text-white text-overline">Done</div>
+                </q-card-section>
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                  <CardSprint v-if="card.card_round === 'DONE'" :allCards="allCards" :card="card"></CardSprint>
+                </div>
               </div>
             </div>
           </div>
@@ -48,7 +77,7 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-        <CardsForm :allCards="allCards" :newCard="editCards" :editCard="true" :editCardId="editCardId" @submitCard="updateCards()"></CardsForm>
+        <CardsForm :allCards="allCards" :newCard="editCards" :editCard="true" :editCardId="editCardId" @submitCard="showCards()"></CardsForm>
       </q-card>
     </q-dialog>
     <q-dialog v-model="addCard" full-width>
@@ -68,13 +97,13 @@ import { mapGetters, mapActions } from 'vuex'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
 import AddCard from 'components/AddCardSprint.vue'
-import Card from 'components/Card.vue'
+import CardSprint from 'components/CardSprint.vue'
 
 Vue.component('draggable', draggable)
 
 export default {
   name: 'Zgodbe',
-  components: { AddCard, Card },
+  components: { AddCard, CardSprint },
   data () {
     return {
       addCard: false,
@@ -180,12 +209,6 @@ export default {
       }
       return projectCards
     },
-    updateCardsArrays () {
-      setTimeout(() => {
-        var cards = this.getCards()
-        this.projectCards = this.cardsToArray(cards)
-      }, 300)
-    },
     sprint () {
       var sprints = this.getSprints()
       for (var s in sprints) {
@@ -201,7 +224,8 @@ export default {
       setTimeout(() => {
         var cards = this.getCards()
         this.allSprintCards = this.cardsToArray(cards)
-      }, 100)
+      }, 200)
+      console.log('added')
     },
     cardsToArray (cards) {
       var allCards = []

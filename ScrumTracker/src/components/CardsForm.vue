@@ -76,7 +76,7 @@ export default {
         priority: '',
         value: '',
         subtasks: [],
-        card_round: ''
+        card_round: 'PRODUCT BACKLOG'
       },
       acc_tests: ''
     }
@@ -192,7 +192,7 @@ export default {
       this.addedCard.priority = this.$props.newCard.priority
       this.addedCard.value = this.$props.newCard.value
       this.addedCard.subtasks = this.$props.newCard.subtasks
-      this.addedCard.card_round = this.$props.newCard.card_round
+      this.addedCard.card_round = 'PRODUCT BACKLOG'
       this.error = ''
     }
   }
