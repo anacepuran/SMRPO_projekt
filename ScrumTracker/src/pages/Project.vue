@@ -23,14 +23,6 @@
                 <q-space/>
                 <q-btn v-if="checkRole('Scrum Master')" size="md" class="q-ma-md" icon="edit" color="secondary" label="Edit project" @click="editFunction" />
             </div>
-            <div class="row">
-                <q-space/>
-                <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" class="q-ma-md" icon="add" color="primary" label="Add card to project" @click="addCard=true" />
-            </div>
-            <div class="row">
-                <q-space/>
-                <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" class="q-ma-md" icon="visibility" color="primary" label="Show project cards" @click="showAllCards=true" />
-            </div>
           </q-card-section>
         </q-card-section>
       </q-card>
@@ -44,26 +36,6 @@
           <ProjectForm :newProject="editProject" :editProject="editProjectData" @submitProject="updateProjectInfo()"></ProjectForm>
         </q-card>
       </q-dialog>
-      <q-dialog v-model="addCard">
-        <q-card class="q-pa-md" style="width: 80vw">
-          <q-card-section class="row items-center">
-            <div class="text-h6 q-ma-md">Add new card</div>
-            <q-space />
-            <q-btn icon="close" flat round dense @click="onResetCard" v-close-popup />
-          </q-card-section>
-          <!-- CARD FORM COMPONENT -->
-          <AddCardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="onResetCard"></AddCardsForm>
-        </q-card>
-      </q-dialog>
-      <q-dialog v-model="showAllCards" full-width>
-        <q-card class="q-pa-md">
-          <q-card-section class="row items-center">
-            <q-btn icon="close" flat round dense @click="onResetCard" v-close-popup/>
-          </q-card-section>
-          <!-- SHOW CARDS COMPONENT -->
-          <ShowCards :allCards="allCards" :projectId="this.$route.params.id"></ShowCards>
-        </q-card>
-      </q-dialog>
       <div>
         <q-splitter
           v-model="splitterModel"
@@ -74,6 +46,7 @@
               vertical
               class="text-secondary"
             >
+              <q-tab name="productbacklog" icon="credit_card" label="Product Backlog" />
               <q-tab name="sprints" icon="dynamic_feed" label="Sprints" />
               <q-tab name="documentation" icon="description" label="Documentation" />
               <q-tab name="wall" icon="post_add" label="Project Wall" />
@@ -88,6 +61,9 @@
               transition-prev="jump-up"
               transition-next="jump-up"
             >
+              <q-tab-panel name="productbacklog">
+                <ProductBacklog :allCards="allCards" :projectId="$route.params.id" :user="user"></ProductBacklog>
+              </q-tab-panel>
               <q-tab-panel name="sprints">
                 <SprintTable :projectIdProp="$route.params.id" :projectUsersProp="project.users"></SprintTable>
               </q-tab-panel>
@@ -107,14 +83,13 @@
 import { mapGetters, mapActions } from 'vuex'
 import ProjectForm from 'components/ProjectForm.vue'
 import Documentation from 'components/Documentation.vue'
-import AddCardsForm from 'components/CardsForm.vue'
-import ShowCards from 'components/ShowCards.vue'
 import SprintTable from 'components/SprintTable.vue'
 import ProjectWall from 'components/ProjectWall.vue'
+import ProductBacklog from 'components/ProductBacklog.vue'
 
 export default {
   name: 'Project',
-  components: { ProjectForm, AddCardsForm, ShowCards, SprintTable, Documentation, ProjectWall },
+  components: { ProjectForm, SprintTable, Documentation, ProjectWall, ProductBacklog },
   data () {
     return {
       user: {},
@@ -129,22 +104,7 @@ export default {
         wall: [],
         _id: ''
       },
-      addCard: false,
-      showAllCards: false,
       allCards: [],
-      newCard: {
-        _id: '',
-        project_id: this.$route.params.id,
-        sprint_id: '',
-        expected_time: '',
-        card_name: '',
-        description: '',
-        acceptance_test: [],
-        priority: '',
-        value: '',
-        subtasks: [],
-        card_round: ''
-      },
       tab: 'sprints',
       splitterModel: 20
     }
@@ -213,20 +173,6 @@ export default {
       this.editProject.users = userTable
       this.editProjectData = true
     },
-    onResetCard () {
-      this.showCards()
-      this.newCard.project_id = this.$route.params.id
-      this.newCard.sprint_id = ''
-      this.newCard.description = ''
-      this.newCard.card_name = ''
-      this.newCard.acceptance_test = []
-      this.newCard.subtasks = ''
-      this.newCard.card_round = ''
-      this.newaCard.expectedtime = ''
-      this.newCard.priority = ''
-      this.newCard.value = ''
-      this.expected_time = ''
-    },
     formatUserRoles (userRoles) {
       var roles = ''
       for (var i = 1; i < userRoles.length; i++) {
@@ -264,7 +210,6 @@ export default {
           allCards.push(cards[card])
         }
       }
-      console.log(allCards)
       return allCards
     }
   },

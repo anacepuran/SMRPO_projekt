@@ -23,49 +23,34 @@
         </q-card-section>
       </q-card-section>
     </q-card>
-    <draggable class="row q-mt-xs" group="columns" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-      <div class="col-4 q-px-xs" v-for="(element, index) in sections" v-bind:key="index">
-        <div class="q-pa-xs column-background">
-          <q-item style="cursor: move;" class="q-pa-none text-white q-pa-sm" :class="element.theme">
-            <q-item-section avatar style="min-width:25px">
-              <q-icon name="list" class="q-pa-none q-ma-none"/>
-            </q-item-section>
-            <q-item-section class="text-h6 text-weight-bolder">{{element.name}}</q-item-section>
-          </q-item>
-          <draggable class="list-group" :list="cards" group="tasks" v-bind="dragOptions" @start="drag = true" @end="drag = false">
-            <div v-for="(card, index) in allSprintCards" v-bind:key="index">
-              <q-card square v-if="card.card_round.toLowerCase() == element.name.toLowerCase()" flat bordered class="box-shadow cursor-move bg-white q-mt-xs list-group-item">
-                <q-card-section class="row" :class="element.border">
-                  <span class="text-white text-h6 q-ma-xxs">{{card.card_name}}</span>
-                  <q-space/>
-                  <span class="text-white text-capitalize q-ml-xxs right">({{ card.priority }})</span>
-                </q-card-section>
-                <q-card-section class="q-pt-sm">
-                  <div class="row items-center no-wrap">
-                  <div class="col">
-                      <div><span class="material-icons text-h5 text-secondary">description</span> {{ card.description }}</div>
-                  </div>
-                  </div>
-                  <div class="row items-center no-wrap">
-                      <div class="col">
-                      <div class="text-overline text-secondary">
-                          VALUE:<span class="text-weight-bolder text-h6 text-black">{{ card.value }}</span>
-                      </div>
-                      </div>
-                  </div>
-                  <div class="row items-center no-wrap">
-                    <div class="col">
-                      <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
-                      <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
+    <template>
+    <div>
+      <div class="q-pa-md">
+        <div class="row justify-center items-center content-center ">
+          <div class="col-12">
+            <q-card-section class="row bg-secondary">
+              <div class="text-white text-h6 q-ma-sm">Sprint backlog</div>
+            </q-card-section>
+            <div class="row">
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
+                  <CardSprint :allCards="allCards" :card="card"></CardSprint>
+                </div>
             </div>
-          </draggable>
+          </div>
         </div>
       </div>
-    </draggable>
+    </div>
+    </template>
+    <q-dialog v-model="editCardData">
+      <q-card class="q-pa-md" style="width: 80vh">
+        <q-card-section class="row items-center">
+          <div class="text-h6"> Edit Card </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <CardsForm :allCards="allCards" :newCard="editCards" :editCard="true" :editCardId="editCardId" @submitCard="showCards()"></CardsForm>
+      </q-card>
+    </q-dialog>
     <q-dialog v-model="addCard" full-width>
       <q-card class="q-pa-md">
         <q-card-section class="row items-center">
@@ -83,12 +68,13 @@ import { mapGetters, mapActions } from 'vuex'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
 import AddCard from 'components/AddCardSprint.vue'
+import CardSprint from 'components/CardSprint.vue'
 
 Vue.component('draggable', draggable)
 
 export default {
   name: 'Zgodbe',
-  components: { AddCard },
+  components: { AddCard, CardSprint },
   data () {
     return {
       addCard: false,
@@ -97,23 +83,32 @@ export default {
       confirmDelete: false,
       deleteCardId: '',
       editCardId: '',
-      sections: {
-        1: {
+      task_index: {
+        to_do_index: null,
+        in_progress_index: null,
+        test_index: null,
+        done_index: null
+      },
+      sections: [
+        {
+          id: 1,
           name: 'PRODUCT BACKLOG',
           theme: 'to-do-title',
           border: 'border-todo'
         },
-        2: {
+        {
+          id: 2,
           name: 'SPRINT BACKLOG',
           theme: 'in-progress-title',
           border: 'border-in-progress'
         },
-        3: {
+        {
+          id: 1,
           name: 'DONE',
           theme: 'done-title',
           border: 'border-done'
         }
-      },
+      ],
       sprints: [],
       cards: [],
       user: {},
@@ -153,6 +148,14 @@ export default {
     this.showCards()
     this.allProjectCards = this.projectCards()
   },
+  props: {
+    allCards: {
+      type: Array
+    },
+    sprint_id: {
+      type: String
+    }
+  },
   methods: {
     ...mapGetters('user', [
       'getCurrentUser'
@@ -165,7 +168,6 @@ export default {
     ]),
     ...mapActions('card', [
       'fetchCards',
-      'postCard',
       'updateCard'
     ]),
     projectCards () {
@@ -193,7 +195,8 @@ export default {
       setTimeout(() => {
         var cards = this.getCards()
         this.allSprintCards = this.cardsToArray(cards)
-      }, 1000)
+      }, 200)
+      console.log('added')
     },
     cardsToArray (cards) {
       var allCards = []
