@@ -35,6 +35,7 @@ export function updateSprint ({ commit }, payload) {
   })
     .then((res) => {
       commit('PUSH_NEW_SPRINT', res.data)
+      console.log(res.data)
     })
     .catch((error) => {
       console.error(error)

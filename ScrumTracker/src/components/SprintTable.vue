@@ -49,7 +49,7 @@
             <template v-slot:body-cell-edit="propsEdit" v-if="checkRole('Scrum Master')">
               <q-td :props="propsEdit">
                 <div>
-                  <q-btn flat @click="editSprint()" icon="edit" color="secondary" ></q-btn>
+                  <q-btn flat @click="editSprint(propsEdit.row)" icon="edit" color="secondary" ></q-btn>
                 </div>
               </q-td>
             </template>
@@ -117,6 +117,7 @@ export default {
         expectedtime: ''
       },
       editSprints: {
+        _id: '',
         name: '',
         project_id: '',
         startdate: '',
@@ -241,24 +242,15 @@ export default {
       }
       return validRole
     },
-    editSprint () {
-      this.editSprints.name = this.sprint.name
-      this.editSprints.startdate = this.sprint.startdate
-      this.editSprints.enddate = this.sprint.enddate
-      this.editSprints.expectedtime = this.sprint.expectedtime
-      this.editSprints.project_id = this.sprint.project_id
-      this.editSprints._id = this.projectId
-      var userTable = []
-      for (var user in this.sprint.users) {
-        var userData = {
-          label: this.sprint.users[user].user_name,
-          value: this.sprint.users[user].user_name,
-          role: this.sprint.users[user].user_role
-        }
-        userTable.push(userData)
-      }
-      this.editSprints.users = userTable
+    editSprint (sprint) {
+      this.editSprints.name = sprint.name
+      this.editSprints.startdate = sprint.start_date
+      this.editSprints.enddate = sprint.end_date
+      this.editSprints.expectedtime = sprint.expected_time
+      this.editSprints.project_id = sprint.project_id
+      this.editSprints._id = sprint._id
       this.editSprintData = true
+      console.log(this.editSprints)
     },
     openSprint (sprintId) {
       this.$router.push('/sprints/' + sprintId)

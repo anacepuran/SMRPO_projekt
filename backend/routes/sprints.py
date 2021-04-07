@@ -56,6 +56,7 @@ def delete_sprints():
 
 @sprints_route.route('/sprints/update', methods=['PUT'])
 def update_sprints():
+    print(request.json())
     name = request.json['name']
     project_id = request.json['project_id']
     start_date = request.json['start_date']

@@ -106,6 +106,7 @@ export default {
     }
   },
   mounted () {
+    console.log(this.pushSprint)
     this.fetchSprint()
     this.fetchUsers()
     this.onReset()
@@ -190,6 +191,7 @@ export default {
       if (!this.checkSprintName()) {
         if (this.$props.editProject) {
           submitMessage = 'Sprint updated.'
+          console.log(this.pushSprint)
           this.updateSprint(this.pushSprint)
           this.onReset()
         } else {
@@ -216,10 +218,9 @@ export default {
       this.pushSprint.startdate = this.$props.newSprint.startdate
       this.pushSprint.enddate = this.$props.newSprint.enddate
       this.pushSprint.expectedtime = this.$props.newSprint.expectedtime
+      this.pushSprint._id = this.$props.newSprint._id
       this.error = ''
       this.dateError = ''
-      console.log('newSprint form')
-      console.log(this.newSprint)
     }
   }
 }
