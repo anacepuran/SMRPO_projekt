@@ -46,6 +46,13 @@
                 </div>
               </q-td>
             </template>
+            <template v-slot:body-cell-edit="propsEdit" v-if="checkRole('Scrum Master')">
+              <q-td :props="propsEdit">
+                <div>
+                  <q-btn flat @click="editSprint()" icon="edit" color="secondary" ></q-btn>
+                </div>
+              </q-td>
+            </template>
           </q-table>
         </div>
         <q-dialog v-model="confirmDelete">
@@ -60,6 +67,16 @@
               </q-card-actions>
             </q-card>
           </q-dialog>
+        <q-dialog v-model="editSprintData">
+          <q-card class="q-pa-md" style="width: 80vh">
+            <q-card-section class="row items-center">
+              <div class="text-h6"> Edit Sprint </div>
+              <q-space />
+              <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
+             </q-card-section>
+            <SprintForm :newSprint="editSprints" :editProject="editSprintData"  @submitSprint="updateSprints()"></SprintForm>
+          </q-card>
+        </q-dialog>
         <q-dialog v-model="addSprint">
             <q-card class="q-pa-md" style="width: 80vh">
               <q-card-section class="row items-center">
@@ -98,7 +115,15 @@ export default {
         startdate: '',
         enddate: '',
         expectedtime: ''
-      }
+      },
+      editSprints: {
+        name: '',
+        project_id: '',
+        startdate: '',
+        enddate: '',
+        expectedtime: ''
+      },
+      editSprintData: false
     }
   },
   props: {
@@ -117,6 +142,15 @@ export default {
     this.showSprints()
   },
   computed: {
+    sprint () {
+      var allSprints = this.getSprints()
+      for (var sprint in allSprints) {
+        if (allSprints[sprint]._id === this.projectId) {
+          return allSprints[sprint]
+        }
+      }
+      return 'No project found.'
+    },
     filteredSprints () {
       return this.sprints
     },
@@ -134,7 +168,8 @@ export default {
           { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
           { name: 'end_date', align: 'center', label: 'End date', field: 'end_date', sortable: true },
           { name: 'expected_time', align: 'center', label: 'Expected time', field: 'expected_time' },
-          { name: 'delete', align: 'center', label: 'Delete sprint', field: 'delete' }
+          { name: 'delete', align: 'center', label: 'Delete sprint', field: 'delete' },
+          { name: 'edit', align: 'left', label: 'Edit sprint', field: 'edit' }
         ]
       } else {
         return [
@@ -162,11 +197,15 @@ export default {
     ]),
     ...mapActions('sprint', [
       'fetchSprint',
-      'deleteSprint'
+      'deleteSprint',
+      'updateSprint'
     ]),
     ...mapGetters('project', [
       'getProjects'
     ]),
+    updateSprints () {
+      this.editSprintData = false
+    },
     showSprints () {
       this.addSprint = false
       this.loading = true
@@ -202,6 +241,25 @@ export default {
       }
       return validRole
     },
+    editSprint () {
+      this.editSprints.name = this.sprint.name
+      this.editSprints.startdate = this.sprint.startdate
+      this.editSprints.enddate = this.sprint.enddate
+      this.editSprints.expectedtime = this.sprint.expectedtime
+      this.editSprints.project_id = this.sprint.project_id
+      this.editSprints._id = this.projectId
+      var userTable = []
+      for (var user in this.sprint.users) {
+        var userData = {
+          label: this.sprint.users[user].user_name,
+          value: this.sprint.users[user].user_name,
+          role: this.sprint.users[user].user_role
+        }
+        userTable.push(userData)
+      }
+      this.editSprints.users = userTable
+      this.editSprintData = true
+    },
     openSprint (sprintId) {
       this.$router.push('/sprints/' + sprintId)
     },
@@ -214,8 +272,9 @@ export default {
       this.newSprint.startdate = ''
       this.newSprint.enddate = ''
       this.newSprint.expectedtime = ''
-      this.newSprint.project_id = this.projectId
+      this.newSprint.project_id = this.projectId // ovde namesto ova ko vo project
     }
+
   }
 }
 </script>

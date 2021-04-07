@@ -26,10 +26,12 @@ export function postSprint ({ commit }, payload) {
 
 export function updateSprint ({ commit }, payload) {
   this.$axios.put('sprints/update', {
+    _id: payload._id,
     name: payload.name,
-    users: payload.users,
-    deadline: payload.deadline,
-    _id: payload._id
+    project_id: payload.project_id,
+    start_date: payload.startdate,
+    end_date: payload.enddate,
+    expected_time: payload.expectedtime
   })
     .then((res) => {
       commit('PUSH_NEW_SPRINT', res.data)

@@ -175,9 +175,9 @@ export default {
     checkSprintName () {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
       var alreadyExists = false
-      if (this.pushSprint.name.toLowerCase() !== this.newSprint.name.toLowerCase()) {
+      if (this.pushSprint.name !== this.newSprint.name) {
         for (var sprint in this.allSprints) {
-          if (this.pushSprint.name.toLowerCase() === this.allSprints[sprint].name.toLowerCase()) {
+          if (this.pushSprint.name === this.allSprints[sprint].name) {
             alreadyExists = true
             this.error = 'Sprint with the name "' + this.pushSprint.name + '" already exists in this project.'
           }
