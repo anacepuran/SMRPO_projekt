@@ -95,7 +95,7 @@
                 <Documentation :project="project"></Documentation>
               </q-tab-panel>
               <q-tab-panel name="wall">
-                <ProjectWall></ProjectWall>
+                <ProjectWall :project="project"></ProjectWall>
               </q-tab-panel>
             </q-tab-panels>
           </template>

@@ -2,8 +2,20 @@
     <div>
         <div class="row">
             <div class="text-h4 q-ma-md">Documentation</div>
+        </div>
+        <div class="row bg-secondary">
+            <q-btn color="white" text-color="black" dense size="sm" class="q-ma-lg" label="import" @click="importFile" icon="cloud_upload" />
+            <q-btn color="white" text-color="black" dense size="sm" class="q-ma-lg" label="export" @click="exportFile" icon="file_download" />
             <q-space />
             <q-btn v-if="editDocumentation===false" label="Edit documentation" class="q-ma-md" color="primary" icon="edit" @click="editDocumentation=true" />
+        </div>
+        <div>
+            <div class="q-ma-md" v-if="chooseFile===true">
+                <span style="color: red">Warning!</span><p class="text-caption"> If you upload a file, the current documentation will be overwritten.</p>
+            </div>
+            <input :class="getClass" type="file" id="input-file"/>
+            <q-btn v-if="uploadButton===true" class="q-ma-md" color="secondary" label="upload" @click="uploadDocumentation" />
+            <q-btn round flat v-if="uploadButton===false && chooseFile===true" class="q-ma-md" color="secondary" icon="close" @click="closeImport" />
         </div>
         <div class="q-pa-md">
             <form
@@ -16,32 +28,20 @@
                 <q-editor
                     v-model="editor"
                     min-height="5rem"
-                    :definitions="{
-                        export: {
-                          icon: 'save',
-                          label: 'export',
-                          handler: exportFile
-                        },
-                        import: {
-                          icon: 'cloud_upload',
-                          label: 'Import',
-                          handler: importFile
-                        }
-                    }"
                     :toolbar="[
                     [
-                    {
+                      {
                         label: $q.lang.editor.align,
                         icon: $q.iconSet.editor.align,
                         fixedLabel: true,
                         list: 'only-icons',
                         options: ['left', 'center', 'right', 'justify']
-                    },
+                      },
                     ],
                     ['bold', 'italic', 'strike', 'underline'],
                     ['hr', 'link'],
                     [
-                    {
+                      {
                         label: $q.lang.editor.formatting,
                         icon: $q.iconSet.editor.formatting,
                         list: 'no-icons',
@@ -55,8 +55,8 @@
                         'h2',
                         'h1'
                         ]
-                    },
-                    {
+                      },
+                      {
                         label: $q.lang.editor.defaultFont,
                         icon: $q.iconSet.editor.font,
                         fixedIcon: true,
@@ -72,11 +72,10 @@
                         'times_new_roman',
                         'verdana'
                         ]
-                    }
+                      }
                     ],
                     ['unordered', 'ordered'],
-                    ['undo', 'redo'],
-                    ['import', 'export']
+                    ['undo', 'redo']
                 ]"
                 :fonts="{
                     arial: 'Arial',
@@ -102,6 +101,8 @@
 </template>
 <script>
 import { mapActions } from 'vuex'
+const TurndownService = require('turndown').default
+console.log(new TurndownService())
 export default {
   name: 'Documentation',
   data () {
@@ -115,7 +116,10 @@ export default {
         documentation: '',
         wall: [],
         _id: ''
-      }
+      },
+      chooseFile: false,
+      uploadedText: '',
+      uploadButton: false
     }
   },
   props: {
@@ -123,9 +127,17 @@ export default {
       type: Object
     }
   },
+  computed: {
+    getClass () {
+      if (this.chooseFile === true) {
+        return 'q-ma-md'
+      } else {
+        return 'hidden q-ma-md'
+      }
+    }
+  },
   mounted () {
     this.updateProj = this.$props.project
-    console.log(this.updateProj)
     this.editor = this.$props.project.documentation
   },
   methods: {
@@ -134,37 +146,71 @@ export default {
     ]),
     updateDocumentation () {
       this.updateProj.documentation = this.editor
-      /* var userTable = []
-      for (var user in this.updateProj.users) {
-        var userData = {
-          label: this.project.users[user].user_name,
-          value: this.project.users[user].user_name,
-          role: this.project.users[user].user_role
-        }
-        userTable.push(userData)
-      }
-      this.updateProj.users = userTable */
-      console.log(this.updateProj.documentation)
-      console.log('this.updateProj')
-      console.log(this.updateProj)
       this.updateProject(this.updateProj)
       this.editDocumentation = false
     },
     exportFile () {
-      this.$q.notify({
-        message: 'Saved your text to local storage',
-        color: 'green-4',
-        textColor: 'white',
-        icon: 'cloud_done'
-      })
+      var turndownService = new TurndownService()
+      var markdownContent = turndownService.turndown(this.editor)
+      var filename = 'README.md'
+      this.download(filename, markdownContent)
+    },
+    download (filename, text) {
+      var element = document.createElement('a')
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
+      element.setAttribute('download', filename)
+      element.style.display = 'none'
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
     },
     importFile () {
-      this.$q.notify({
-        message: 'Server unavailable. Check connectivity.',
-        color: 'red-5',
-        textColor: 'white',
-        icon: 'warning'
+      this.chooseFile = true
+      document.getElementById('input-file')
+        .addEventListener('change', this.getFile)
+    },
+    getFile (event) {
+      console.log('get file')
+      this.uploadButton = true
+      const input = event.target
+      if ('files' in input && input.files.length > 0) {
+        this.placeFileContent(
+          input.files[0]
+        )
+      }
+    },
+    placeFileContent (file) {
+      console.log('place file content')
+      this.readFileContent(file).then(content => {
+        this.uploadedText = content
+        console.log(this.uploadedText)
+      }).catch(error => console.log(error))
+    },
+    readFileContent (file) {
+      console.log('read file content')
+      const reader = new FileReader()
+      return new Promise((resolve, reject) => {
+        reader.onload = event => resolve(event.target.result)
+        reader.onerror = error => reject(error)
+        reader.readAsText(file)
       })
+    },
+    uploadDocumentation () {
+      const showdown = require('showdown'),
+        converter = new showdown.Converter(),
+        text = this.uploadedText,
+        html = converter.makeHtml(text)
+      console.log(html)
+      this.editor = html
+      this.updateDocumentation()
+      this.chooseFile = false
+      this.uploadButton = false
+      this.uploadedText = ''
+    },
+    closeImport () {
+      this.chooseFile = false
+      this.uploadButton = false
+      this.uploadedText = ''
     }
   }
 }
