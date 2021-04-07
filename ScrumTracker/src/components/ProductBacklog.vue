@@ -161,6 +161,7 @@ export default {
       this.newCard.expectedtime = ''
       this.newCard.priority = ''
       this.newCard.value = ''
+      this.newCard.subtasks = ''
       this.expected_time = ''
     }
   }

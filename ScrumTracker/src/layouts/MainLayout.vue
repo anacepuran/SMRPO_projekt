@@ -96,6 +96,12 @@ export default {
           icon: 'manage_accounts',
           link: '/users',
           permissions: 'Admin'
+        },
+        {
+          title: 'Tasks',
+          icon: 'task',
+          link: '/tasks',
+          permissions: ''
         }
       ]
     }

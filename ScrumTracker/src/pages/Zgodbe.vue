@@ -196,7 +196,6 @@ export default {
         var cards = this.getCards()
         this.allSprintCards = this.cardsToArray(cards)
       }, 200)
-      console.log('added')
     },
     cardsToArray (cards) {
       var allCards = []

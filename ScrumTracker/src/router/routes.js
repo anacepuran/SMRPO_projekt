@@ -27,6 +27,11 @@ const routes = [
         path: '/sprints/:id',
         component: () => import('pages/Zgodbe.vue'),
         meta: { requiresAuth: true, requiresAdmin: false }
+      },
+      {
+        path: '/tasks',
+        component: () => import('pages/Tasks.vue'),
+        meta: { requiresAuth: true, requiresAdmin: false }
       }
     ]
   },

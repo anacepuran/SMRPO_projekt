@@ -78,6 +78,7 @@ export default {
         email: '',
         username: '',
         password: '',
+        tasks: [],
         permissions: null,
         _id: '',
         last_login: ''
@@ -135,6 +136,7 @@ export default {
       this.newUser.email = user.email
       this.newUser.username = user.username
       this.newUser.password = ''
+      this.newUser.tasks = []
       this.newUser.permissions = user.permissions
       this.newUser._id = user._id
       this.newUser.last_login = user.last_login
@@ -167,6 +169,7 @@ export default {
       this.newUser._id = ''
       this.newUser.last_login = ''
       this.newUser.this_login = ''
+      this.newUser.tasks = ''
       this.editUser = false
     }
   }

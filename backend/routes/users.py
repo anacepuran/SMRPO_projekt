@@ -33,6 +33,7 @@ def user_authenticate():
                     'email': user['email'],
                     'username': user['username'],
                     'permissions': user['permissions'],
+                    'tasks': user['tasks'],
                     'this_login': this_login,
                     'last_login': last_login,
                     '_id': str(user['_id'])
@@ -60,6 +61,7 @@ def add_user():
     username = request.json['username']
     password = request.json['password']
     permissions = request.json['permissions']
+    tasks = request.json['tasks']
 
     if username and password:
         user_id = mongo.db.users.insert(
@@ -69,6 +71,7 @@ def add_user():
              'username': username,
              'password': hash_password(password),
              'permissions': permissions,
+             'tasks': tasks,
              'this_login': 'This user has not yet logged in.',
              'last_login': 'This user has not yet logged in.'}
         )
@@ -79,6 +82,7 @@ def add_user():
             'email': email,
             'username': username,
             'permissions': permissions,
+            'tasks': tasks,
             'last_login': 'This user has not yet logged in.'
         }
         print(response)
@@ -112,6 +116,7 @@ def update_user():
     permissions = request.json['permissions']
     last_login = request.json['last_login']
     this_login = request.json['this_login']
+    tasks = request.json['tasks']
     user_id = request.json['_id']
     print(user_id)
     user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
@@ -120,6 +125,7 @@ def update_user():
     user['surname'] = surname
     user['email'] = email
     user['username'] = username
+    user['tasks'] = tasks
     user['last_login'] = last_login
     user['this_login'] = this_login
     if permissions != '':
@@ -135,6 +141,7 @@ def update_user():
         'email': email,
         'username': username,
         'permissions': permissions,
+        'tasks': tasks,
         'last_login': last_login,
         'this_login': this_login
     }

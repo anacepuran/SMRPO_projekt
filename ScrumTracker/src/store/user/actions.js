@@ -42,6 +42,7 @@ export function postUser ({ commit }, payload) {
     username: payload.username,
     password: payload.password,
     permissions: payload.permissions,
+    tasks: payload.tasks,
     last_login: 'User has not yet logged in.',
     this_login: 'User has not yet logged in.'
   })
@@ -61,6 +62,7 @@ export function updateUser ({ commit }, payload) {
     username: payload.username,
     password: payload.password,
     permissions: payload.permissions,
+    tasks: payload.tasks,
     last_login: payload.last_login,
     this_login: payload.this_login,
     _id: payload._id
