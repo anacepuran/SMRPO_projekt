@@ -93,7 +93,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import SprintForm from 'components/SprintForm.vue'
-
 export default {
   name: 'SprintTable',
   components: { SprintForm },
@@ -127,7 +126,10 @@ export default {
       },
       editSprintData: false,
       projectCards: '',
-      dateError: ''
+      dateError: '',
+      today: '',
+      sdate: '',
+      edate: ''
     }
   },
   props: {
@@ -139,6 +141,9 @@ export default {
     },
     allSprints: {
       type: Array
+    },
+    newSprint1: {
+      type: Object
     }
   },
   mounted () {
@@ -148,6 +153,7 @@ export default {
     this.user = this.getCurrentUser()
     this.projectId = this.$props.projectIdProp
     this.projectUsers = this.$props.projectUsersProp
+    this.today = this.getDate()
     this.onReset()
     this.showSprints()
   },
@@ -222,6 +228,27 @@ export default {
       }
       this.newSprint.name = 'Sprint ' + (data.length + 1)
       return data
+    },
+    /*
+    Sprintdate (sprint1) {
+      this.sdate = sprint1.startdate
+      this.edate = sprint1.enddate
+      console.log(this.sdate)
+      // this.sdate = this.newSprint.startdate
+      var today1 = moment(this.today, 'DD/MM/YYYY')
+      var start1 = moment(this.sdate, 'DD/MM/YYYY')
+      var end1 = moment(this.edate, 'DD/MM/YYYY')
+      // console.log(start1)
+      // console.log(end1)
+      // console.log(today1)
+
+      if (today1 > start1 && today1 > end1) return false
+      return true
+    }, */
+    getDate () {
+      var d = new Date()
+      var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
+      return dateNow
     },
     checkRole (currentRole) {
       var validRole = false

@@ -78,7 +78,10 @@ export default {
         expectedtime: '',
         project_id: ''
       },
-      today: ''
+      today: '',
+      getdat: '',
+      sdate: '',
+      edate: ''
     }
   },
   props: {
@@ -115,6 +118,10 @@ export default {
     this.today = this.getDate()
     this.selectDuration = this.pushSprint.deadline
     this.projectId = this.$props.newSprint.project_id
+    // this.getdat = this.Sprintdate()
+    this.sdate = this.$props.newSprint.startdate
+    this.edate = this.$props.newSprint.enddate
+    console.log(this.Sprintdate())
   },
   methods: {
     ...mapGetters('sprint', [
@@ -173,12 +180,22 @@ export default {
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
     },
+    /**
+     * @return {boolean}
+     * @return {boolean}
+     */
     Sprintdate () {
-      if (this.today > this.allSprints.start_date && this.today > this.allSprints.end_date) {
-        return false
-      } else {
-        return true
-      }
+      console.log(this.sdate)
+      console.log(this.today)
+      var today1 = moment(this.today, 'DD/MM/YYYY')
+      var start1 = moment(this.sdate, 'DD/MM/YYYY')
+      var end1 = moment(this.edate, 'DD/MM/YYYY')
+      console.log(start1)
+      console.log(end1)
+      console.log(today1)
+
+      if (today1 > start1 && today1 > end1) return false
+      return true
     },
     checkSprintName () {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
