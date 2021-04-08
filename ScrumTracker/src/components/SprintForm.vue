@@ -7,7 +7,7 @@
       <div class="text-h6">{{pushSprint.name}}</div>
       <div class="row">
         <div class="col q-ma-md">
-          <q-btn label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
+          <q-btn v-if="Sprintdate()" label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
           <q-badge class="q-ma-sm" color="secondary">
             Duration: {{ selectDuration }}
         </q-badge>
@@ -172,6 +172,13 @@ export default {
       var d = new Date()
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
+    },
+    Sprintdate () {
+      if (this.today > this.allSprints.start_date && this.today > this.allSprints.end_date) {
+        return false
+      } else {
+        return true
+      }
     },
     checkSprintName () {
       // CHECK IF USER WITH USERNAME ALREADY EXISTS

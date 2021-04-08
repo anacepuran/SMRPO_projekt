@@ -56,7 +56,7 @@ def delete_sprints():
 
 @sprints_route.route('/sprints/update', methods=['PUT'])
 def update_sprints():
-    print(request.json())
+
     name = request.json['name']
     project_id = request.json['project_id']
     start_date = request.json['start_date']
@@ -64,6 +64,7 @@ def update_sprints():
     expected_time = request.json['expected_time']
     sprint_id = request.json['_id']
 
+    #console.log(mongo)
     sprint = mongo.db.sprints.find_one({'_id': ObjectId(sprint_id)})
     sprint['project_id'] = project_id
     sprint['name'] = name

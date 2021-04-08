@@ -39,7 +39,7 @@
                 </div>
               </q-td>
             </template>
-            <template v-slot:body-cell-delete="propsDelete" v-if="checkRole('Scrum Master')">
+            <template v-slot:body-cell-delete="propsDelete" v-if="checkRole('Scrum Master')" >
               <q-td :props="propsDelete">
                 <div>
                   <q-btn @click="confirmDelete=true; deleteSprintId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
@@ -74,7 +74,7 @@
               <q-space />
               <q-btn icon="close" flat round dense @click="onReset" v-close-popup />
              </q-card-section>
-            <SprintForm :newSprint="editSprints" :editProject="editSprintData"  @submitSprint="updateSprints()"></SprintForm>
+            <SprintForm :newSprint="editSprints" :editProject="editSprintData"  @submitSprint="showSprints()"></SprintForm>
           </q-card>
         </q-dialog>
         <q-dialog v-model="addSprint">
@@ -93,6 +93,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import SprintForm from 'components/SprintForm.vue'
+
 export default {
   name: 'SprintTable',
   components: { SprintForm },
@@ -124,7 +125,9 @@ export default {
         enddate: '',
         expectedtime: ''
       },
-      editSprintData: false
+      editSprintData: false,
+      projectCards: '',
+      dateError: ''
     }
   },
   props: {
@@ -133,9 +136,15 @@ export default {
     },
     projectIdProp: {
       type: String
+    },
+    allSprints: {
+      type: Array
     }
   },
   mounted () {
+    setTimeout(() => {
+      this.projectCards = this.allSprints
+    }, 100)
     this.user = this.getCurrentUser()
     this.projectId = this.$props.projectIdProp
     this.projectUsers = this.$props.projectUsersProp
@@ -143,15 +152,6 @@ export default {
     this.showSprints()
   },
   computed: {
-    sprint () {
-      var allSprints = this.getSprints()
-      for (var sprint in allSprints) {
-        if (allSprints[sprint]._id === this.projectId) {
-          return allSprints[sprint]
-        }
-      }
-      return 'No project found.'
-    },
     filteredSprints () {
       return this.sprints
     },
@@ -204,9 +204,6 @@ export default {
     ...mapGetters('project', [
       'getProjects'
     ]),
-    updateSprints () {
-      this.editSprintData = false
-    },
     showSprints () {
       this.addSprint = false
       this.loading = true
@@ -250,7 +247,6 @@ export default {
       this.editSprints.project_id = sprint.project_id
       this.editSprints._id = sprint._id
       this.editSprintData = true
-      console.log(this.editSprints)
     },
     openSprint (sprintId) {
       this.$router.push('/sprints/' + sprintId)

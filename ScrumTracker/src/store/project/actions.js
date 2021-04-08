@@ -31,6 +31,7 @@ export function updateProject ({ commit }, payload) {
   })
     .then((res) => {
       commit('PUSH_NEW_PROJECT', res.data)
+      console.log(res.data)
     })
     .catch((error) => {
       console.error(error)

@@ -159,11 +159,11 @@ export default {
     ]),
     updateCards () {
       this.editCardData = false
-      this.$emit('updateCardsArrays')
+      this.$emit('updateSprintsArrays')
     },
     deleteFunction (cardId) {
       this.deleteCard(cardId)
-      this.$emit('updateCardsArrays')
+      this.$emit('updateSprintsArrays')
     },
     editExpectedTime (card) {
       card.expected_time = this.timeExpected
