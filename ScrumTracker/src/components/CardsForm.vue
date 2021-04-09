@@ -1,23 +1,25 @@
 <template>
+  <div class="q-ma-md">
     <q-form
+        class="q-ma-md"
         @submit="onSubmit"
-        @reset="onReset"
-        class="q-gutter-md">
+        @reset="onReset">
         <q-input
             filled
             v-model="addedCard.card_name"
-            label="Card name"
+            label="Name"
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please type something']"/>
         <q-input
             filled
             v-model="addedCard.description"
-            label="Card description"
+            label="Description"
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please type something']"/>
         <!-- WHEN ADDING CARD -->
-        <div class="text-caption">Write each test in new line!</div>
+        <div class="text-caption">Acceptance tests</div>
         <q-input
+          hint="Write each test in new line!"
           filled
           placeholder="First test
 Second test
@@ -25,15 +27,19 @@ Third test"
           type="textarea"
           v-model="acc_tests"
           :rows="3"/>
-        <div v-if="editCard === true">
-        </div>
+          <hr class="q-ma-md" style="opacity:.5">
         <div class="row">
-          <q-select
+          <q-input
               filled
+              type="number"
               v-model="addedCard.value"
-              :options="value_options"
+              hint="Set business value 1-10"
               label="Business value"
               style="width: 230px"
+              lazy-rules
+              max="10"
+              min="1"
+              :rules="[ val => val && 11 > val > 0  || 'Please set Business value']"
           />
           <q-space/>
           <q-select
@@ -42,6 +48,8 @@ Third test"
               :options="priority_options"
               label="Priority"
               style="width: 230px"
+              lazy-rules
+              :rules="[ val => val && val.length > 0 || 'Please set priority']"
           />
         </div>
         <q-card-actions horizontal align="right">
@@ -52,6 +60,7 @@ Third test"
             <p style="color: red;" v-if="error != ''">{{error}}</p>
         </div>
     </q-form>
+  </div>
 </template>
 
 <script>
@@ -62,7 +71,6 @@ export default {
   data () {
     return {
       priority_options: ['Must have', 'Could have', 'Should have', 'Won\'t have this time'],
-      value_options: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       error: '',
       numberOfTests: 0,
       addedCard: {
@@ -85,9 +93,6 @@ export default {
     newCard: {
       type: Object
     },
-    allCards: {
-      type: Array
-    },
     editCard: {
       type: Boolean
     },
@@ -96,6 +101,7 @@ export default {
     }
   },
   mounted () {
+    this.allCards = this.getCards()
     this.onReset()
     this.acc_tests = this.setAcceptanceTests()
   },
@@ -120,18 +126,10 @@ export default {
       var accept = true
       // CHECK IF PROJECT WITH THIS NAME ALREADY EXISTS
       for (var card in this.allCards) {
-        if (this.addedCard.card_name.toLowerCase() === this.allCards[card].card_name.toLowerCase() && this.allCards[card]._id !== this.addedCard._id) {
+        if (this.addedCard.card_name.toLowerCase().trim().trim() === this.allCards[card].card_name.toLowerCase().trim().trim() && this.allCards[card]._id !== this.addedCard._id) {
           accept = false
-          this.error = 'Project with the name "' + this.addedCard.card_name + '" already exists.'
+          this.error = 'Project with the name "' + this.addedCard.card_name.trim() + '" already exists.'
         }
-      }
-      if (this.addedCard.priority === '') {
-        accept = false
-        this.error = 'Set priority.'
-      }
-      if (this.addedCard.value === '') {
-        accept = false
-        this.error = 'Set business value.'
       }
       return accept
     },

@@ -5,7 +5,8 @@
     </div>
     <template>
       <div class="q-ma-md">
-        <q-scroll-area ref="scrollArea" style="height: 400px">
+        <div v-if="updateProj.wall.length===0" class="text-caption">There are no posts yet in this project.</div>
+        <q-scroll-area v-else ref="scrollArea" style="height: 400px">
           <q-card class="q-ma-sm" flat v-for="post in updateProj.wall" :key="post.id" :class="getClass(post)">
             <q-card-section dense>
               <div class="row">
@@ -76,6 +77,7 @@ export default {
   },
   mounted () {
     this.updateProj = this.$props.project
+    console.log(this.updateProj.wall)
   },
   methods: {
     ...mapActions('project', [
@@ -109,10 +111,11 @@ export default {
         post: this.editor,
         time: currentTime
       }
-      this.updateProj.wall.push(post)
+      this.updateProj.wall.unshift(post)
       console.log(this.updateProj.wall)
       this.updateProject(this.updateProj)
       this.addPost = false
+      this.editor = ''
     },
     formatDate () {
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']

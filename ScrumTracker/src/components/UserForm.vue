@@ -112,18 +112,18 @@ export default {
     checkUserData () {
       var alreadyExists = false
       // CHECK IF USER WITH USERNAME ALREADY EXISTS
-      if (this.pushUser.username.toLowerCase() !== this.newUser.username.toLowerCase()) {
+      if (this.pushUser.username.toLowerCase().trim() !== this.newUser.username.toLowerCase().trim()) {
         for (var userN in this.allUsers) {
-          if (this.pushUser.username.toLowerCase() === this.allUsers[userN].username.toLowerCase()) {
+          if (this.pushUser.username.toLowerCase().trim() === this.allUsers[userN].username.toLowerCase().trim()) {
             alreadyExists = true
             this.error = 'User with the username "' + this.pushUser.username + '" already exists.'
           }
         }
       }
       // CHECK IF USER WITH EMAIL ALREADY EXISTS
-      if (this.pushUser.email.toLowerCase() !== this.newUser.email.toLowerCase()) {
+      if (this.pushUser.email.toLowerCase().trim() !== this.newUser.email.toLowerCase().trim()) {
         for (var userE in this.allUsers) {
-          if (this.pushUser.email.toLowerCase() === this.allUsers[userE].email.toLowerCase()) {
+          if (this.pushUser.email.toLowerCase().trim() === this.allUsers[userE].email.toLowerCase().trim()) {
             alreadyExists = true
             this.error = 'User with the email "' + this.pushUser.email + '" already exists.'
           }

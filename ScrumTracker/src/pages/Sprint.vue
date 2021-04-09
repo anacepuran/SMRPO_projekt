@@ -8,16 +8,20 @@
         </q-card-section>
         <q-card-section class="q-ma-sm" style="width: 30%">
           <div class="text-h5 q-ma-md">{{ sprints.name }}</div>
-          <div class="text-overline q-ma-md">StartDate: {{ sprints.start_date }}</div>
-          <div class="text-overline q-ma-md">EndDate: {{ sprints.end_date }}</div>
-          <div class="text-overline q-ma-md">Expected Time: {{sprints.expected_time}} days</div>
+          <div class="text-overline q-ma-md">Start Date: {{ sprints.start_date }}</div>
+          <div class="text-overline q-ma-md">End Date: {{ sprints.end_date }}</div>
+          <div class="text-overline q-ma-md">Sprint velocity: <span class="text-h6">{{sprints.expected_time}}</span> points (MD)</div>
         </q-card-section>
         <q-separator vertical />
         <q-card-section class="full-width">
           <div class="row">
             <q-space/>
             <div class="q-ma-sm">
-            <q-btn size="md" color="primary" label="Add Card to sprint" icon="create_new_folder" @click="addCard=true" />
+              <q-btn v-if="isActive(sprints.start_date, sprints.end_date) && (checkRole('Scrum Master')===true || user.permissions==='Admin')" size="md" color="primary" label="Add user story to sprint" icon="create_new_folder" @click="addCard=true" />
+              <div v-else class="text-caption">
+                <span v-if="isActive(sprints.start_date, sprints.end_date)===false">This Sprint is not active.</span>
+                <span v-else>You do not have permissions to add user stories to this Sprint.</span>
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -54,7 +58,7 @@
     <q-dialog v-model="addCard" full-width>
       <q-card class="q-pa-md">
         <q-card-section class="row items-center">
-          <div class="text-h6">Add cards to sprint</div>
+          <div class="text-h6">Add user story to sprint</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup/>
         </q-card-section>
@@ -65,6 +69,7 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import moment from 'moment'
 import Vue from 'vue'
 import draggable from 'vuedraggable'
 import AddCard from 'components/AddCardSprint.vue'
@@ -73,7 +78,7 @@ import CardSprint from 'components/CardSprint.vue'
 Vue.component('draggable', draggable)
 
 export default {
-  name: 'Zgodbe',
+  name: 'Sprint',
   components: { AddCard, CardSprint },
   data () {
     return {
@@ -141,10 +146,13 @@ export default {
     }
   },
   mounted () {
+    this.project = this.currentProject()
+    console.log(this.project)
     this.fetchCards()
     this.user = this.getCurrentUser()
     this.sprintId = this.$route.params.id
     this.sprints = this.sprint()
+    console.log(this.sprints)
     this.showCards()
     this.allProjectCards = this.projectCards()
   },
@@ -169,6 +177,9 @@ export default {
     ...mapActions('card', [
       'fetchCards',
       'updateCard'
+    ]),
+    ...mapGetters('project', [
+      'getProjects'
     ]),
     projectCards () {
       var cards = this.getCards()
@@ -205,6 +216,45 @@ export default {
         }
       }
       return allCards
+    },
+    isActive (sDate, eDate) {
+      var sMoment = moment(sDate, 'DD/MM/YYYY')
+      var eMoment = moment(eDate, 'DD/MM/YYYY')
+      var today = new Date()
+      var tMoment = moment(today, 'DD/MM/YYYY')
+      if (tMoment > sMoment && tMoment < eMoment) {
+        return true
+      } else {
+        return false
+      }
+    },
+    checkRole (currentRole) {
+      var validRole = false
+      console.log('function')
+      if (this.user !== {}) {
+        console.log('user not empty')
+        for (var user in this.project.users) {
+          console.log(this.project.users[user])
+          if (this.user.username === this.project.users[user].user_name) {
+            if (this.project.users[user].user_role[1] === currentRole) {
+              validRole = true
+            }
+          }
+        }
+      }
+      console.log(validRole)
+      return validRole
+    },
+    currentProject () {
+      var allProjects = this.getProjects()
+      for (var project in allProjects) {
+        console.log(allProjects[project]._id)
+        console.log(this.sprints.projectId)
+        if (allProjects[project]._id === this.sprints.project_id) {
+          return allProjects[project]
+        }
+      }
+      return 'No project found.'
     }
   }
 }

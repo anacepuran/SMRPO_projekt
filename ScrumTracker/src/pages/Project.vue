@@ -47,7 +47,7 @@
               class="text-secondary"
             >
               <q-tab name="productbacklog" icon="credit_card" label="Product Backlog" />
-              <q-tab name="sprints" icon="dynamic_feed" label="Sprints" />
+              <q-tab v-if="checkRole('Product Owner')===false || user.permissions === 'Admin'" name="sprints" icon="dynamic_feed" label="Sprints" />
               <q-tab name="documentation" icon="description" label="Documentation" />
               <q-tab name="wall" icon="post_add" label="Project Wall" />
             </q-tabs>
@@ -56,13 +56,12 @@
             <q-tab-panels
               v-model="tab"
               animated
-              swipeable
               vertical
               transition-prev="jump-up"
               transition-next="jump-up"
             >
               <q-tab-panel name="productbacklog">
-                <ProductBacklog :allCards="allCards" :projectId="$route.params.id" :user="user"></ProductBacklog>
+                <ProductBacklog :projectId="$route.params.id" :user="user"></ProductBacklog>
               </q-tab-panel>
               <q-tab-panel name="sprints">
                 <SprintTable :projectIdProp="$route.params.id" :projectUsersProp="project.users"></SprintTable>
@@ -105,8 +104,9 @@ export default {
         _id: ''
       },
       allCards: [],
-      tab: 'sprints',
-      splitterModel: 20
+      tab: 'productbacklog',
+      splitterModel: 20,
+      activeSprint: ''
     }
   },
   computed: {
@@ -198,10 +198,12 @@ export default {
     },
     showCards () {
       this.addCard = false
+      this.fetchCards()
       setTimeout(() => {
         var cards = this.getCards()
         this.allCards = this.cardsToArray(cards)
       }, 1000)
+      console.log(this.allCards)
     },
     cardsToArray (cards) {
       var allCards = []

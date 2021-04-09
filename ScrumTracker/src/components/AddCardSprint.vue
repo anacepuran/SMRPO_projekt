@@ -117,7 +117,7 @@ export default {
           currentSprint = this.sprints[s]
         }
       }
-      const expectedSprintTime = currentSprint.expected_time * 24 // converted from days to hours
+      const expectedSprintTime = currentSprint.expected_time
       let currentSprintTime = 0
       for (const c in this.allCards) {
         if (this.allCards[c].sprint_id === this.sprintId) {

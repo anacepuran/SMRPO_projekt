@@ -1,12 +1,14 @@
 <template>
   <div>
     <q-card class="q-ma-md">
-      <q-card-section class="row bg-secondary">
+      <q-card-section class="row bg-primary">
         <div class="text-white text-h6 q-ma-sm">Product backlog</div>
         <q-space/>
         <div class="row">
           <q-space/>
-          <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" class="q-ma-md" icon="add" color="primary" label="Add card to project" @click="addCard=true" />
+          <div class="q-ma-sm">
+            <q-btn v-if="checkRole('Product Owner') || checkRole('Scrum Master')" size="md" icon="add" color="secondary" label="Add user story" @click="addCard=true" />
+          </div>
         </div>
       </q-card-section>
     </q-card>
@@ -14,46 +16,46 @@
       <div class="row">
         <div class="col-8">
           <q-card-section class="row bg-secondary">
-            <div class="text-white text-overline">NOT DONE</div>
+            <div class="text-white text-overline">UNFINISHED USER STORIES</div>
           </q-card-section>
           <div class="row">
             <div class="col">
               <q-card-section class="row bg-secondary">
-                <div class="text-white text-overline">Not assigned</div>
+                <div class="text-white text-overline">List of user stories</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id === ''"  :allCards="allCards" :card="card" :projectId="projectId" @updateCardsArrays="updateCardsArrays"></Card>
+                <Card v-if="card.sprint_id === '' && card.card_round!=='DONE'" :card="card" :projectId="projectId" @updateCardsArrays="updateCardsArrays"></Card>
               </div>
             </div>
             <div class="col">
               <q-card-section class="row bg-secondary">
-                <div class="text-white text-overline">Assigned</div>
+                <div class="text-white text-overline">User stories for active Sprint</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id !== ''" :allCards="allCards" :card="card" :projectId="projectId"></Card>
+                <Card v-if="card.sprint_id !== ''" :card="card" :projectId="projectId"></Card>
               </div>
             </div>
           </div>
         </div>
         <div class="col-4">
           <q-card-section class="row bg-secondary">
-            <div class="text-white text-overline">DONE</div>
+            <div class="text-white text-overline">FINISHED</div>
           </q-card-section>
           <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-            <Card v-if="card.card_round === 'DONE'" :allCards="allCards" :card="card" :projectId="projectId"></Card>
+            <Card v-if="card.card_round === 'DONE'" :card="card" :projectId="projectId"></Card>
           </div>
         </div>
       </div>
     </div>
     <q-dialog v-model="addCard">
-      <q-card class="q-pa-md" style="width: 80vw">
-        <q-card-section class="row items-center">
-          <div class="text-h6 q-ma-md">Add new card</div>
+      <q-card class="q-ma-sm" style="width: 80vh">
+        <q-card-section class="row bg-primary text-white">
+          <div class="text-h6">Add new user story</div>
           <q-space />
           <q-btn icon="close" flat round dense @click="onResetCard" v-close-popup />
         </q-card-section>
         <!-- CARD FORM COMPONENT -->
-        <AddCardsForm :newCard="newCard" :allCards="allCards" :editCard="false" @submitCard="onResetCard"></AddCardsForm>
+        <AddCardsForm :newCard="newCard" :editCard="false" @submitCard="onResetCard"></AddCardsForm>
       </q-card>
     </q-dialog>
   </div>
@@ -87,12 +89,9 @@ export default {
   },
   mounted () {
     this.project = this.getCurrentproject()
-    this.projectCards = this.allCards
+    this.projectCards = this.cardsToArray(this.getCards())
   },
   props: {
-    allCards: {
-      type: Array
-    },
     projectId: {
       type: String
     },
@@ -111,7 +110,7 @@ export default {
       setTimeout(() => {
         var cards = this.getCards()
         this.projectCards = this.cardsToArray(cards)
-      }, 300)
+      }, 1000)
     },
     cardsToArray (cards) {
       var allCards = []

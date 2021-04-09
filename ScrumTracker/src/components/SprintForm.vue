@@ -2,41 +2,46 @@
     <q-form
         @submit="onSubmit"
         @reset="onReset"
-        class="q-gutter-md"
+        class="q-ma-md"
     >
-      <div class="text-h6">{{pushSprint.name}}</div>
+      <div class="text-h6 q-ma-md">{{pushSprint.name}}</div>
       <div class="row">
-        <div class="col q-ma-md">
-          <q-btn v-if="Sprintdate()" label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
-          <q-badge class="q-ma-sm" color="secondary">
-            Duration: {{ selectDuration }}
-        </q-badge>
-      </div>
-      <div class="col q-ma-sm">
-        <q-input
-            filled
-            v-model="pushSprint.expectedtime"
-            type="number"
-            label="Expected Time"
-            min="1" max="50"
-            hint="Please specify Sprint expected time"
-            lazy-rules
-            :rules="[
-              val => val !== null && val !== '' || 'Please select expected time',
-              val => val > 0 && val < 51 || 'Please type a valid expected time'
-            ]"
-        />
-      </div>
+        <div v-if="isActive(selectDuration.from, selectDuration.to)===false" class="col q-ma-sm">
+          <q-btn class="q-ma-sm" label="Select duration" icon="event" color="secondary" @click="datePicker=true" />
+          <br />
+          <q-badge class="q-ma-sm" v-if="selectDuration!==''" color="secondary">
+            From: {{ selectDuration.from }}
+          </q-badge>
+          <br />
+          <q-badge class="q-ma-sm" v-if="selectDuration!==''" color="secondary">
+            To: {{ selectDuration.to }}
+          </q-badge>
+        </div>
+        <div class="col q-ma-sm">
+          <q-input
+              filled
+              v-model="pushSprint.expectedtime"
+              type="number"
+              label="Sprint velocity"
+              min="1" max="50"
+              hint="Please specify in points (MD)"
+              lazy-rules
+              :rules="[
+                val => val !== null && val !== '' || 'Please select expected time',
+                val => val > 0 && val < 51 || 'Please type a valid expected time'
+              ]"
+          />
+        </div>
       </div>
         <q-dialog v-model="datePicker">
             <q-card class="q-ma-md">
                 <div class="row">
                     <q-date
-                        class="q-ma-md"
-                        mask="DD/MM/YYYY"
-                        v-model="selectDuration"
-                        minimal
-                        range
+                      class="q-ma-md"
+                      mask="DD/MM/YYYY"
+                      v-model="selectDuration"
+                      minimal
+                      range
                     />
                 </div>
                 <div class="row q-ma-md flex flex-center">
@@ -68,7 +73,7 @@ export default {
       dateError: '',
       allSprints: [],
       datePicker: false,
-      selectDuration: '',
+      selectDuration: {},
       projectId: '',
       pushSprint: {
         name: '',
@@ -116,12 +121,13 @@ export default {
     var sprints = this.getSprints()
     this.allSprints = this.sprintsToArray(sprints)
     this.today = this.getDate()
-    this.selectDuration = this.pushSprint.deadline
+    this.selectDuration.from = this.pushSprint.startdate
+    this.selectDuration.to = this.pushSprint.enddate
+    console.log('this.selectDuration')
+    console.log(this.selectDuration)
     this.projectId = this.$props.newSprint.project_id
-    // this.getdat = this.Sprintdate()
     this.sdate = this.$props.newSprint.startdate
     this.edate = this.$props.newSprint.enddate
-    console.log(this.Sprintdate())
   },
   methods: {
     ...mapGetters('sprint', [
@@ -165,6 +171,17 @@ export default {
         this.datePicker = false
       }
     },
+    isActive (sDate, eDate) {
+      var sMoment = moment(sDate, 'DD/MM/YYYY')
+      var eMoment = moment(eDate, 'DD/MM/YYYY')
+      var today = new Date()
+      var tMoment = moment(today, 'DD/MM/YYYY')
+      if (tMoment > sMoment && tMoment < eMoment) {
+        return true
+      } else {
+        return false
+      }
+    },
     dateOverlaps (Astart, Aend, Bstart, Bend) {
       var ASmoment = moment(Astart, 'DD/MM/YYYY')
       var AEmoment = moment(Aend, 'DD/MM/YYYY')
@@ -180,61 +197,29 @@ export default {
       var dateNow = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`
       return dateNow
     },
-    /**
-     * @return {boolean}
-     * @return {boolean}
-     */
-    Sprintdate () {
-      console.log(this.sdate)
-      console.log(this.today)
-      var today1 = moment(this.today, 'DD/MM/YYYY')
-      var start1 = moment(this.sdate, 'DD/MM/YYYY')
-      var end1 = moment(this.edate, 'DD/MM/YYYY')
-      console.log(start1)
-      console.log(end1)
-      console.log(today1)
-
-      if (today1 > start1 && today1 > end1) return false
-      return true
-    },
-    checkSprintName () {
-      // CHECK IF USER WITH USERNAME ALREADY EXISTS
-      var alreadyExists = false
-      if (this.pushSprint.name !== this.newSprint.name) {
-        for (var sprint in this.allSprints) {
-          if (this.pushSprint.name === this.allSprints[sprint].name) {
-            alreadyExists = true
-            this.error = 'Sprint with the name "' + this.pushSprint.name + '" already exists in this project.'
-          }
-        }
-      }
-      return alreadyExists
-    },
     onSubmit () {
       var submitMessage = ''
-      if (!this.checkSprintName()) {
-        if (this.$props.editProject) {
-          submitMessage = 'Sprint updated.'
-          console.log(this.pushSprint)
-          this.updateSprint(this.pushSprint)
-          this.onReset()
-        } else {
-          submitMessage = 'Sprint added.'
-          this.postSprint(this.pushSprint)
-          this.onReset()
-        }
-        // if(this.pushSprint.startdate )
-        this.$q.notify({
-          color: 'green',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: submitMessage,
-          position: 'top-right',
-          timeout: 1000
-        })
-        this.error = ''
-        this.$emit('submitSprint')
+      if (this.$props.editProject) {
+        submitMessage = 'Sprint updated.'
+        console.log(this.pushSprint)
+        this.updateSprint(this.pushSprint)
+        this.onReset()
+      } else {
+        submitMessage = 'Sprint added.'
+        this.postSprint(this.pushSprint)
+        this.onReset()
       }
+      // if(this.pushSprint.startdate )
+      this.$q.notify({
+        color: 'green',
+        textColor: 'white',
+        icon: 'cloud_done',
+        message: submitMessage,
+        position: 'top-right',
+        timeout: 1000
+      })
+      this.error = ''
+      this.$emit('submitSprint')
     },
     onReset () {
       this.pushSprint.name = this.$props.newSprint.name

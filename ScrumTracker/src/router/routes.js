@@ -25,7 +25,7 @@ const routes = [
       },
       {
         path: '/sprints/:id',
-        component: () => import('pages/Zgodbe.vue'),
+        component: () => import('pages/Sprint.vue'),
         meta: { requiresAuth: true, requiresAdmin: false }
       },
       {

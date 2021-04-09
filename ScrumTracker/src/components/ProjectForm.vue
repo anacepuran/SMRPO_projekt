@@ -170,9 +170,9 @@ export default {
     checkProject () {
       var accept = true
       // CHECK IF PROJECT WITH THIS NAME ALREADY EXISTS
-      if (this.pushProject.name.toLowerCase() !== this.newProject.name.toLowerCase()) {
+      if (this.pushProject.name.toLowerCase().trim() !== this.newProject.name.toLowerCase().trim()) {
         for (var project in this.allProjects) {
-          if (this.pushProject.name.toLowerCase() === this.allProjects[project].name.toLowerCase()) {
+          if (this.pushProject.name.toLowerCase().trim() === this.allProjects[project].name.toLowerCase().trim()) {
             accept = false
             this.error = 'Project with the name "' + this.pushProject.name + '" already exists.'
           }

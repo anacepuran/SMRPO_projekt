@@ -216,8 +216,8 @@ export default {
       if (this.search !== '') {
         var filteredItems = []
         for (var project in this.projects) {
-          const projectName = this.projects[project].name.toLowerCase()
-          if (projectName.startsWith(search.toLowerCase())) {
+          const projectName = this.projects[project].name.toLowerCase().trim()
+          if (projectName.startsWith(search.toLowerCase().trim())) {
             filteredItems.push(this.projects[project])
           }
         }

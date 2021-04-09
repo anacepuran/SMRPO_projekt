@@ -3,12 +3,12 @@
         <div class="row">
             <div class="text-h4 q-ma-md">Documentation</div>
         </div>
-        <div class="row bg-secondary">
+        <q-card class="row q-ma-md bg-secondary">
             <q-btn color="white" text-color="black" dense size="sm" class="q-ma-lg" label="import" @click="importFile" icon="cloud_upload" />
             <q-btn color="white" text-color="black" dense size="sm" class="q-ma-lg" label="export" @click="exportFile" icon="file_download" />
             <q-space />
             <q-btn v-if="editDocumentation===false" label="Edit documentation" class="q-ma-md" color="primary" icon="edit" @click="editDocumentation=true" />
-        </div>
+        </q-card>
         <div>
             <div class="q-ma-md" v-if="chooseFile===true">
                 <span style="color: red">Warning!</span><p class="text-caption"> If you upload a file, the current documentation will be overwritten.</p>

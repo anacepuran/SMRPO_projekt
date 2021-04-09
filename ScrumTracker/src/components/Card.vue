@@ -1,7 +1,7 @@
 <template>
   <div>
-    <q-card square flat bordered class="cursor-move bg-white q-mt-xs" >
-      <q-card-section class="row bg-secondary">
+    <q-card bordered :class="(card.card_round==='DONE')?'cursor-move bg-green-2 q-mt-xs':'cursor-move bg-white q-mt-xs'">
+      <q-card-section :class="(card.card_round==='DONE')?'row bg-green-5':'row bg-secondary'">
         <span class="text-white text-h6 q-ma-xxs">{{card.card_name}}</span>
         <q-space/>
         <span class="text-white text-capitalize q-ml-xxs right">({{ card.priority }})</span>
@@ -17,8 +17,8 @@
             <div>
               <span class="material-icons text-h4 text-secondary">update</span>
               <span class="text-weight-bolder text-h6 text-black"> {{ card.expected_time }}</span>
-              <span v-if="card.expected_time > 1" class="text-p text-black"> hours</span>
-              <span v-if="card.expected_time == 1" class="text-p text-black"> hour</span>
+              <span v-if="card.expected_time > 1" class="text-p text-black"> points</span>
+              <span v-if="card.expected_time == 1" class="text-p text-black"> point</span>
             </div>
           </div>
           <div class="col">
@@ -46,7 +46,7 @@
         <q-card-actions horizontal align="right" v-if="card.sprint_id === '' && card.card_round !== 'DONE'">
           <q-btn flat @click="confirmDelete=true; deleteCardId=card._id" round color="negative" icon="delete"/>
           <q-btn flat @click="editCardId=card._id; editCards=card; editCardData=true" icon="edit" color="secondary"/>
-          <q-btn flat @click="expectedTime=true; expectedTimeCard=card" round color="teal" icon="schedule" v-if="checkRole('Scrum Master')"/>
+          <q-btn flat @click="expectedTime=true; expectedTimeCard=card" round color="teal" icon="schedule" v-if="checkRole('Scrum Master') && activeSprintExists()"/>
         </q-card-actions>
       </q-card>
       <q-dialog v-model="confirmDelete">
@@ -68,13 +68,13 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-        <CardsForm :allCards="allCards" :newCard="editCards" :editCard="true" :editCardId="editCardId" @submitCard="updateCards()"></CardsForm>
+        <CardsForm :newCard="editCards" :editCard="true" :editCardId="editCardId" @submitCard="updateCards()"></CardsForm>
       </q-card>
     </q-dialog>
     <q-dialog v-model="expectedTime">
       <q-card>
         <q-card-section class="row items-center">
-          <span class="q-ml-sm text-overline text-secondary">SET EXPECTED TIME FOR THE CARD [hours]</span>
+          <span class="q-ml-sm text-overline text-secondary">SET EXPECTED TIME FOR THE CARD [points]</span>
         </q-card-section>
         <q-card-actions horizontal align="center">
           <q-card-section class="row">
@@ -94,6 +94,7 @@
 <script>
 import CardsForm from 'components/CardsForm.vue'
 import { mapGetters, mapActions } from 'vuex'
+import moment from 'moment'
 export default {
   name: 'Card',
   components: { CardsForm },
@@ -118,7 +119,6 @@ export default {
       expectedTimeCard: {},
       expectedTime: false,
       timeExpected: '',
-      projectCards: '',
       deleteCardId: '',
       editCardId: '',
       editCards: {
@@ -136,15 +136,15 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.projectCards = this.allCards
-    }, 100)
     this.user = this.getCurrentUser()
     this.project = this.getCurrentProject()
   },
   methods: {
     ...mapGetters('card', [
       'getCards'
+    ]),
+    ...mapGetters('sprint', [
+      'getSprints'
     ]),
     ...mapActions('card', [
       'postCard',
@@ -159,11 +159,11 @@ export default {
     ]),
     updateCards () {
       this.editCardData = false
-      this.$emit('updateSprintsArrays')
+      this.$emit('updateCardsArrays')
     },
     deleteFunction (cardId) {
       this.deleteCard(cardId)
-      this.$emit('updateSprintsArrays')
+      this.$emit('updateCardsArrays')
     },
     editExpectedTime (card) {
       card.expected_time = this.timeExpected
@@ -195,6 +195,30 @@ export default {
           return project
         }
       }
+    },
+    isActive (sDate, eDate) {
+      var sMoment = moment(sDate, 'DD/MM/YYYY')
+      var eMoment = moment(eDate, 'DD/MM/YYYY')
+      var today = new Date()
+      var tMoment = moment(today, 'DD/MM/YYYY')
+      if (tMoment > sMoment && tMoment < eMoment) {
+        return true
+      } else {
+        return false
+      }
+    },
+    activeSprintExists () {
+      var sprints = this.getSprints()
+      console.log(sprints)
+      for (var s in sprints) {
+        if (sprints[s].project_id === this.$props.projectId) {
+          if (this.isActive(sprints[s].start_date, sprints[s].end_date)) {
+            console.log('is active')
+            return true
+          }
+        }
+      }
+      return false
     }
   }
 }
