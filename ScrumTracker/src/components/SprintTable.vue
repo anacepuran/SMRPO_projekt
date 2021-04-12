@@ -23,34 +23,54 @@
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />
           </template>
-          <template v-slot:body="props">
-            <q-tr :props="props" :class="(isActive(props.row.start_date, props.row.end_date))?'bg-green-3':''" @click="openSprint(props.row._id)">
-              <q-td>
-                  <q-icon class="q-ma-sm" size="sm" color="secondary" name="folder_open" />
-                  <span class="q-ma-sm" style="font-size: 2vh">{{props.row.name}}</span>
+          <template v-slot:body-cell-name="propsName">
+            <q-td :props="propsName" :class="(isActive(propsName.row.start_date, propsName.row.end_date))?'bg-green-3':''"  @click="openSprint(propsName.row._id)" >
+              <q-td key = "name">
+                  <q-icon class="q-ma-sm " size="sm" color="secondary" name="folder_open" />
+                  <span class="q-ma-sm " style="font-size: 2vh">{{propsName.row.name}}</span>
               </q-td>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-start_date="propsStart">
+            <q-td :props="propsStart" :class="(isActive(propsStart.row.start_date, propsStart.row.end_date))?'bg-green-3':''">
               <q-td key="start_date">
-                <span class="q-ma-sm">{{props.row.start_date}}</span>
+                <span class="q-ma-sm">{{propsStart.row.start_date}}</span>
               </q-td>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-end_date="propsEnd">
+            <q-td :props="propsEnd" :class="(isActive(propsEnd.row.start_date, propsEnd.row.end_date))?'bg-green-3':''">
               <q-td key="end_date">
-                <span class="q-ma-sm">{{props.row.end_date}}</span>
+                <span class="q-ma-sm">{{propsEnd.row.end_date}}</span>
               </q-td>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-expected_time="propsExp">
+            <q-td :props="propsExp" :class="(isActive(propsExp.row.start_date, propsExp.row.end_date))?'bg-green-3':''">
               <q-td key="expected_time">
-                <span class="q-ma-sm">{{props.row.expected_time}}</span>
+                <span class="q-ma-sm">{{propsExp.row.expected_time}}</span>
               </q-td>
-              <q-td key="delete">
-                <q-btn v-if="isActive(props.row.start_date, props.row.end_date)===false" @click="confirmDelete=true; deleteSprintId=props.row._id" size="sm" round color="negative" icon="delete" />
+            </q-td>
+          </template>
+          <template v-slot:body-cell-delete="propsDelete">
+            <q-td :props="propsDelete" :class="(isActive(propsDelete.row.start_date, propsDelete.row.end_date))?'bg-green-3':''">
+              <q-td align="right" key="delete">
+                <q-btn class="q-ma-sm" v-if="isActive(propsDelete.row.start_date, propsDelete.row.end_date)===false" @click="confirmDelete=true; deleteSprintId=propsDelete.row._id" size="sm" round color="negative" icon="delete" />
               </q-td>
-              <q-td>
-                <q-btn flat @click="editSprint(props.row)" icon="edit" color="secondary" ></q-btn>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-edit="propsEdit">
+            <q-td  :props="propsEdit" :class="(isActive(propsEdit.row.start_date, propsEdit.row.end_date))?'bg-green-3':''">
+            <q-td key="edit">
+              <q-btn class="q-ma-sm" flat @click="editSprint(propsEdit.row)" icon="edit" color="secondary" ></q-btn>
+            </q-td>
               </q-td>
-            </q-tr>
           </template>
         </q-table>
       </div>
       <q-dialog v-model="confirmDelete">
         <q-card>
-          <q-card-section class="row items-center">
+          <q-card-section class="row items-right">
             <q-avatar icon="delete" color="primary" text-color="white" />
             <span class="q-ml-sm">Are you sure you want to delete this Sprint?</span>
           </q-card-section>
@@ -156,11 +176,11 @@ export default {
             field: row => row.name,
             sortable: true
           },
-          { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
+          { name: 'start_date', align: 'float-left', label: 'Start date', field: 'start_date' },
           { name: 'end_date', align: 'center', label: 'End date', field: 'end_date' },
-          { name: 'expected_time', align: 'right', label: 'Sprint velocity', field: 'expected_time' },
-          { name: 'delete', align: 'right', label: 'Delete sprint', field: 'delete' },
-          { name: 'edit', align: 'left', label: 'Edit sprint', field: 'edit' }
+          { name: 'expected_time', align: 'left', label: 'Sprint velocity', field: 'expected_time' },
+          { name: 'delete', align: 'left', label: 'Delete sprint', field: 'delete' },
+          { name: 'edit', align: 'center', label: 'Edit sprint', field: 'edit' }
         ]
       } else {
         return [
@@ -174,7 +194,7 @@ export default {
           },
           { name: 'start_date', align: 'center', label: 'Start date', field: 'start_date' },
           { name: 'end_date', align: 'center', label: 'End date', field: 'end_date', sortable: true },
-          { name: 'expected_time', align: 'right', label: 'Sprint velocity', field: 'expected_time' }
+          { name: 'expected_time', align: 'center', label: 'Sprint velocity', field: 'expected_time' }
         ]
       }
     }
