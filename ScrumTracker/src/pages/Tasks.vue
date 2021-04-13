@@ -52,8 +52,8 @@ export default {
       pagination: {
         rowsPerPage: 0
       },
-      allTasks: {},
-      allCards: {},
+      allTasks: [],
+      allCards: [],
       currentUser: {},
       loading: false,
       columns: [
@@ -67,11 +67,10 @@ export default {
     }
   },
   mounted () {
-    this.fetchCards()
     this.currentUser = this.getCurrentUser()
     this.allCards = this.getCards()
     this.allProjects = this.getProjects()
-    this.allTasks = this.tasksToArray()
+    this.showTasks()
   },
   methods: {
     ...mapGetters('user', [
