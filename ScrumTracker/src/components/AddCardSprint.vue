@@ -21,8 +21,8 @@
                     <div>
                       <span class="material-icons text-h4 text-secondary">update</span>
                       <span class="text-weight-bolder text-h6 text-black"> {{ card.expected_time }}</span>
-                      <span v-if="card.expected_time > 1" class="text-p text-black"> hours</span>
-                      <span v-if="card.expected_time == 1" class="text-p text-black"> hour</span>
+                      <span v-if="card.expected_time > 1" class="text-p text-black"> points</span>
+                      <span v-if="card.expected_time == 1" class="text-p text-black"> point</span>
                     </div>
                   </div>
                   <div class="col">
