@@ -17,6 +17,7 @@ export function PUSH_NEW_USER (state, newUser) {
     permissions: newUser.permissions,
     tasks: newUser.tasks,
     this_login: newUser.this_login,
+    password: newUser.password,
     last_login: newUser.last_login
   }
   state.users[newUser._id] = pushUser

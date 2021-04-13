@@ -1,13 +1,13 @@
 export function fetchCards ({ commit }) {
   this.$axios.get('cards/get')
     .then((res) => {
-      console.log(res.data)
       commit('SET_CARD', res.data)
     })
     .catch((error) => {
       console.error(error)
     })
 }
+
 export function postCard ({ commit }, payload) {
   this.$axios.post('cards/add', {
     sprint_id: payload.sprint_id,

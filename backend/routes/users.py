@@ -36,6 +36,7 @@ def user_authenticate():
                     'tasks': user['tasks'],
                     'this_login': this_login,
                     'last_login': last_login,
+                    'password': user['password'],
                     '_id': str(user['_id'])
                 }
                 user['this_login'] = this_login
@@ -83,6 +84,7 @@ def add_user():
             'username': username,
             'permissions': permissions,
             'tasks': tasks,
+            'password': password,
             'last_login': 'This user has not yet logged in.'
         }
         print(response)
@@ -143,7 +145,33 @@ def update_user():
         'permissions': permissions,
         'tasks': tasks,
         'last_login': last_login,
-        'this_login': this_login
+        'this_login': this_login,
+        'password': password
+    }
+    return response, 200
+
+
+@users_route.route('/users/updateTasks', methods=['POST'])
+def update_user_tasks():
+    print(request.json)
+    tasks = request.json['tasks']
+    user_id = request.json['_id']
+    print(user_id)
+    user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
+    print(user)
+    user['tasks'] = tasks
+    mongo.db.users.save(user)
+    response = {
+        '_id': str(user_id),
+        'name': user['name'],
+        'surname': user['surname'],
+        'email': user['email'],
+        'username': user['username'],
+        'permissions': user['permissions'],
+        'tasks': tasks,
+        'last_login': user['last_login'],
+        'this_login': user['this_login'],
+        'password': user['password']
     }
     return response, 200
 

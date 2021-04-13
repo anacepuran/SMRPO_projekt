@@ -68,6 +68,21 @@ export function updateUser ({ commit }, payload) {
     _id: payload._id
   })
     .then((res) => {
+      console.log(res.data)
+      commit('PUSH_NEW_USER', res.data)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+export function updateUserTasks ({ commit }, payload) {
+  this.$axios.post('/users/updateTasks', {
+    tasks: payload.tasks,
+    _id: payload._id
+  })
+    .then((res) => {
+      console.log(res.data)
       commit('PUSH_NEW_USER', res.data)
     })
     .catch((error) => {

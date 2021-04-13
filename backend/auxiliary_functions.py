@@ -1,12 +1,14 @@
 from flask_bcrypt import generate_password_hash, check_password_hash
 from datetime import datetime
 
+
 def hash_password(password):
     password = generate_password_hash(password).decode('utf8')
     return password
 
 
 def check_password(password, password_hash):
+    print(generate_password_hash("admin").decode('utf8'))
     return check_password_hash(password, password_hash)
 
 

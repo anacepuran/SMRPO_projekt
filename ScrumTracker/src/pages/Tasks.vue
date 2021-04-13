@@ -32,8 +32,9 @@
         <template v-slot:body-cell-acceptReject="propsAcceptReject">
           <q-td :props="propsAcceptReject">
             <div>
-              <q-btn v-if="propsAcceptReject.row.assigned !== ''" size="sm" round color="teal" icon="done" class="q-ma-xs"/>
-              <q-btn v-if="propsAcceptReject.row.assigned !== ''" size="sm" round color="red-5" icon="clear" class="q-ma-xs"/>
+              <q-btn v-if="propsAcceptReject.row.assigned === '' && propsAcceptReject.row.accepted !== true" size="sm" round color="teal" icon="done" class="q-ma-xs" @click="acceptTask(propsAcceptReject.row)"/>
+              <q-btn v-if="propsAcceptReject.row.accepted === true" size="sm" round color="red-5" icon="clear" class="q-ma-xs" @click="rejectTask(propsAcceptReject.row)"/>
+              <q-icon v-if="propsAcceptReject.row.assigned !== '' && propsAcceptReject.row.accepted !== true" size="sm" round color="grey-4" name="hide_source" />
             </div>
           </q-td>
         </template>
@@ -86,6 +87,20 @@ export default {
     ...mapActions('card', [
       'fetchCards'
     ]),
+    ...mapActions('card', [
+      'updateCard'
+    ]),
+    ...mapActions('user', [
+      'updateUserTasks',
+      'updateCurrentUser'
+    ]),
+    showTasks () {
+      this.fetchCards()
+      setTimeout(() => {
+        var cards = this.getCards()
+        this.allTasks = this.tasksToArray(cards)
+      }, 300)
+    },
     tasksToArray () {
       const taskValues = []
       setTimeout(() => {
@@ -95,10 +110,11 @@ export default {
           const currentCard = this.getCurrentCard(task.card_id)
           const currentTask = this.getCurrentTask(task.subtask_id, currentCard.subtasks)
           const cardProject = this.getCurrentProject(currentCard.project_id)
-          const cardReorder = { project: cardProject.name, card: currentCard.card_name, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
+          const cardReorder = { project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
           taskValues.push(cardReorder)
         }
       }, 100)
+      console.log(this.currentUser)
       return taskValues
     },
     getCurrentCard (card) {
@@ -121,6 +137,53 @@ export default {
           return this.allProjects[p]
         }
       }
+    },
+    getKeyOfSubtask (subtasks, subtask) {
+      let key = 0
+      for (const t in subtasks) {
+        if (subtasks[t].subtask_id === subtask) {
+          key = t
+        }
+      }
+      return key
+    },
+    acceptTask (data) {
+      console.log(data)
+      // CHANGE CARD DATA IN DB
+      const currentCard = this.getCurrentCard(data.cardId)
+      const currentSubtask = this.getCurrentTask(data.subtaskId, currentCard.subtasks)
+      const subtaskKeyCard = this.getKeyOfSubtask(currentCard.subtasks, data.subtaskId)
+      currentSubtask.assigned_user = this.currentUser._id
+      currentCard.subtasks[subtaskKeyCard] = currentSubtask
+      this.updateCard(currentCard)
+      // CHANGE USER DATA IN DB
+      const user = this.currentUser
+      const subtaskKeyUser = this.getKeyOfSubtask(user.tasks, data.subtaskId)
+      const currentSubtaskUser = this.getCurrentTask(data.subtaskId, user.tasks)
+      currentSubtaskUser.accepted = true
+      user.tasks[subtaskKeyUser] = currentSubtaskUser
+      this.updateUserTasks(user)
+      this.updateCurrentUser(user)
+      this.showTasks()
+    },
+    rejectTask (data) {
+      console.log(data)
+      // CHANGE CARD DATA IN DB
+      const currentCard = this.getCurrentCard(data.cardId)
+      const currentSubtask = this.getCurrentTask(data.subtaskId, currentCard.subtasks)
+      const subtaskKeyCard = this.getKeyOfSubtask(currentCard.subtasks, data.subtaskId)
+      currentSubtask.assigned_user = ''
+      currentCard.subtasks[subtaskKeyCard] = currentSubtask
+      this.updateCard(currentCard)
+      // CHANGE USER DATA IN DB
+      const user = this.currentUser
+      const subtaskKeyUser = this.getKeyOfSubtask(user.tasks, data.subtaskId)
+      const currentSubtaskUser = this.getCurrentTask(data.subtaskId, user.tasks)
+      currentSubtaskUser.accepted = false
+      user.tasks[subtaskKeyUser] = currentSubtaskUser
+      this.updateUserTasks(user)
+      this.updateCurrentUser(user)
+      this.showTasks()
     }
   }
 }

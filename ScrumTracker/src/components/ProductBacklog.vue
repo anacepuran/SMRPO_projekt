@@ -24,7 +24,7 @@
                 <div class="text-white text-overline">List of user stories</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id === '' && card.card_round!=='DONE'" :card="card" :projectId="projectId" @updateCardsArrays="updateCardsArrays"></Card>
+                <Card v-if="card.sprint_id === '' && card.card_round !== 'DONE'"  :allCards="allCards" :card="card" :projectId="projectId" @updateCardsArrays="updateCardsArrays"></Card>
               </div>
             </div>
             <div class="col">
@@ -63,7 +63,7 @@
 <script>
 import Card from 'components/Card.vue'
 import AddCardsForm from 'components/CardsForm.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'ProductBacklog',
   components: { Card, AddCardsForm },
@@ -72,6 +72,7 @@ export default {
       projectCards: [],
       project: {},
       addCard: false,
+      allCards: [],
       newCard: {
         _id: '',
         project_id: this.$route.params.id,
@@ -88,6 +89,7 @@ export default {
     }
   },
   mounted () {
+    this.fetchCards()
     this.project = this.getCurrentproject()
     this.projectCards = this.cardsToArray(this.getCards())
   },
@@ -106,9 +108,13 @@ export default {
     ...mapGetters('project', [
       'getProjects'
     ]),
+    ...mapActions('card', [
+      'fetchCards'
+    ]),
     updateCardsArrays () {
       setTimeout(() => {
         var cards = this.getCards()
+        console.log(cards)
         this.projectCards = this.cardsToArray(cards)
       }, 1000)
     },
@@ -119,7 +125,6 @@ export default {
           allCards.push(cards[card])
         }
       }
-      console.log(allCards)
       return allCards
     },
     checkRole (currentRole) {
