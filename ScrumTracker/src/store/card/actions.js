@@ -51,6 +51,7 @@ export function updateCard ({ commit }, payload) {
       console.error(error)
     })
 }
+
 export function deleteCard ({ commit }, id) {
   commit('DELETE_CARD', id)
   console.log(id)

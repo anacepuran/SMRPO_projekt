@@ -1,6 +1,7 @@
 export function SET_CARD (state, fetchedCards) {
   state.cards = fetchedCards
 }
+
 export function PUSH_NEW_CARD (state, newCard) {
   var pushCard = {
     _id: newCard._id,
@@ -17,6 +18,7 @@ export function PUSH_NEW_CARD (state, newCard) {
   }
   state.cards[newCard._id] = pushCard
 }
+
 export function DELETE_CARD (state, cardId) {
   delete state.cards[cardId]
 }

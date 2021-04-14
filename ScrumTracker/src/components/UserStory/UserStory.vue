@@ -2,16 +2,16 @@
   <div>
     <q-tabs v-model="tab" inline-label class="text-primary shadow-2">
       <q-tab name="details" icon="info" label="Details"/>
-      <q-tab name="subtasks" icon="task" label="Tasks"/>
+      <q-tab v-if="card.card_round !== 'DONE'" name="addSubtasks" icon="add" label="Add task"/>
       <q-space/>
     </q-tabs>
     <q-separator />
     <q-tab-panels v-model="tab" animated>
       <q-tab-panel name="details">
-        <UserStoryDetails :card="this.card"/>
+        <UserStoryDetails :card="this.card" :project="this.project"/>
       </q-tab-panel>
-      <q-tab-panel name="subtasks">
-        <UserStoryTasks :card="this.card"/>
+      <q-tab-panel name="addSubtasks">
+        <AddSubtask :card="this.card" :project="this.project" :projectUsers="this.projectUsers" @submitTask="tab='subtasks'; $emit('submit')"/>
       </q-tab-panel>
     </q-tab-panels>
   <div>
@@ -21,19 +21,26 @@
 
 <script>
 import UserStoryDetails from 'components/UserStory/UserStoryDetails.vue'
-import UserStoryTasks from 'components/UserStory/UserStoryTasks.vue'
-
+import AddSubtask from 'components/UserStory/AddSubtask.vue'
 export default {
   name: 'Card',
-  components: { UserStoryDetails, UserStoryTasks },
+  components: { UserStoryDetails, AddSubtask },
   props: {
     card: {
       type: Object
+    },
+    project: {
+      type: Object
+    },
+    projectUsers: {
+      type: Array
     }
   },
   data () {
     return {
-      tab: 'details'
+      tab: 'addSubtasks',
+      projects: {},
+      currentProject: {}
     }
   }
 }

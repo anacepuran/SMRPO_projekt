@@ -69,6 +69,7 @@ export default {
   mounted () {
     this.currentUser = this.getCurrentUser()
     this.allProjects = this.getProjects()
+    this.fetchCards()
     this.showTasks()
   },
   methods: {
@@ -93,12 +94,11 @@ export default {
       'updateCurrentUser'
     ]),
     showTasks () {
-      this.fetchCards()
       setTimeout(() => {
         var cards = this.getCards()
         this.allCards = this.getCards()
         this.allTasks = this.tasksToArray(cards)
-      }, 300)
+      }, 500)
     },
     tasksToArray () {
       const taskValues = []
@@ -112,7 +112,7 @@ export default {
           const cardReorder = { project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
           taskValues.push(cardReorder)
         }
-      }, 100)
+      }, 500)
       console.log(this.currentUser)
       return taskValues
     },
@@ -124,6 +124,8 @@ export default {
       }
     },
     getCurrentTask (task, tasks) {
+      console.log(task)
+      console.log(tasks)
       for (const t in tasks) {
         if (tasks[t].subtask_id === task) {
           return tasks[t]

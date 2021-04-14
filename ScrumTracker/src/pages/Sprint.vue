@@ -36,8 +36,8 @@
               <div class="text-white text-h6 q-ma-sm">Sprint backlog</div>
             </q-card-section>
             <div class="row">
-                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-4 col-sm-6">
-                  <CardSprint :allCards="allCards" :card="card"></CardSprint>
+                <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-6 col-sm-12">
+                  <CardSprint :allCards="allCards" :card="card" :project="project" :projectUsers="namesOfUsers"></CardSprint>
                 </div>
             </div>
           </div>
@@ -132,7 +132,8 @@ export default {
         card_round: ''
       },
       sprintId: '',
-      drag: false
+      drag: false,
+      namesOfUsers: []
     }
   },
   computed: {
@@ -146,15 +147,14 @@ export default {
     }
   },
   mounted () {
-    this.project = this.currentProject()
-    console.log(this.project)
     this.fetchCards()
     this.user = this.getCurrentUser()
     this.sprintId = this.$route.params.id
     this.sprints = this.sprint()
-    console.log(this.sprints)
     this.showCards()
     this.allProjectCards = this.projectCards()
+    this.project = this.currentProject()
+    this.namesOfUsers = this.namesOfProjectUsers()
   },
   props: {
     allCards: {
@@ -230,11 +230,8 @@ export default {
     },
     checkRole (currentRole) {
       var validRole = false
-      console.log('function')
       if (this.user !== {}) {
-        console.log('user not empty')
         for (var user in this.project.users) {
-          console.log(this.project.users[user])
           if (this.user.username === this.project.users[user].user_name) {
             if (this.project.users[user].user_role[1] === currentRole) {
               validRole = true
@@ -242,19 +239,23 @@ export default {
           }
         }
       }
-      console.log(validRole)
       return validRole
     },
     currentProject () {
       var allProjects = this.getProjects()
       for (var project in allProjects) {
-        console.log(allProjects[project]._id)
-        console.log(this.sprints.projectId)
         if (allProjects[project]._id === this.sprints.project_id) {
           return allProjects[project]
         }
       }
       return 'No project found.'
+    },
+    namesOfProjectUsers () {
+      const userNames = []
+      for (var p in this.project.users) {
+        userNames.push(this.project.users[p].user_name)
+      }
+      return userNames
     }
   }
 }

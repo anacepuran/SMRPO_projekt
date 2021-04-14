@@ -8,7 +8,8 @@ def hash_password(password):
 
 
 def check_password(password, password_hash):
-    print(generate_password_hash("admin").decode('utf8'))
+    print(generate_password_hash("bojan").decode('utf8'))
+    print(generate_password_hash("jakob").decode('utf8'))
     return check_password_hash(password, password_hash)
 
 

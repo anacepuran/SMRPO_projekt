@@ -7,13 +7,9 @@
         <q-btn size="sm" round color="primary" icon="open_in_new" class="q-ma-xs"  @click="openCard(card)"></q-btn>
       </q-card-section>
       <q-card-section>
-        <div class="row">
-          <div class="col">
-              <div><span class="material-icons text-h6 text-secondary">description</span> {{ card.description }}</div>
-          </div>
-        </div>
-        </q-card-section>
-      </q-card>
+        <UserStoryTasks :project="this.project" :card="this.card"></UserStoryTasks>
+      </q-card-section>
+    </q-card>
       <q-dialog v-model="openCurrentCard" medium>
       <q-card style="width: 800px; max-width: 80vw;">
         <q-card-section class="row bg-primary text-white">
@@ -22,7 +18,7 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup/>
         </q-card-section>
-        <UserStory :card="this.currentCard"></UserStory>
+        <UserStory :card="this.currentCard" :project="this.project" :projectUsers="this.projectUsers" @submit="openCurrentCard=false"></UserStory>
       </q-card>
     </q-dialog>
   </div>
@@ -30,12 +26,19 @@
 
 <script>
 import UserStory from 'components/UserStory/UserStory.vue'
+import UserStoryTasks from 'components/UserStory/UserStoryTasks.vue'
 export default {
   name: 'CardSprint',
-  components: { UserStory },
+  components: { UserStory, UserStoryTasks },
   props: {
     card: {
       type: Object
+    },
+    project: {
+      type: Object
+    },
+    projectUsers: {
+      type: Array
     }
   },
   data () {

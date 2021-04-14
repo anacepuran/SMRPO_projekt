@@ -1,6 +1,7 @@
 <template>
   <div>
-    {{ card.card_name }}
+    <!-- TO DO: PRIKAZI PODROBNOSTI KARTICE -->
+    PODROBNOSTI KARTICE
   </div>
 </template>
 
@@ -9,6 +10,9 @@ export default {
   name: 'UserStoryDetails',
   props: {
     card: {
+      type: Object
+    },
+    project: {
       type: Object
     }
   }
