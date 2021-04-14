@@ -68,7 +68,6 @@ export default {
   },
   mounted () {
     this.currentUser = this.getCurrentUser()
-    this.allCards = this.getCards()
     this.allProjects = this.getProjects()
     this.showTasks()
   },
@@ -97,6 +96,7 @@ export default {
       this.fetchCards()
       setTimeout(() => {
         var cards = this.getCards()
+        this.allCards = this.getCards()
         this.allTasks = this.tasksToArray(cards)
       }, 300)
     },
