@@ -13,6 +13,15 @@
         <template v-slot:loading>
           <q-inner-loading showing color="primary" />
         </template>
+        <template v-slot:body-cell-finnished="propsFinnished">
+          <q-td :props="propsFinnished">
+            <div>
+              <q-btn v-if="propsFinnished.row.finnished !== true && propsFinnished.row.accepted === true" size="sm" round color="teal" icon="done" @click="markAsDone(propsFinnished.row)"/>
+              <q-btn v-if="propsFinnished.row.finnished === true && propsFinnished.row.accepted === true" size="sm" round color="blue-10" icon="clear" @click="markAsDone(propsFinnished.row)"/>
+              <q-icon v-if="propsFinnished.row.accepted !== true" size="sm" round color="grey-4" name="hide_source" />
+            </div>
+          </q-td>
+        </template>
         <template v-slot:body-cell-accepted="propsAccepted">
           <q-td :props="propsAccepted">
             <div>
@@ -40,6 +49,19 @@
         </template>
       </q-table>
     </div>
+    <q-dialog v-model="errorMessageDialog" persistent transition-show="scale" transition-hide="scale">
+      <q-card class="bg-teal text-white text-center" style="width: 300px">
+        <q-card-section>
+          <div class="text-h6">Alert</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          {{this.errorMessage}}
+        </q-card-section>
+        <q-card-actions align="right" class="bg-white text-teal">
+          <q-btn flat label="OK" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -56,7 +78,10 @@ export default {
       allCards: [],
       currentUser: {},
       loading: false,
+      errorMessage: '',
+      errorMessageDialog: false,
       columns: [
+        { name: 'finnished', align: 'center', label: 'Mark as (not) done' },
         { name: 'project', required: true, label: 'Project name', align: 'center', field: 'project' },
         { name: 'card', required: true, align: 'center', label: 'Card name', field: 'card' },
         { name: 'task', required: true, align: 'center', label: 'Task name', field: 'task' },
@@ -109,11 +134,10 @@ export default {
           const currentCard = this.getCurrentCard(task.card_id)
           const currentTask = this.getCurrentTask(task.subtask_id, currentCard.subtasks)
           const cardProject = this.getCurrentProject(currentCard.project_id)
-          const cardReorder = { project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
+          const cardReorder = { finnished: currentTask.done, project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
           taskValues.push(cardReorder)
         }
       }, 500)
-      console.log(this.currentUser)
       return taskValues
     },
     getCurrentCard (card) {
@@ -124,8 +148,6 @@ export default {
       }
     },
     getCurrentTask (task, tasks) {
-      console.log(task)
-      console.log(tasks)
       for (const t in tasks) {
         if (tasks[t].subtask_id === task) {
           return tasks[t]
@@ -185,6 +207,20 @@ export default {
       this.updateUserTasks(user)
       this.updateCurrentUser(user)
       this.showTasks()
+    },
+    markAsDone (data) {
+      const currentCard = this.getCurrentCard(data.cardId)
+      const currentSubtask = this.getCurrentTask(data.subtaskId, currentCard.subtasks)
+      const subtaskKeyCard = this.getKeyOfSubtask(currentCard.subtasks, data.subtaskId)
+      if (currentCard.card_round !== 'DONE') {
+        currentSubtask.done = !data.finnished
+        currentCard[subtaskKeyCard] = currentSubtask
+        this.updateCard(currentCard)
+        this.showTasks()
+      } else {
+        this.errorMessage = 'You can\'t change the status of this task as the associated user stoy is already marked as finnished!'
+        this.errorMessageDialog = true
+      }
     }
   }
 }
