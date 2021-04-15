@@ -18,7 +18,7 @@
             type="number"
             min="1"
             style="width: 230px"
-            label="Time expected"
+            label="Time expected [hours]"
             lazy-rules
             :rules="[val => val !== null && val !== '' || 'Please select expected time']"/>
         <q-select
@@ -58,15 +58,16 @@ export default {
     },
     projectUsers: {
       type: Array
+    },
+    subtask: {
+      type: Object
+    },
+    edit: {
+      type: Boolean
     }
   },
   data () {
     return {
-      subtask: {
-        subtask_name: '',
-        subtask_time: '',
-        assignees: []
-      },
       error: '',
       uuid: uuid.v1(),
       submitMessage: '',
@@ -93,33 +94,36 @@ export default {
       'fetchUsers'
     ]),
     onSubmit () {
-      // ADD TASK TO CARD DB
-      const task = this.setTask()
-      this.card.subtasks.push(task)
-      this.updateCard(this.card)
-      // ADD TASK TO USERS DB
+      if (this.edit) {
 
-      // TO DO: PREVERI PODJAVANJE IMENA ?????
-      const userTask = {}
-      userTask.accepted = false
-      userTask.card_id = this.card._id
-      userTask.subtask_id = task.subtask_id
-      for (const a in task.assignees) {
-        const currentUser = this.getCurrentUser(task.assignees[a])
-        currentUser.tasks.push(userTask)
-        this.updateUserTasks(currentUser)
+      } else {
+        // ADD TASK TO CARD DB
+        const task = this.setTask()
+        this.card.subtasks.push(task)
+        this.updateCard(this.card)
+        // ADD TASK TO USERS DB
+        // TO DO: PREVERI PODJAVANJE IMENA - NU NUJNO
+        const userTask = {}
+        userTask.accepted = false
+        userTask.card_id = this.card._id
+        userTask.subtask_id = task.subtask_id
+        for (const a in task.assignees) {
+          const currentUser = this.getCurrentUser(task.assignees[a])
+          currentUser.tasks.push(userTask)
+          this.updateUserTasks(currentUser)
+        }
+        this.submitMessage = 'Task added.'
+        this.$q.notify({
+          color: 'green',
+          textColor: 'white',
+          icon: 'cloud_done',
+          message: this.submitMessage,
+          position: 'top-right',
+          timeout: 1000
+        })
+        this.onReset()
+        this.$emit('submitTask')
       }
-      this.submitMessage = 'Task added.'
-      this.$q.notify({
-        color: 'green',
-        textColor: 'white',
-        icon: 'cloud_done',
-        message: this.submitMessage,
-        position: 'top-right',
-        timeout: 1000
-      })
-      this.onReset()
-      this.$emit('submitTask')
     },
     setTask () {
       const task = {}

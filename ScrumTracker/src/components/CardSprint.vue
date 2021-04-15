@@ -7,7 +7,7 @@
         <q-btn size="sm" round color="primary" icon="open_in_new" class="q-ma-xs" @click="openCard(card)"  :class="(card.card_round==='DONE')?'bg-green-8':'bg-primary'"></q-btn>
       </q-card-section>
       <q-card-section>
-        <UserStoryTasks :project="this.project" :card="this.card"></UserStoryTasks>
+        <UserStoryTasks :project="this.project" :card="this.card" :projectUsers="this.projectUsers"></UserStoryTasks>
       </q-card-section>
     </q-card>
       <q-dialog v-model="openCurrentCard" medium>

@@ -12,7 +12,7 @@
         <UserStoryDetails :card="this.card" :project="this.project"/>
       </q-tab-panel>
       <q-tab-panel name="addSubtasks">
-        <AddSubtask :card="this.card" :project="this.project" :projectUsers="this.projectUsers" @submitTask="tab='subtasks'; $emit('submit')"/>
+        <AddSubtask :card="this.card" :project="this.project" :projectUsers="this.projectUsers" :subtask="this.subtask" :edit="false" @submitTask="tab='subtasks'; $emit('submit')"/>
       </q-tab-panel>
       <q-tab-panel name="acceptReject">
         <AcceptReject :card="this.card" :project="this.project"/>
@@ -45,7 +45,12 @@ export default {
     return {
       tab: 'details',
       projects: {},
-      currentProject: {}
+      currentProject: {},
+      subtask: {
+        subtask_name: '',
+        subtask_time: '',
+        assignees: []
+      }
     }
   }
 }

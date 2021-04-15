@@ -22,22 +22,6 @@
             </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-accepted="propsAccepted">
-          <q-td :props="propsAccepted">
-            <div>
-              <q-icon v-if="propsAccepted.row.accepted === true" size="sm" round color="teal" name="done" />
-              <q-icon v-if="propsAccepted.row.accepted !== true" size="sm" round color="red-5" name="clear" />
-            </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-assigned="propsAssigned">
-          <q-td :props="propsAssigned">
-            <div>
-              <q-icon v-if="propsAssigned.row.assigned !== ''" size="sm" round color="teal" name="done" />
-              <q-icon v-if="propsAssigned.row.assigned === ''" size="sm" round color="red-5" name="clear" />
-            </div>
-          </q-td>
-        </template>
         <template v-slot:body-cell-acceptReject="propsAcceptReject">
           <q-td :props="propsAcceptReject">
             <div>
@@ -85,8 +69,6 @@ export default {
         { name: 'project', required: true, label: 'Project name', align: 'center', field: 'project' },
         { name: 'card', required: true, align: 'center', label: 'Card name', field: 'card' },
         { name: 'task', required: true, align: 'center', label: 'Task name', field: 'task' },
-        { name: 'accepted', required: true, align: 'center', label: 'Accepted', field: 'accepted' },
-        { name: 'assigned', required: true, align: 'center', label: 'Assigned', field: 'assigned' },
         { name: 'acceptReject', align: 'center', label: 'Accept/Reject' }
       ]
     }
@@ -120,9 +102,8 @@ export default {
     ]),
     showTasks () {
       setTimeout(() => {
-        var cards = this.getCards()
         this.allCards = this.getCards()
-        this.allTasks = this.tasksToArray(cards)
+        this.allTasks = this.tasksToArray(this.allCards)
       }, 500)
     },
     tasksToArray () {
@@ -133,6 +114,7 @@ export default {
           const task = userTasks[t]
           const currentCard = this.getCurrentCard(task.card_id)
           const currentTask = this.getCurrentTask(task.subtask_id, currentCard.subtasks)
+          console.log(task.subtask_id)
           const cardProject = this.getCurrentProject(currentCard.project_id)
           const cardReorder = { finnished: currentTask.done, project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
           taskValues.push(cardReorder)
