@@ -9,27 +9,27 @@
       <q-card-section class="q-pt-sm">
         <div class="row">
           <div class="col">
-              <div><span class="material-icons text-h4 text-secondary">description</span> {{ card.description }}</div>
+              <div><span class="material-icons text-h4" :class="setColor(card.card_round)">description</span> {{ card.description }}</div>
           </div>
         </div>
         <div class="row items-center no-wrap">
           <div class="col"  v-if="card.expected_time !== ''">
             <div>
-              <span class="material-icons text-h4 text-secondary">update</span>
-              <span class="text-weight-bolder text-h6 text-black"> {{ card.expected_time }}</span>
-              <span v-if="card.expected_time > 1" class="text-p text-black"> points</span>
-              <span v-if="card.expected_time == 1" class="text-p text-black"> point</span>
+              <span class="material-icons text-h4" :class="setColor(card.card_round)">update</span>
+              <span class="text-weight-bolder text-h6"> {{ card.expected_time }}</span>
+              <span v-if="card.expected_time > 1" class="text-p"> points</span>
+              <span v-if="card.expected_time == 1" class="text-p"> point</span>
             </div>
           </div>
           <div class="col">
-            <div class="text-overline text-secondary">
-                VALUE:<span class="text-weight-bolder text-h6 text-black">{{ card.value }}</span>
+            <div class="text-overline" :class="setColor(card.card_round)">
+                VALUE:<span class="text-weight-bolder text-h6 text-black"> {{ card.value }}</span>
             </div>
           </div>
         </div>
         <div class="row items-center no-wrap">
           <div class="col">
-            <div class="text-overline text-secondary">
+            <div class="text-overline" :class="setColor(card.card_round)">
               ASSIGNED TO SPRINT:
               <span class="text-weight-bolder text-h5 text-negative" v-if="card.sprint_id === ''"><span class="material-icons">highlight_off</span></span>
               <span class="text-weight-bolder text-h5 text-negative" v-if="card.sprint_id !== ''"><span class="material-icons">done</span></span>
@@ -38,7 +38,7 @@
         </div>
         <div class="row items-center no-wrap" v-if="card.acceptance_test === ''  || card.acceptance_test.length !== 0">
           <div class="col">
-            <div class="text-overline text-secondary">ACCEPTANCE TESTS:</div>
+            <div class="text-overline" :class="setColor(card.card_round)">ACCEPTANCE TESTS:</div>
               <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
           </div>
         </div>
@@ -219,6 +219,13 @@ export default {
         }
       }
       return false
+    },
+    setColor (round) {
+      if (round === 'DONE') {
+        return 'text-green-5'
+      } else {
+        return 'text-secondary'
+      }
     }
   }
 }

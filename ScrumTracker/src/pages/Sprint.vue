@@ -252,8 +252,12 @@ export default {
     },
     namesOfProjectUsers () {
       const userNames = []
+      console.log(this.project.users)
       for (var p in this.project.users) {
-        userNames.push(this.project.users[p].user_name)
+        // ZA TASKE SE LAHKO DODAJAJO SAMO DEVELOPERJI
+        if (this.project.users[p].user_role[1].toLowerCase() !== 'scrum master') {
+          userNames.push(this.project.users[p].user_name)
+        }
       }
       return userNames
     }

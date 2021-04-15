@@ -1,10 +1,10 @@
 <template>
   <div>
     <q-card square flat bordered class="cursor-move bg-white">
-      <q-card-section class="row bg-secondary q-pa-s">
-        <span class="text-white text-overline">{{card.card_name}}</span>
+      <q-card-section class="row q-pa-s" :class="(card.card_round==='DONE')?'bg-green-4':'bg-secondary'">
+        <span class="text-white text-subtitle2" style="font-size: 17px">{{card.card_name}}</span>
         <q-space/>
-        <q-btn size="sm" round color="primary" icon="open_in_new" class="q-ma-xs"  @click="openCard(card)"></q-btn>
+        <q-btn size="sm" round color="primary" icon="open_in_new" class="q-ma-xs" @click="openCard(card)"  :class="(card.card_round==='DONE')?'bg-green-8':'bg-primary'"></q-btn>
       </q-card-section>
       <q-card-section>
         <UserStoryTasks :project="this.project" :card="this.card"></UserStoryTasks>
