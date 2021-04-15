@@ -123,9 +123,6 @@ export default {
     this.today = this.getDate()
     this.selectDuration.from = this.pushSprint.startdate
     this.selectDuration.to = this.pushSprint.enddate
-    console.log('this.selectDuration')
-    console.log(this.selectDuration)
-    this.projectId = this.$props.newSprint.project_id
     this.sdate = this.$props.newSprint.startdate
     this.edate = this.$props.newSprint.enddate
   },
@@ -147,10 +144,11 @@ export default {
     sprintsToArray (sprints) {
       var data = []
       for (var sprint in sprints) {
-        if (sprints[sprint].project_id === this.pushSprint.project_id) {
+        if (sprints[sprint]._id !== this.$route.params.id && sprints[sprint].project_id === this.pushSprint.project_id) {
           data.push(sprints[sprint])
         }
       }
+
       return data
     },
     setdates () {
@@ -161,7 +159,9 @@ export default {
       }
       for (var sprint in this.allSprints) {
         if (this.dateOverlaps(this.selectDuration.from, this.selectDuration.to, this.allSprints[sprint].start_date, this.allSprints[sprint].end_date)) {
-          this.dateError = 'Sprint duration overleaps with the ' + this.allSprints[sprint].name + ' duration.'
+          if (this.allSprints[sprint].start_date !== this.sdate) {
+            this.dateError = 'Sprint duration overleaps with the ' + this.allSprints[sprint].name + ' duration.'
+          }
         }
       }
       if (this.dateError === '') {
@@ -231,6 +231,7 @@ export default {
       this.error = ''
       this.dateError = ''
     }
+
   }
 }
 </script>
