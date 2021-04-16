@@ -6,6 +6,7 @@
         @reset="onReset">
         <q-input
             filled
+            :disable ="subtask.assigned_user !== '' && edit === true"
             v-model="subtask.subtask_name"
             label="Name"
             class="q-ma-md"
@@ -23,11 +24,11 @@
             :rules="[val => val !== null && val !== '' || 'Please select expected time']"/>
         <q-select
               filled
+              :disable ="subtask.assigned_user !== '' && edit === true"
               class="q-ma-md"
               v-model="subtask.assignees"
-              multiple
               :options="projectUsers"
-              label="Asignees"
+              label="Assignees"
               color="secondary"
               use-chips
               stack-label
@@ -35,7 +36,6 @@
         <q-space/>
         <q-card-actions horizontal align="right">
             <q-btn label="Submit" type="submit" color="primary" />
-            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
         </q-card-actions>
         <div class="q-ma-md text-center">
             <p style="color: red;" v-if="error != ''">{{error}}</p>
@@ -71,7 +71,8 @@ export default {
       error: '',
       uuid: uuid.v1(),
       submitMessage: '',
-      users: {}
+      users: {},
+      usersBeforeEdit: []
     }
   },
   mounted () {
@@ -79,6 +80,7 @@ export default {
     setTimeout(() => {
       this.users = this.getUsers()
     }, 200)
+    this.usersBeforeEdit = this.subtask.assignees
   },
   methods: {
     ...mapActions('card', [
@@ -95,41 +97,35 @@ export default {
     ]),
     onSubmit () {
       if (this.edit) {
-
+        this.editTaskFunction()
       } else {
-        // ADD TASK TO CARD DB
-        const task = this.setTask()
-        this.card.subtasks.push(task)
-        this.updateCard(this.card)
-        // ADD TASK TO USERS DB
-        // TO DO: PREVERI PODJAVANJE IMENA - NU NUJNO
-        const userTask = {}
-        userTask.accepted = false
-        userTask.card_id = this.card._id
-        userTask.subtask_id = task.subtask_id
-        for (const a in task.assignees) {
-          const currentUser = this.getCurrentUser(task.assignees[a])
-          currentUser.tasks.push(userTask)
-          this.updateUserTasks(currentUser)
-        }
-        this.submitMessage = 'Task added.'
-        this.$q.notify({
-          color: 'green',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: this.submitMessage,
-          position: 'top-right',
-          timeout: 1000
-        })
+        this.addTaskFunction()
         this.onReset()
-        this.$emit('submitTask')
       }
+      this.$q.notify({
+        color: 'green',
+        textColor: 'white',
+        icon: 'cloud_done',
+        message: this.submitMessage,
+        position: 'top-right',
+        timeout: 1000
+      })
+      this.$emit('submitTask')
     },
     setTask () {
       const task = {}
-      task.subtask_id = this.uuid
-      if (this.subtask.assignees.length === 0) {
+      if (this.edit === false) {
+        task.subtask_id = this.uuid
+      } else {
+        task.subtask_id = this.subtask.subtask_id
+      }
+      if (!this.subtask.assignees || this.subtask.assignees.length === 0) {
+        console.log(this.projectUsers)
         task.assignees = this.projectUsers
+      } else if (!Array.isArray(this.subtask.assignees)) {
+        const arr = []
+        arr.push(this.subtask.assignees)
+        task.assignees = arr
       } else {
         task.assignees = this.subtask.assignees
       }
@@ -140,7 +136,6 @@ export default {
       return task
     },
     getCurrentUser (assignee) {
-      console.log(this.users)
       for (const u in this.users) {
         if (this.users[u].username === assignee) {
           return this.users[u]
@@ -148,11 +143,94 @@ export default {
       }
       return null
     },
+    editTaskCard (task) {
+      for (const t in this.card.subtasks) {
+        if (this.card.subtasks[t].subtask_id === task.subtask_id) {
+          console.log(this.card.subtasks[t])
+          this.card.subtasks[t] = task
+        }
+      }
+    },
+    deleteTaskFromUser (user, task) {
+      for (const t in user.tasks) {
+        if (user.tasks[t].subtask_id === task.subtask_id) {
+          user.tasks.pop(user.tasks[t])
+        }
+      }
+      return user
+    },
+    editTaskFunction () {
+      // CAN EDIT EVERY FIELD
+      if (this.subtask.assigned_user === '') {
+        this.submitMessage = 'Task edited.'
+        // EDIT SPECIFIC TASK IN CARD COLLECTION
+        const task = this.setTask()
+        console.log(task)
+        this.editTaskCard(task)
+        this.updateCard(this.card)
+        // EDIT SPECIFIC TASK IN USERS COLLECTION - DELETE FIRST
+        for (const a in this.usersBeforeEdit) {
+          let currentUser = this.getCurrentUser(this.usersBeforeEdit[a])
+          console.log(this.usersBeforeEdit[a])
+          currentUser = this.deleteTaskFromUser(currentUser, task)
+          console.log(currentUser)
+          this.updateUserTasks(currentUser)
+        }
+        // EDIT SPECIFIC TASK IN USERS COLLECTION - ADD TO REASSIGNED USERS
+        setTimeout(() => {
+          const userTask = {}
+          userTask.accepted = false
+          userTask.card_id = this.card._id
+          userTask.subtask_id = task.subtask_id
+          console.log(task.assignees)
+          for (const a in task.assignees) {
+            const currentUser = this.getCurrentUser(task.assignees[a])
+            console.log(task.assignees)
+            currentUser.tasks.push(userTask)
+            console.log(currentUser)
+            this.updateUserTasks(currentUser)
+          }
+        }, 200)
+        this.usersBeforeEdit = []
+      // EDIT ONLY TIME
+      } else {
+        const task = {}
+        task.subtask_id = this.subtask.subtask_id
+        task.subtask_name = this.subtask.subtask_name
+        task.subtask_time = this.subtask.subtask_time
+        task.assignees = this.subtask.assignees
+        task.assigned_user = this.subtask.assigned_user
+        task.done = false
+        this.editTaskCard(task)
+        this.updateCard(this.card)
+      }
+    },
+    addTaskFunction () {
+      // ADD TASK TO CARD DB
+      const task = this.setTask()
+      this.card.subtasks.push(task)
+      this.updateCard(this.card)
+      // ADD TASK TO USERS DB
+      const userTask = {}
+      userTask.accepted = false
+      userTask.card_id = this.card._id
+      userTask.subtask_id = task.subtask_id
+      if (!Array.isArray(task.assignees)) {
+        const arr = []
+        arr.push(task.assignees)
+        task.assignees = arr
+      }
+      for (const a in task.assignees) {
+        const currentUser = this.getCurrentUser(task.assignees[a])
+        currentUser.tasks.push(userTask)
+        this.updateUserTasks(currentUser)
+      }
+      this.submitMessage = 'Task added.'
+    },
     onReset () {
       this.subtask.subtask_name = ''
       this.subtask.subtask_time = ''
-      this.subtask.assignees = ''
-      this.subtask.asignees = []
+      this.subtask.assignees = []
       this.subtask.subtask_id = ''
       this.error = ''
     }

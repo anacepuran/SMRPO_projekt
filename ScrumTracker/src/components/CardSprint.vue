@@ -7,7 +7,7 @@
         <q-btn size="sm" round color="primary" icon="open_in_new" class="q-ma-xs" @click="openCard(card)"  :class="(card.card_round==='DONE')?'bg-green-8':'bg-primary'"></q-btn>
       </q-card-section>
       <q-card-section>
-        <UserStoryTasks :project="this.project" :card="this.card" :projectUsers="this.projectUsers"></UserStoryTasks>
+        <UserStoryTasks :project="this.project" :card="this.card" :projectUsers="this.projectUsers" @submit="openCurrentCard=false" @refreshCards="refreshCards()"></UserStoryTasks>
       </q-card-section>
     </q-card>
       <q-dialog v-model="openCurrentCard" medium>
@@ -18,7 +18,7 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup/>
         </q-card-section>
-        <UserStory :card="this.currentCard" :project="this.project" :projectUsers="this.projectUsers" @submit="openCurrentCard=false"></UserStory>
+        <UserStory :card="this.currentCard" :project="this.project" :projectUsers="this.projectUsers" @submit="openCurrentCard=false" @refreshCards="refreshCards()"></UserStory>
       </q-card>
     </q-dialog>
   </div>
@@ -51,6 +51,9 @@ export default {
     openCard (card) {
       this.openCurrentCard = true
       this.currentCard = card
+    },
+    refreshCards () {
+      this.$emit('resetData')
     }
   }
 }

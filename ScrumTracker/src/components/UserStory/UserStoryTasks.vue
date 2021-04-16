@@ -1,34 +1,51 @@
 <template>
   <div>
-    <div>
-      <q-list separator>
-        <!-- TO DO: POPRAVI IZGLED SEZNAMA -->
-        <div v-for="(task, index) in card.subtasks" v-bind:key="index">
-          <q-item v-if="card.subtasks !== '' || card.subtasks.length !== 0" clickable v-ripple>
-            <q-item-section avatar style="display: inline">
-              <span class="text-overline q-pr-sm">
-                <span v-if="task.done === true" class="text-teal">DONE</span>
-                <span v-if="task.done === false" class="text-blue-4">ACTIVE</span>
-              </span>
-            </q-item-section>
-            <q-item-section class="text-caption" style="font-size:13px" @click="editTaskBool = true; editTaskObj = task">{{ task.subtask_name }}</q-item-section>
-            <q-item-section @click="editTaskBool = true; editTaskObj = task">
-              <span v-if="task.assigned_user !== ''"><b>{{ getUserIdentity(task.assigned_user) }}</b></span>
-              <span v-if="task.assigned_user === ''" class="text-grey-9"><b>Not assigned</b></span>
-            </q-item-section>
-            <q-item-section >
-              <span>{{ task.subtask_time }}h</span>
-            </q-item-section>
-            <q-item-section v-if="task.assigned_user === ''" side>
-              <q-btn style="font-size: 10px" round color="red-5" icon="delete" class="q-ma-xs" @click="deleteTaskBool = true; deleteTaskObj = task"/>
-            </q-item-section>
-          </q-item>
-          <q-separator/>
-        </div>
-        <q-item v-if="card.subtasks === '' || card.subtasks.length === 0">
-          <span class="text-overline" style="font-size:13px">There are no tasks in this user story.</span>
-        </q-item>
-      </q-list>
+    <div v-if="card.subtasks !== '' || card.subtasks.length !== 0">
+      <q-table
+        class="q-pa-lg"
+        :data="card.subtasks"
+        :columns="columns"
+        virtual-scroll
+        :rows-per-page-options="[0]"
+        hide-bottom
+        style="box-shadow: none">
+        <template v-slot:loading>
+          <q-inner-loading showing color="primary" />
+        </template>
+        <template v-slot:body-cell-status="propsStatus">
+          <q-td :props="propsStatus">
+            <div>
+              <span v-if="propsStatus.row.done === true" class="text-teal">DONE</span>
+              <span v-if="propsStatus.row.done !== true" class="text-blue-4">ACTIVE</span>
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-name="propsName">
+          <q-td :props="propsName" class="text-caption" style="font-size:13px">
+            {{propsName.row.subtask_name}}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-assignee="propsAssignee">
+          <q-td :props="propsAssignee">
+            <span v-if="propsAssignee.row.assigned_user !== ''"><b>{{ getUserIdentity(propsAssignee.row.assigned_user) }}</b></span>
+            <span v-if="propsAssignee.row.assigned_user === ''" class="text-grey-9"><b>Not assigned</b></span>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-time="propsTime">
+          <q-td :props="propsTime">
+            {{ propsTime.row.subtask_time }}h
+          </q-td>
+        </template>
+        <template v-slot:body-cell-delete="propsDelete">
+          <q-td :props="propsDelete">
+            <q-btn v-if="propsDelete.row.assigned_user === ''" style="font-size: 10px" round color="red-5" icon="delete" class="q-ma-xs" @click="deleteTaskBool = true; deleteTaskObj = propsDelete.row"/>
+            <q-btn style="font-size: 10px" round color="blue-5" icon="edit" class="q-ma-xs" @click="editTaskBool = true; editTaskObj = propsDelete.row"/>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+    <div v-if="card.subtasks === '' || card.subtasks.length === 0" class="text-overline text-center" style="font-size:13px">
+      There are no tasks in this user story.
     </div>
     <div>
     <q-dialog v-model="editTaskBool">
@@ -38,7 +55,7 @@
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-        <AddSubtask :card="this.card" :project="this.project" :subtask="this.editTaskObj" :edit="true" :projectUsers="this.projectUsers" @submit="editTaskFunction"/>
+        <AddSubtask :card="this.card" :project="this.project" :subtask="this.editTaskObj" :edit="true" :projectUsers="this.projectUsers" @submitTask="editTaskBool=false; $emit('submit')"/>
       </q-card>
     </q-dialog>
     <q-dialog v-model="deleteTaskBool" transition-show="scale" transition-hide="scale">
@@ -80,7 +97,14 @@ export default {
       deleteTaskBool: false,
       deleteTaskObj: {},
       editTaskObj: {},
-      allCards: {}
+      allCards: {},
+      columns: [
+        { name: 'status', align: 'center', label: 'Status' },
+        { name: 'name', required: true, label: 'Name', align: 'center', field: 'name' },
+        { name: 'assignee', required: true, align: 'center', label: 'Assignee', field: 'assignee' },
+        { name: 'time', required: true, align: 'center', label: 'Time expected', field: 'time' },
+        { name: 'delete', align: 'center', label: '' }
+      ]
     }
   },
   mounted () {
@@ -123,7 +147,6 @@ export default {
       }
     },
     deleteFunction () {
-      console.log(this.deleteTaskObj)
       // CHANGE CARD DATA IN DB
       const currentCard = this.getCurrentCard()
       const filteredSubtasks = currentCard.subtasks.filter((item) => item.subtask_id !== this.deleteTaskObj.subtask_id)
@@ -133,17 +156,16 @@ export default {
       // CHANGE USER DATA IN DB
       for (const u in this.deleteTaskObj.assignees) {
         const user = this.getUserIdentityObj(this.deleteTaskObj.assignees[u])
-        console.log(user.tasks)
         const filteredSubtasksUser = user.tasks.filter((item) => item.subtask_id !== this.deleteTaskObj.subtask_id)
         user.tasks = filteredSubtasksUser
         this.updateUserTasks(user)
         this.updateCurrentUser(user)
       }
-      this.allCards = this.getCards()
+      this.$emit('refreshCards')
     },
     editTaskFunction () {
       this.editTaskBool = false
-      this.allCards = this.getCards()
+      this.$emit('refreshCards')
     },
     getCurrentCard () {
       for (const c in this.allCards) {

@@ -37,7 +37,7 @@
             </q-card-section>
             <div class="row">
                 <div v-for="(card, index) in allSprintCards" v-bind:key="index" class="q-pa-md col-md-6 col-sm-12">
-                  <CardSprint :allCards="allCards" :card="card" :project="project" :projectUsers="namesOfUsers"></CardSprint>
+                  <CardSprint :allCards="allCards" :card="card" :project="project" :projectUsers="namesOfUsers" @resetData="showCards()"></CardSprint>
                 </div>
             </div>
           </div>
@@ -252,7 +252,6 @@ export default {
     },
     namesOfProjectUsers () {
       const userNames = []
-      console.log(this.project.users)
       for (var p in this.project.users) {
         // ZA TASKE SE LAHKO DODAJAJO SAMO DEVELOPERJI
         if (this.project.users[p].user_role[1].toLowerCase() !== 'scrum master') {
