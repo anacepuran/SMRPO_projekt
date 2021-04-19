@@ -2,7 +2,7 @@
   <div>
       <div v-for="(card, index) in allCards" v-bind:key="index">
         <div class= "row justify-around items-start ">
-        <q-card v-if="card.sprint_id === '' && card.card_round !== 'DONE' && card.expected_time !== ''" square flat bordered class="col-sm-6 col-md-4 q-pa-sm box-shadow cursor-move bg-white q-mt-xs">
+        <q-card v-if="card.sprint_id === '' && card.card_round !== 'DONE' && card.expected_time !== '' && card.priority != 'Won\'t have this time'" square flat bordered class="col-sm-6 col-md-4 q-pa-sm box-shadow cursor-move bg-white q-mt-xs">
           <q-card-section class="row bg-secondary" >
             <span class="text-white text-h6 q-ma-xxs">{{ card.card_name}}</span>
             <q-space/>

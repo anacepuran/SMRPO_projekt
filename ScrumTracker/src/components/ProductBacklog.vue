@@ -32,7 +32,7 @@
                 <div class="text-white text-overline">User stories for active Sprint</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id !== ''" :card="card" :projectId="projectId"></Card>
+                <Card v-if="card.sprint_id !== '' && card.card_round !== 'DONE'" :card="card" :projectId="projectId"></Card>
               </div>
             </div>
           </div>

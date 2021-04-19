@@ -27,7 +27,7 @@
             </div>
           </div>
         </div>
-        <div class="row items-center no-wrap">
+        <div class="row items-center no-wrap" v-if="card.card_round !== 'DONE'">
           <div class="col">
             <div class="text-overline" :class="setColor(card.card_round)">
               ASSIGNED TO SPRINT:
@@ -47,6 +47,9 @@
           <q-btn flat @click="confirmDelete=true; deleteCardId=card._id" round color="negative" icon="delete"/>
           <q-btn flat @click="editCardId=card._id; editCards=card; editCardData=true" icon="edit" color="secondary"/>
           <q-btn flat @click="expectedTime=true; expectedTimeCard=card" round color="teal" icon="schedule" v-if="checkRole('Scrum Master') && activeSprintExists()"/>
+        </q-card-actions>
+        <q-card-actions horizontal align="right" v-if="card.sprint_id !== '' && card.card_round !== 'DONE'">
+          <q-btn flat @click="acceptReject=true; acceptRejectCard=card" round color="primary" icon="grading" v-if="checkRole('Product Owner') && activeSprintExists()"/>
         </q-card-actions>
       </q-card>
       <q-dialog v-model="confirmDelete">
@@ -88,16 +91,29 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="acceptReject">
+      <q-card style="width: 800px; max-width: 80vw;">
+        <q-card-section class="row items-center bg-primary text-white">
+          <div class="text-h6"> Accept or reject user story </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section class="row items-center">
+          <AcceptReject :card="this.acceptRejectCard" :project="this.project" ></AcceptReject>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import CardsForm from 'components/CardsForm.vue'
+import AcceptReject from 'components/UserStory/AcceptReject.vue'
 import { mapGetters, mapActions } from 'vuex'
 import moment from 'moment'
 export default {
   name: 'Card',
-  components: { CardsForm },
+  components: { CardsForm, AcceptReject },
   props: {
     card: {
       type: Object
@@ -118,6 +134,8 @@ export default {
       confirmDelete: false,
       expectedTimeCard: {},
       expectedTime: false,
+      acceptReject: false,
+      acceptRejectCard: {},
       timeExpected: '',
       deleteCardId: '',
       editCardId: '',
