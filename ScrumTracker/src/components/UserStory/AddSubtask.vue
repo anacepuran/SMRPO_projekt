@@ -120,7 +120,6 @@ export default {
         task.subtask_id = this.subtask.subtask_id
       }
       if (!this.subtask.assignees || this.subtask.assignees.length === 0) {
-        console.log(this.projectUsers)
         task.assignees = this.projectUsers
       } else if (!Array.isArray(this.subtask.assignees)) {
         const arr = []
@@ -146,7 +145,6 @@ export default {
     editTaskCard (task) {
       for (const t in this.card.subtasks) {
         if (this.card.subtasks[t].subtask_id === task.subtask_id) {
-          console.log(this.card.subtasks[t])
           this.card.subtasks[t] = task
         }
       }
@@ -165,15 +163,12 @@ export default {
         this.submitMessage = 'Task edited.'
         // EDIT SPECIFIC TASK IN CARD COLLECTION
         const task = this.setTask()
-        console.log(task)
         this.editTaskCard(task)
         this.updateCard(this.card)
         // EDIT SPECIFIC TASK IN USERS COLLECTION - DELETE FIRST
         for (const a in this.usersBeforeEdit) {
           let currentUser = this.getCurrentUser(this.usersBeforeEdit[a])
-          console.log(this.usersBeforeEdit[a])
           currentUser = this.deleteTaskFromUser(currentUser, task)
-          console.log(currentUser)
           this.updateUserTasks(currentUser)
         }
         // EDIT SPECIFIC TASK IN USERS COLLECTION - ADD TO REASSIGNED USERS
@@ -182,12 +177,9 @@ export default {
           userTask.accepted = false
           userTask.card_id = this.card._id
           userTask.subtask_id = task.subtask_id
-          console.log(task.assignees)
           for (const a in task.assignees) {
             const currentUser = this.getCurrentUser(task.assignees[a])
-            console.log(task.assignees)
             currentUser.tasks.push(userTask)
-            console.log(currentUser)
             this.updateUserTasks(currentUser)
           }
         }, 200)

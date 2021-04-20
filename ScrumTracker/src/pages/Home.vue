@@ -161,6 +161,9 @@ export default {
       'editProject',
       'deleteProject'
     ]),
+    ...mapActions('card', [
+      'fetchCards'
+    ]),
     openProject (projectId) {
       this.$router.push('/project/' + projectId)
     },
@@ -230,6 +233,7 @@ export default {
     this.currentUser = this.getCurrentUser()
     this.fetchProjects()
     this.showProjects()
+    this.fetchCards()
   }
 }
 </script>

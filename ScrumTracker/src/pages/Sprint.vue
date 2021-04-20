@@ -256,7 +256,7 @@ export default {
       const userNames = []
       for (var p in this.project.users) {
         // ZA TASKE SE LAHKO DODAJAJO SAMO DEVELOPERJI
-        if (this.project.users[p].user_role[1].toLowerCase() !== 'scrum master') {
+        if (this.project.users[p].user_role[1].toLowerCase() !== 'scrum master' && this.project.users[p].user_role[1].toLowerCase() !== 'product owner') {
           userNames.push(this.project.users[p].user_name)
         }
       }

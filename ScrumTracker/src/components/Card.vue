@@ -115,7 +115,7 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section class="row items-center">
-          <AcceptReject :card="this.acceptRejectCard" :project="this.project" ></AcceptReject>
+          <AcceptReject :card="this.acceptRejectCard" :project="this.project" :projectUsers="this.projectUsers"></AcceptReject>
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -138,6 +138,9 @@ export default {
       type: String
     },
     allCards: {
+      type: Array
+    },
+    projectUsers: {
       type: Array
     }
   },
@@ -248,7 +251,6 @@ export default {
       for (var s in sprints) {
         if (sprints[s].project_id === this.$props.projectId) {
           if (this.isActive(sprints[s].start_date, sprints[s].end_date)) {
-            console.log('is active')
             return true
           }
         }

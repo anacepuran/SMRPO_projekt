@@ -203,7 +203,6 @@ export default {
         var cards = this.getCards()
         this.allCards = this.cardsToArray(cards)
       }, 1000)
-      console.log(this.allCards)
     },
     cardsToArray (cards) {
       var allCards = []
@@ -215,10 +214,9 @@ export default {
       return allCards
     }
   },
-  created () {
+  mounted () {
     this.user = this.getCurrentUser()
     this.fetchSprint()
-    this.fetchCards()
     this.projectId = this.$route.params.id
     this.showCards()
   }

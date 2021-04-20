@@ -24,7 +24,7 @@
                 <div class="text-white text-overline">List of user stories</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id === '' && card.card_round !== 'DONE'"  :allCards="allCards" :card="card" :projectId="projectId" @updateCardsArrays="updateCardsArrays"></Card>
+                <Card v-if="card.sprint_id === '' && card.card_round !== 'DONE'"  :allCards="allCards" :card="card" :projectId="projectId" :projectUsers="namesOfUsers" @updateCardsArrays="updateCardsArrays"></Card>
               </div>
             </div>
             <div class="col">
@@ -32,7 +32,7 @@
                 <div class="text-white text-overline">User stories for active Sprint</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id !== '' && card.card_round !== 'DONE'" :card="card" :projectId="projectId"></Card>
+                <Card v-if="card.sprint_id !== '' && card.card_round !== 'DONE'" :card="card" :projectId="projectId" :projectUsers="namesOfUsers"></Card>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
             <div class="text-white text-overline">FINISHED</div>
           </q-card-section>
           <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-            <Card v-if="card.card_round === 'DONE'" :card="card" :projectId="projectId"></Card>
+            <Card v-if="card.card_round === 'DONE'" :card="card" :projectId="projectId" :projectUsers="namesOfUsers"></Card>
           </div>
         </div>
       </div>
@@ -73,6 +73,7 @@ export default {
       project: {},
       addCard: false,
       allCards: [],
+      namesOfUsers: [],
       newCard: {
         _id: '',
         project_id: this.$route.params.id,
@@ -94,6 +95,9 @@ export default {
     this.fetchCards()
     this.project = this.getCurrentproject()
     this.projectCards = this.cardsToArray(this.getCards())
+    setTimeout(() => {
+      this.namesOfUsers = this.namesOfProjectUsers()
+    }, 200)
   },
   props: {
     projectId: {
@@ -116,7 +120,6 @@ export default {
     updateCardsArrays () {
       setTimeout(() => {
         var cards = this.getCards()
-        console.log(cards)
         this.projectCards = this.cardsToArray(cards)
       }, 1000)
     },
@@ -153,6 +156,16 @@ export default {
         }
       }
       return 'No project found.'
+    },
+    namesOfProjectUsers () {
+      const userNames = []
+      for (var p in this.project.users) {
+        // ZA TASKE SE LAHKO DODAJAJO SAMO DEVELOPERJI
+        if (this.project.users[p].user_role[1].toLowerCase() !== 'scrum master' && this.project.users[p].user_role[1].toLowerCase() !== 'product owner') {
+          userNames.push(this.project.users[p].user_name)
+        }
+      }
+      return userNames
     },
     onResetCard () {
       this.addCard = false
