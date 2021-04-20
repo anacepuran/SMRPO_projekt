@@ -70,6 +70,8 @@ export default {
         project_id: '',
         sprint_id: '',
         expected_time: '',
+        past_expected_time: '',
+        comment: '',
         card_name: '',
         description: '',
         acceptance_test: [],

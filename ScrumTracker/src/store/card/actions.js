@@ -12,6 +12,8 @@ export function postCard ({ commit }, payload) {
   this.$axios.post('cards/add', {
     sprint_id: payload.sprint_id,
     expected_time: payload.expected_time,
+    past_expected_time: payload.past_expected_time,
+    comment: payload.comment,
     project_id: payload.project_id,
     card_name: payload.card_name,
     description: payload.description,
@@ -36,7 +38,9 @@ export function updateCard ({ commit }, payload) {
     sprint_id: payload.sprint_id,
     card_name: payload.card_name,
     expected_time: payload.expected_time,
+    past_expected_time: payload.past_expected_time,
     project_id: payload.project_id,
+    comment: payload.comment,
     description: payload.description,
     acceptance_test: payload.acceptance_test,
     priority: payload.priority,

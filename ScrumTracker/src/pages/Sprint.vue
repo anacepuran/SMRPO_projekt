@@ -123,6 +123,8 @@ export default {
         sprint_id: '',
         project_id: '',
         expected_time: '',
+        past_expected_time: '',
+        comment: '',
         card_name: '',
         description: '',
         acceptance_test: [],
@@ -263,92 +265,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-  .button {
-    margin-top: 35px;
-  }
-
-  .flip-list-move {
-    transition: transform 0.5s;
-  }
-
-  .no-move {
-    transition: transform 0s;
-  }
-
-  .ghost {
-    opacity: 0.5;
-    background: #c8ebfb;
-  }
-
-  .list-group {
-    min-height: 100vh;
-  }
-
-  .list-group-item {
-    cursor: move;
-  }
-
-  .list-group-item i {
-    cursor: pointer;
-  }
-
-  .cursor-move {
-    cursor: move;
-  }
-
-  .border-todo {
-    background: #060036;
-  }
-
-  .to-do-title {
-    background-color: rgb(6, 0, 54);
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-  }
-
-  .border-in-progress {
-    background: #ee9835 ;
-  }
-
-  .in-progress-title {
-    background-color: #ee9835;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-  }
-
-  .border-done {
-    background: #0c3e3a;
-  }
-
-  .done-title {
-    background-color: #0c3e3a;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-  }
-
-  .to-do-title {
-    background-color: rgb(6, 0, 54);
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-
-  .bottom-right-radius {
-    border-bottom-right-radius: 4px !important;
-  }
-
-  .tag-badge {
-    border: 1px solid currentColor !important;
-    border-radius: 4px !important;
-  }
-
-  .bug {
-    background-color: red;
-  }
-
-  .box-shadow:hover {
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px rgba(0, 0, 0, 0.14),
-    0 1px 10px rgba(0, 0, 0, 0.12) !important;
-  }
-</style>

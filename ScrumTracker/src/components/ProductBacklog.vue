@@ -78,7 +78,9 @@ export default {
         project_id: this.$route.params.id,
         sprint_id: '',
         expected_time: '',
+        past_expected_time: '',
         card_name: '',
+        comment: '',
         description: '',
         acceptance_test: [],
         priority: '',
@@ -163,6 +165,8 @@ export default {
       this.newCard.subtasks = ''
       this.newCard.card_round = ''
       this.newCard.expectedtime = ''
+      this.newCard.comment = ''
+      this.newCard.past_expected_time = ''
       this.newCard.priority = ''
       this.newCard.value = ''
       this.newCard.subtasks = ''

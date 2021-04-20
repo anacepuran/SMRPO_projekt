@@ -37,6 +37,15 @@
       There are no tasks in this user story.
     </div>
     </q-card-section>
+    <q-card-section>
+      <q-input
+          filled
+          placeholder="Add comment only for rejected story"
+          type="textarea"
+          v-model="rejectedComment"
+          class="q-ml-lg q-mr-lg"
+          :rows="1"/>
+    </q-card-section>
     <q-card-actions horizontal align="right">
       <q-btn flat label="Accept" color="teal" v-close-popup @click="acceptUserStory()"/>
       <q-btn flat label="Reject" color="red-4" v-close-popup @click="rejectUserStory()"/>
@@ -58,6 +67,7 @@ export default {
   },
   data () {
     return {
+      rejectedComment: '',
       columns: [
         { name: 'status', align: 'center', label: 'Status' },
         { name: 'name', required: true, label: 'Name', align: 'center', field: 'name' },
@@ -70,15 +80,33 @@ export default {
       'updateCard'
     ]),
     acceptUserStory () {
-      this.submitMessage = 'User story marked as finnished.'
-      // EDIT SPECIFIC TASK IN CARD COLLECTION
+      this.submitMessage = 'User story accepted.'
       this.card.card_round = 'DONE'
+      this.card.comment = ''
       this.updateCard(this.card)
       console.log(this.card)
       this.$q.notify({
         color: 'green',
         textColor: 'white',
         icon: 'cloud_done',
+        message: this.submitMessage,
+        position: 'top-right',
+        timeout: 1000
+      })
+    },
+    rejectUserStory () {
+      this.submitMessage = 'User story rejected.'
+      this.card.card_round = 'PRODUCT BACKLOG'
+      this.card.sprint_id = ''
+      this.card.past_expected_time = this.card.expected_time
+      this.card.expected_time = ''
+      this.card.comment = this.rejectedComment
+      console.log(this.card)
+      this.updateCard(this.card)
+      this.$q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'cloud_off',
         message: this.submitMessage,
         position: 'top-right',
         timeout: 1000

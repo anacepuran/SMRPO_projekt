@@ -9,6 +9,8 @@ export function PUSH_NEW_CARD (state, newCard) {
     card_name: newCard.card_name,
     description: newCard.description,
     expected_time: newCard.expected_time,
+    past_expected_time: newCard.past_expected_time,
+    comment: newCard.comment,
     project_id: newCard.project_id,
     acceptance_test: newCard.acceptance_test,
     priority: newCard.priority,

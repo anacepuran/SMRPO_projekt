@@ -77,6 +77,8 @@ export default {
         id: '',
         project_id: '',
         expected_time: '',
+        past_expected_time: '',
+        comment: '',
         sprint_id: '',
         card_name: '',
         description: '',
@@ -182,6 +184,8 @@ export default {
     onReset () {
       this.addedCard._id = this.$props.newCard._id
       this.addedCard.expected_time = this.$props.newCard.expected_time
+      this.addedCard.past_expected_time = this.$props.newCard.past_expected_time
+      this.addedCard.comment = this.$props.newCard.comment
       this.addedCard.sprint_id = this.$props.newCard.sprint_id
       this.addedCard.project_id = this.$props.newCard.project_id
       this.addedCard.card_name = this.$props.newCard.card_name

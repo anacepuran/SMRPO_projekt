@@ -18,12 +18,16 @@ def add_card():
     subtasks = request.json['subtasks']
     card_round = request.json['card_round']
     expected_time = request.json['expected_time']
+    past_expected_time = request.json['past_expected_time']
+    comment = request.json['comment']
 
     card_id = mongo.db.cards.insert(
         {'sprint_id': sprint_id,
             'project_id': project_id,
             'card_name': card_name,
             'expected_time': expected_time,
+            'past_expected_time': past_expected_time,
+            'comment': comment,
             'description': description,
             'priority': priority,
             'acceptance_test': acceptance_test,
@@ -38,6 +42,8 @@ def add_card():
         'card_name': card_name,
         'description': description,
         'expected_time': expected_time,
+        'past_expected_time': past_expected_time,
+        'comment': comment,
         'priority': priority,
         'acceptance_test': acceptance_test,
         'value': value,
@@ -82,6 +88,8 @@ def update_sprint_of_card():
     card_round = request.json['card_round']
     card_name = request.json['card_name']
     expected_time = request.json['expected_time']
+    past_expected_time = request.json['past_expected_time']
+    comment = request.json['comment']
 
     current_card = mongo.db.cards.find_one({'_id': ObjectId(card_id)})
     current_card['sprint_id'] = sprint_id
@@ -94,11 +102,14 @@ def update_sprint_of_card():
     current_card['subtasks'] = subtasks
     current_card['card_round'] = card_round
     current_card['card_name'] = card_name
+    current_card['comment'] = comment
+    current_card['past_expected_time'] = past_expected_time
 
     mongo.db.cards.save(current_card)
     response = {
         '_id': str(card_id),
         'expected_time': current_card['expected_time'],
+        'past_expected_time': current_card['past_expected_time'],
         'project_id': str(project_id),
         'sprint_id': str(sprint_id),
         'card_name': current_card['card_name'],
@@ -108,6 +119,7 @@ def update_sprint_of_card():
         'value': current_card['value'],
         'subtasks': current_card['subtasks'],
         'card_round': current_card['card_round'],
-        'card_name': current_card['card_name']
+        'card_name': current_card['card_name'],
+        'comment': current_card['comment']
     }
     return response, 200

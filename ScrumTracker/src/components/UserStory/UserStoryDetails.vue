@@ -11,9 +11,17 @@
     <q-separator/>
     <q-card-section>
       <div class="row items-center no-wrap">
+        <div class="col"  v-if="card.past_expected_time !== ''">
+          <div class="text-grey">
+            <span class="material-icons text-h4 text-secondary">history</span>
+            <span class="text-weight-bolder text-h6 text-black"> {{ card.past_expected_time }}</span>
+            <span v-if="card.past_expected_time > 1" class="text-p text-black"> points</span>
+            <span v-if="card.past_expected_time == 1" class="text-p text-black"> point</span>
+          </div>
+        </div>
         <div class="col"  v-if="card.expected_time !== ''">
           <div>
-            <span class="material-icons text-h4 text-secondary">update</span>
+            <span class="material-icons text-h4 text-secondary">schedule</span>
             <span class="text-weight-bolder text-h6 text-black"> {{ card.expected_time }}</span>
             <span v-if="card.expected_time > 1" class="text-p text-black"> points</span>
             <span v-if="card.expected_time == 1" class="text-p text-black"> point</span>
@@ -35,6 +43,13 @@
         </div>
       </div>
     </q-card-section>
+    <q-separator/>
+    <div class="row items-center no-wrap q-ma-md" v-if="card.comment !== ''">
+      <div class="col text-overline">
+        <span class="text-black">PROJECT OWNER'S COMMENT: </span>
+        <span class="text-caption">{{ card.comment }}</span>
+      </div>
+    </div>
   </div>
 </template>
 

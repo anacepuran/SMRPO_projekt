@@ -13,9 +13,17 @@
           </div>
         </div>
         <div class="row items-center no-wrap">
+          <div class="col"  v-if="card.past_expected_time !== ''">
+            <div class="text-grey">
+              <span class="material-icons text-h4">history</span>
+              <span class="text-weight-bolder text-h6"> {{ card.past_expected_time }}</span>
+              <span v-if="card.past_expected_time > 1" class="text-p"> points</span>
+              <span v-if="card.past_expected_time == 1" class="text-p"> point</span>
+            </div>
+          </div>
           <div class="col"  v-if="card.expected_time !== ''">
             <div>
-              <span class="material-icons text-h4" :class="setColor(card.card_round)">update</span>
+              <span class="material-icons text-h4" :class="setColor(card.card_round)">schedule</span>
               <span class="text-weight-bolder text-h6"> {{ card.expected_time }}</span>
               <span v-if="card.expected_time > 1" class="text-p"> points</span>
               <span v-if="card.expected_time == 1" class="text-p"> point</span>
@@ -23,7 +31,8 @@
           </div>
           <div class="col">
             <div class="text-overline" :class="setColor(card.card_round)">
-                VALUE:<span class="text-weight-bolder text-h6 text-black"> {{ card.value }}</span>
+                <span :class="setColor(card.card_round)">VALUE: </span>
+                <span class="text-weight-bolder text-h6 text-black"> {{ card.value }}</span>
             </div>
           </div>
         </div>
@@ -40,6 +49,13 @@
           <div class="col">
             <div class="text-overline" :class="setColor(card.card_round)">ACCEPTANCE TESTS:</div>
               <div v-for="(test, index) in card.acceptance_test" v-bind:key="index"><span class="material-icons text-h6">tag</span>{{test}}</div>
+          </div>
+        </div>
+        <div class="row items-center no-wrap" v-if="card.comment !== ''">
+          <div class="col text-overline" :class="setColor(card.card_round)">
+            <hr class="q-ma-md" style="opacity:.5">
+            <span class="text-black">PROJECT OWNER'S COMMENT: </span>
+            <span class="text-caption">{{ card.comment }}</span>
           </div>
         </div>
         </q-card-section>
@@ -142,6 +158,8 @@ export default {
       editCards: {
         sprint_id: '',
         expected_time: '',
+        past_expected_time: '',
+        comment: '',
         project_id: '',
         card_name: '',
         description: '',
@@ -227,7 +245,6 @@ export default {
     },
     activeSprintExists () {
       var sprints = this.getSprints()
-      console.log(sprints)
       for (var s in sprints) {
         if (sprints[s].project_id === this.$props.projectId) {
           if (this.isActive(sprints[s].start_date, sprints[s].end_date)) {
