@@ -39,7 +39,7 @@
         <template v-slot:body-cell-delete="propsDelete">
           <q-td :props="propsDelete">
             <q-btn v-if="propsDelete.row.assigned_user === ''" style="font-size: 10px" round color="red-5" icon="delete" class="q-ma-xs" @click="deleteTaskBool = true; deleteTaskObj = propsDelete.row"/>
-            <q-btn style="font-size: 10px" round color="blue-5" icon="edit" class="q-ma-xs" @click="editTaskBool = true; editTaskObj = propsDelete.row"/>
+            <q-btn style="font-size: 10px" round color="blue-5" icon="edit" class="q-ma-xs" @click="editTaskObj = propsDelete.row; editTaskBool = true"/>
           </q-td>
         </template>
       </q-table>

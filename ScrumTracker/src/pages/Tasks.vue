@@ -114,7 +114,6 @@ export default {
           const task = userTasks[t]
           const currentCard = this.getCurrentCard(task.card_id)
           const currentTask = this.getCurrentTask(task.subtask_id, currentCard.subtasks)
-          console.log(task.subtask_id)
           const cardProject = this.getCurrentProject(currentCard.project_id)
           const cardReorder = { finnished: currentTask.done, project: cardProject.name, card: currentCard.card_name, subtaskId: task.subtask_id, cardId: task.card_id, task: currentTask.subtask_name, accepted: task.accepted, assigned: currentTask.assigned_user }
           taskValues.push(cardReorder)

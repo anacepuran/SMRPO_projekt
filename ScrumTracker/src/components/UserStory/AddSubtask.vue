@@ -158,6 +158,7 @@ export default {
       return user
     },
     editTaskFunction () {
+      console.log(this.subtask)
       // CAN EDIT EVERY FIELD
       if (this.subtask.assigned_user === '') {
         this.submitMessage = 'Task edited.'
@@ -182,7 +183,7 @@ export default {
             currentUser.tasks.push(userTask)
             this.updateUserTasks(currentUser)
           }
-        }, 200)
+        }, 1000)
         this.usersBeforeEdit = []
       // EDIT ONLY TIME
       } else {
