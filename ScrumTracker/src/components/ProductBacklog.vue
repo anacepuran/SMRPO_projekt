@@ -32,7 +32,7 @@
                 <div class="text-white text-overline">User stories for active Sprint</div>
               </q-card-section>
               <div v-for="(card, index) in projectCards" v-bind:key="index" class="q-pa-sm">
-                <Card v-if="card.sprint_id !== '' && card.card_round !== 'DONE'" :card="card" :projectId="projectId" :projectUsers="namesOfUsers"></Card>
+                <Card v-if="card.sprint_id !== '' && isActive(card.sprint_id) && card.card_round !== 'DONE'" :card="card" :projectId="projectId" :projectUsers="namesOfUsers"></Card>
               </div>
             </div>
           </div>
@@ -62,6 +62,7 @@
 </template>
 <script>
 import Card from 'components/Card.vue'
+import moment from 'moment'
 import AddCardsForm from 'components/CardsForm.vue'
 import { mapGetters, mapActions } from 'vuex'
 export default {
@@ -70,6 +71,7 @@ export default {
   data () {
     return {
       projectCards: [],
+      sprints: {},
       project: {},
       addCard: false,
       allCards: [],
@@ -93,7 +95,9 @@ export default {
   },
   mounted () {
     this.fetchCards()
+    this.fetchSprint()
     this.project = this.getCurrentproject()
+    this.sprints = this.getSprints()
     this.projectCards = this.cardsToArray(this.getCards())
     setTimeout(() => {
       this.namesOfUsers = this.namesOfProjectUsers()
@@ -116,6 +120,12 @@ export default {
     ]),
     ...mapActions('card', [
       'fetchCards'
+    ]),
+    ...mapGetters('sprint', [
+      'getSprints'
+    ]),
+    ...mapActions('sprint', [
+      'fetchSprint'
     ]),
     updateCardsArrays () {
       setTimeout(() => {
@@ -166,6 +176,29 @@ export default {
         }
       }
       return userNames
+    },
+    isActive (sprintId) {
+      var sprints = this.getCardsSprint(sprintId)
+      var sDate = sprints[0]
+      var eDate = sprints[1]
+      var sMoment = moment(sDate, 'DD/MM/YYYY')
+      var eMoment = moment(eDate, 'DD/MM/YYYY')
+      var today = new Date()
+      var tMoment = moment(today, 'DD/MM/YYYY')
+      if (tMoment > sMoment && tMoment < eMoment) {
+        return true
+      } else {
+        return false
+      }
+    },
+    getCardsSprint (sprintId) {
+      for (const c in this.sprints) {
+        console.log(this.sprints[c]._id)
+        console.log(sprintId)
+        if (this.sprints[c]._id === sprintId) {
+          return [this.sprints[c].start_date, this.sprints[c].end_date]
+        }
+      }
     },
     onResetCard () {
       this.addCard = false

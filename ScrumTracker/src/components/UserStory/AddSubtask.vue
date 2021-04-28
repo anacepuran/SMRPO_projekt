@@ -183,7 +183,7 @@ export default {
             currentUser.tasks.push(userTask)
             this.updateUserTasks(currentUser)
           }
-        }, 1000)
+        }, 3000)
         this.usersBeforeEdit = []
       // EDIT ONLY TIME
       } else {
